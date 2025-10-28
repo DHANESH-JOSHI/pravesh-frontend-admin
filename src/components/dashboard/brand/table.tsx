@@ -1,14 +1,15 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Funnel, X, Check } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
 import { EmptyState } from "@/components/dashboard/common/empty-state";
 import { OverlaySpinner as CommonOverlaySpinner } from "@/components/dashboard/common/overlay-spinner";
 import TableHeaderControls from "@/components/dashboard/common/table-header-controls";
+import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
@@ -28,30 +29,59 @@ import {
 import { CustomAlertDialog } from "../common/custom-alert-dialog";
 import { BrandFormDialog } from "./form-dialog";
 import { brandService } from "@/services/brand.service";
-import { Brand, CreateBrand, UpdateBrand } from "@/types/brand";
+import { Brand, CreateBrand, UpdateBrand, BrandQueryOptions } from "@/types/brand";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 export function BrandsTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterDraft, setFilterDraft] = useState<Partial<BrandQueryOptions>>({});
+  const [appliedFilters, setAppliedFilters] = useState<Partial<BrandQueryOptions>>({});
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["brands"],
-    queryFn: async () => await brandService.getAll(),
+    queryKey: ["brands", { page, limit, filters: appliedFilters, searchTerm }],
+    queryFn: async () =>
+      await brandService.getAll({
+        search: searchTerm || undefined,
+        page,
+        limit,
+        ...appliedFilters,
+      }),
   });
 
   const brands = data?.data?.brands ?? [];
-  const filteredBrands = useMemo(
-    () => {
-      return brands.filter(
-        (brand: Brand) =>
-          brand.name
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()),
-      )
-    },
-    [brands, searchTerm],
-  );
+  const totalPages = data?.data?.totalPages ?? 1;
+
+  function applyFilters() {
+    const sanitized: Partial<BrandQueryOptions> = Object.entries(filterDraft).reduce((acc, [k, v]) => {
+      if (typeof v === "string") {
+        const trimmed = v.trim();
+        if (trimmed !== "" && trimmed !== "all") (acc as Record<string, unknown>)[k] = trimmed;
+      } else {
+        (acc as Record<string, unknown>)[k] = v;
+      }
+      return acc;
+    }, {} as Record<string, unknown>);
+    setAppliedFilters(sanitized);
+    setPage(1);
+  }
+
+  function resetFilters() {
+    setFilterDraft({});
+    setAppliedFilters({});
+    setPage(1);
+    setSearchTerm("");
+  }
+
+  const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
+    if (v === undefined || v === null) return false;
+    if (typeof v === "string") return v.trim() !== "";
+    return true;
+  });
 
   const deleteMutation = useMutation({
     mutationFn: brandService.delete,
@@ -69,7 +99,7 @@ export function BrandsTable() {
   const updatemutation = useMutation({
     mutationFn: async (values: UpdateBrand) => {
       if (!editingBrand) return;
-      const data = await brandService.update(editingBrand?._id!, values);
+      const data = await brandService.update(editingBrand._id, values);
       return data.data;
     },
     onSuccess: () => {
@@ -99,17 +129,81 @@ export function BrandsTable() {
   return (
     <Card>
       <CardHeader>
-        <TableHeaderControls
-          title="Brands"
-          count={filteredBrands?.length ?? 0}
-          countNoun="brand"
-          isFetching={isFetching}
-          onRefresh={refetch}
-          onCreate={() => setIsCreateDialogOpen(true)}
-          searchTerm={searchTerm}
-          onSearch={setSearchTerm}
-          searchPlaceholder="Search brands..."
-        />
+        <div className="flex flex-col gap-2">
+          <TableHeaderControls
+            title="Brands"
+            count={brands?.length ?? 0}
+            countNoun="brand"
+            isFetching={isFetching}
+            onRefresh={refetch}
+            onCreate={() => setIsCreateDialogOpen(true)}
+            searchTerm={searchTerm}
+            onSearch={(v) => { setSearchTerm(v); setPage(1); }}
+            searchPlaceholder="Search brands..."
+            pageSize={limit}
+            onChangePageSize={(v) => { const n = Number(v); setLimit(n); setPage(1); }}
+          />
+
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label="toggle filters"
+                onClick={() => setIsFilterOpen((s) => !s)}
+                className="flex items-center gap-1"
+              >
+                <Funnel className="h-4 w-4" />
+                <span className="hidden sm:inline">Filters</span>
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasFiltersSelected && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetFilters}
+                  aria-label="reset filters"
+                  className="flex items-center gap-1"
+                >
+                  <X className="h-4 w-4 text-muted-foreground" />
+                  <span className="hidden md:inline text-sm">Reset</span>
+                </Button>
+              )}
+              <Button
+                size="sm"
+                onClick={applyFilters}
+                aria-label="apply filters"
+                className="flex items-center gap-1"
+              >
+                <Check className="h-4 w-4" />
+                <span className="hidden md:inline text-sm">Apply</span>
+              </Button>
+            </div>
+          </div>
+
+          {isFilterOpen && (
+            <div className="mt-3 p-4 bg-white dark:bg-slate-800 border rounded-lg shadow-sm">
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-muted-foreground">Deleted Status</label>
+                  <Select
+                    value={filterDraft.isDeleted}
+                    onValueChange={(v) => setFilterDraft((d) => ({ ...d, isDeleted: v }))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Active" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="false">Active</SelectItem>
+                      <SelectItem value="true">Deleted</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <div className="relative rounded-md border">
@@ -135,7 +229,7 @@ export function BrandsTable() {
                     "h-8 w-12 rounded",
                   ]}
                 />
-              ) : filteredBrands.length === 0 ? (
+              ) : brands.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="p-6">
                     <EmptyState
@@ -146,7 +240,7 @@ export function BrandsTable() {
                 </TableRow>
               ) : (
                 <>
-                  {filteredBrands.map((brand: Brand) => (
+                  {brands.map((brand: Brand) => (
                     <TableRow key={brand._id}>
                       <TableCell>
                         <Image
@@ -210,6 +304,14 @@ export function BrandsTable() {
             </TableBody>
           </Table>
         </div>
+        <PaginationControls
+          page={page}
+          totalPages={totalPages}
+          isFetching={isFetching}
+          onPrev={() => setPage((p) => Math.max(1, p - 1))}
+          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+          onPageChange={(p) => setPage(p)}
+        />
       </CardContent>
 
       <BrandFormDialog

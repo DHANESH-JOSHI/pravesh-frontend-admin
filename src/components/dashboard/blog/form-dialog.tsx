@@ -26,8 +26,6 @@ import {
   type Blog,
   type CreateBlog,
   createBlogSchema,
-  type UpdateBlog,
-  updateBlogSchema,
 } from "@/types";
 import BlogEditor from "./editor";
 import { Switch } from "@/components/ui/switch";
@@ -40,7 +38,6 @@ export function BlogFormDialog({
   initialData,
   isLoading,
 }: FormDialogProps<CreateBlog, Blog>) {
-  const isEditMode = !!initialData;
   const featuredImageRef = useRef<HTMLInputElement>(null);
   const [featuredImagePreview, setFeaturedImagePreview] = useState<string | null>(
     initialData?.featuredImage || null,

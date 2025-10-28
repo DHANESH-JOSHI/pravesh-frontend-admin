@@ -43,7 +43,7 @@ export function CategoryFormDialog({
     defaultValues: {
       title: initialData?.title || "",
       image: undefined,
-      parentCategoryId: initialData?.parentCategory?._id || "",
+      parentCategoryId: typeof initialData?.parentCategory === "string" ? initialData?.parentCategory : initialData?.parentCategory?._id || "",
     },
   });
 

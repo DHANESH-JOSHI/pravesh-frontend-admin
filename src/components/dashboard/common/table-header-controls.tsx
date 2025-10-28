@@ -1,12 +1,13 @@
 "use client";
 
 import { Plus, Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import { RefreshButton } from "@/components/dashboard/common/refresh-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PageSizeSelect from "@/components/dashboard/common/page-size-select";
-
 type Props = {
     title?: string;
     count: number;
@@ -34,6 +35,18 @@ export function TableHeaderControls({
     pageSize,
     onChangePageSize,
 }: Props) {
+    const [inputValue, setInputValue] = useState(searchTerm);
+    const debouncedOnSearch = useDebouncedCallback(onSearch, 300);
+
+    useEffect(() => {
+        setInputValue(searchTerm);
+    }, [searchTerm]);
+
+    const handleInputChange = (value: string) => {
+        setInputValue(value);
+        debouncedOnSearch(value);
+    };
+
     return (
         <>
             <div className="flex items-center justify-between">
@@ -56,8 +69,8 @@ export function TableHeaderControls({
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         placeholder={searchPlaceholder}
-                        value={searchTerm}
-                        onChange={(e) => onSearch(e.target.value)}
+                        value={inputValue}
+                        onChange={(e) => handleInputChange(e.target.value)}
                         className="pl-10"
                     />
                 </div>

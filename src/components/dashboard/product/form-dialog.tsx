@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, ChevronsUpDown, ImageIcon, Loader2, Plus, Trash, Upload } from "lucide-react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -89,9 +90,6 @@ export function ProductFormDialog({
       unit: initialData?.unit || undefined,
       minStock: initialData?.minStock || 0,
       tags: initialData?.tags || [],
-      seoTitle: initialData?.seoTitle || "",
-      seoDescription: initialData?.seoDescription || "",
-      seoKeywords: initialData?.seoKeywords || [],
       isFeatured: initialData?.isFeatured || false,
       isNewArrival: initialData?.isNewArrival || false,
     },
@@ -116,8 +114,7 @@ export function ProductFormDialog({
         features: initialData.features || [],
         specifications: initialData.specifications ? Object.entries(initialData.specifications).map(([key, value]) => ({ key, value })) : [],
         tags: initialData.tags || [],
-        seoKeywords: initialData.seoKeywords || [],
-        thumbnail: undefined, // do not reset file input
+        thumbnail: undefined,
       })
       if (initialData.thumbnail) {
         setThumbnailPreview(initialData.thumbnail)
@@ -166,7 +163,7 @@ export function ProductFormDialog({
                 const transformedData = {
                   ...data,
                   features: data.features,
-                  specifications: data.specifications ? Object.fromEntries(data.specifications.filter((s: any) => s.key).map((s: { key: string, value: string }) => [s.key, s.value])) : undefined,
+                  specifications: data.specifications ? Object.fromEntries(data.specifications.filter((s:any) => s.key).map((s: { key: string, value: string }) => [s.key, s.value])) : undefined,
                 };
                 onSubmit(transformedData as CreateProduct);
               },
@@ -176,7 +173,7 @@ export function ProductFormDialog({
           >
             <ScrollArea className="grow p-4 -mx-4">
 
-              
+
               <div className="flex flex-col gap-6 md:flex-row md:gap-8 w-full">
                 {/* Left: Fields */}
                 <div className="space-y-6 md:w-2/5">
@@ -460,54 +457,6 @@ export function ProductFormDialog({
                   <KeyValueFormArray name="specifications" title="Specifications" form={form} fields={specFields} append={appendSpec} remove={removeSpec} />
 
                   <Card className="p-4 space-y-4">
-                    <h3 className="text-lg font-medium">SEO</h3>
-                    <FormField
-                      control={form.control}
-                      name="seoTitle"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>SEO Title</FormLabel>
-                          <Input placeholder="Enter SEO title" {...field} />
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="seoDescription"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>SEO Description</FormLabel>
-                          <Textarea placeholder="Enter SEO description" {...field} />
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Controller
-                      control={form.control}
-                      name="tags"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Tags</FormLabel>
-                          <Input placeholder="Enter tags, comma separated" defaultValue={field.value.join(', ')} onChange={e => field.onChange(e.target.value.split(',').map(s => s.trim()))} />
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Controller
-                      control={form.control}
-                      name="seoKeywords"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>SEO Keywords</FormLabel>
-                          <Input placeholder="Enter keywords, comma separated" defaultValue={field.value.join(', ')} onChange={e => field.onChange(e.target.value.split(',').map(s => s.trim()))} />
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </Card>
-
-                  <Card className="p-4 space-y-4">
                     <h3 className="text-lg font-medium">Flags</h3>
                     <div className="flex flex-wrap gap-6">
                       <FormField
@@ -568,11 +517,24 @@ export function ProductFormDialog({
 
 function BrandSearchableSelect({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
+
+  const debouncedSetSearch = useDebouncedCallback((value: string) => {
+    setSearch(value);
+  }, 300);
+
+  useEffect(() => {
+    debouncedSetSearch(inputValue);
+  }, [inputValue, debouncedSetSearch]);
 
   const { data: brandsData, isLoading: isLoadingBrands } = useQuery({
     queryKey: ["brands", "search", search],
-    queryFn: () => brandService.getAll(search, 1, 20),
+    queryFn: () => brandService.getAll({
+      page:1,
+      limit:20,
+      search: search,
+    }),
     enabled: open,
   });
 
@@ -595,7 +557,7 @@ function BrandSearchableSelect({ value, onChange }: { value: string; onChange: (
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
         <Command shouldFilter={false}>
-          <CommandInput placeholder="Search brand..." value={search} onValueChange={setSearch} />
+          <CommandInput placeholder="Search brand..." value={inputValue} onValueChange={setInputValue} />
           <CommandEmpty>{isLoadingBrands ? "Searching..." : "No brand found."}</CommandEmpty>
           <CommandGroup>
             <ScrollArea className="h-48">
@@ -615,11 +577,24 @@ function BrandSearchableSelect({ value, onChange }: { value: string; onChange: (
 
 function CategorySearchableSelect({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
+
+  const debouncedSetSearch = useDebouncedCallback((value: string) => {
+    setSearch(value);
+  }, 300);
+
+  useEffect(() => {
+    debouncedSetSearch(inputValue);
+  }, [inputValue, debouncedSetSearch]);
 
   const { data: categoriesData, isLoading: isLoadingCategories } = useQuery({
     queryKey: ["categories", "search", search],
-    queryFn: () => categoryService.getAll(search, 1, 20),
+    queryFn: () => categoryService.getAll({
+      page:1,
+      limit:20,
+      search,
+    }),
     enabled: open,
   });
 
@@ -642,7 +617,7 @@ function CategorySearchableSelect({ value, onChange }: { value: string; onChange
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
         <Command shouldFilter={false}>
-          <CommandInput placeholder="Search category..." value={search} onValueChange={setSearch} />
+          <CommandInput placeholder="Search category..." value={inputValue} onValueChange={setInputValue} />
           <CommandEmpty>{isLoadingCategories ? "Searching..." : "No category found."}</CommandEmpty>
           <CommandGroup>
             <ScrollArea className="h-48">

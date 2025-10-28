@@ -1,14 +1,15 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Funnel, X, Check } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
 import { EmptyState } from "@/components/dashboard/common/empty-state";
 import { OverlaySpinner as CommonOverlaySpinner } from "@/components/dashboard/common/overlay-spinner";
 import TableHeaderControls from "@/components/dashboard/common/table-header-controls";
+import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
@@ -28,29 +29,32 @@ import {
 import { CustomAlertDialog } from "../common/custom-alert-dialog";
 import { BannerFormDialog } from "./form-dialog";
 import { bannerService } from "@/services/banner.service";
-import { Banner, CreateBanner, UpdateBanner } from "@/types/banner";
+import { Banner, CreateBanner, UpdateBanner, BannerQueryOptions } from "@/types/banner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 export function BannersTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterDraft, setFilterDraft] = useState<Partial<BannerQueryOptions>>({});
+  const [appliedFilters, setAppliedFilters] = useState<Partial<BannerQueryOptions>>({});
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["banners"],
-    queryFn: async () => await bannerService.getAllBanners(),
+    queryKey: ["banners", { page, limit, filters: appliedFilters, searchTerm }],
+    queryFn: async () =>
+      await bannerService.getAllBanners({
+        page,
+        limit,
+        search: searchTerm || undefined,
+        ...appliedFilters,
+      }),
   });
 
-  const banners = data?.data ?? [];
-  const filteredBanners = useMemo(
-    () =>
-      banners.filter(
-        (banner: Banner) =>
-          banner.title
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()),
-      ),
-    [banners, searchTerm],
-  );
+  const banners = data?.data?.banners ?? [];
+  const totalPages = data?.data?.totalPages ?? 1;
 
   const deleteMutation = useMutation({
     mutationFn: bannerService.delete,
@@ -68,7 +72,7 @@ export function BannersTable() {
   const updatemutation = useMutation({
     mutationFn: async (values: UpdateBanner) => {
       if (!editingBanner) return;
-      const data = await bannerService.update(editingBanner?._id!, values);
+      const data = await bannerService.update(editingBanner._id, values);
       return data.data;
     },
     onSuccess: () => {
@@ -95,20 +99,134 @@ export function BannersTable() {
     },
   });
 
+  function applyFilters() {
+    const sanitized: Partial<BannerQueryOptions> = Object.entries(filterDraft).reduce((acc, [k, v]) => {
+      if (typeof v === "string") {
+        const trimmed = v.trim();
+        if (trimmed !== "" && trimmed !== "all") (acc as Record<string, unknown>)[k] = trimmed;
+      } else {
+        (acc as Record<string, unknown>)[k] = v;
+      }
+      return acc;
+    }, {} as Record<string, unknown>);
+    setAppliedFilters(sanitized);
+    setPage(1);
+  }
+
+  function resetFilters() {
+    setFilterDraft({});
+    setAppliedFilters({});
+    setPage(1);
+    setSearchTerm("");
+  }
+
+  const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
+    if (v === undefined || v === null) return false;
+    if (typeof v === "string") return v.trim() !== "";
+    return true;
+  });
+
   return (
     <Card>
       <CardHeader>
-        <TableHeaderControls
-          title="Banners"
-          count={filteredBanners?.length ?? 0}
-          countNoun="banner"
-          isFetching={isFetching}
-          onRefresh={refetch}
-          onCreate={() => setIsCreateDialogOpen(true)}
-          searchTerm={searchTerm}
-          onSearch={setSearchTerm}
-          searchPlaceholder="Search banners..."
-        />
+        <div className="flex flex-col gap-2">
+          <TableHeaderControls
+            title="Banners"
+            count={banners?.length ?? 0}
+            countNoun="banner"
+            isFetching={isFetching}
+            onRefresh={refetch}
+            onCreate={() => setIsCreateDialogOpen(true)}
+            searchTerm={searchTerm}
+            onSearch={setSearchTerm}
+            searchPlaceholder="Search banners..."
+            pageSize={limit}
+            onChangePageSize={(v) => {
+              const n = Number(v);
+              setLimit(n);
+              setPage(1);
+            }}
+          />
+
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label="toggle filters"
+                onClick={() => setIsFilterOpen((s) => !s)}
+                className="flex items-center gap-1"
+              >
+                <Funnel className="h-4 w-4" />
+                <span className="hidden sm:inline">Filters</span>
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasFiltersSelected && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetFilters}
+                  aria-label="reset filters"
+                  className="flex items-center gap-1"
+                >
+                  <X className="h-4 w-4 text-muted-foreground" />
+                  <span className="hidden md:inline text-sm">Reset</span>
+                </Button>
+              )}
+              <Button
+                size="sm"
+                onClick={applyFilters}
+                aria-label="apply filters"
+                className="flex items-center gap-1"
+              >
+                <Check className="h-4 w-4" />
+                <span className="hidden md:inline text-sm">Apply</span>
+              </Button>
+            </div>
+          </div>
+
+          {isFilterOpen && (
+            <div className="mt-3 p-4 bg-white dark:bg-slate-800 border rounded-lg shadow-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-muted-foreground">Type</label>
+                  <Select
+                    value={filterDraft.type || ""}
+                    onValueChange={(v) => setFilterDraft((d) => ({ ...d, type: v === "all" ? undefined : v }))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="All" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="hero">Hero</SelectItem>
+                      <SelectItem value="featured">Featured</SelectItem>
+                      <SelectItem value="category">Category</SelectItem>
+                      <SelectItem value="promotion">Promotion</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-muted-foreground">Deleted Status</label>
+                  <Select
+                    value={filterDraft.isDeleted || ""}
+                    onValueChange={(v) => setFilterDraft((d) => ({ ...d, isDeleted: v }))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Active" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="false">Active</SelectItem>
+                      <SelectItem value="true">Deleted</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <div className="relative rounded-md border">
@@ -136,7 +254,7 @@ export function BannersTable() {
                     "h-8 w-12 rounded",
                   ]}
                 />
-              ) : filteredBanners.length === 0 ? (
+              ) : banners.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="p-6">
                     <EmptyState
@@ -147,7 +265,7 @@ export function BannersTable() {
                 </TableRow>
               ) : (
                 <>
-                  {filteredBanners.map((banner: Banner) => (
+                  {banners.map((banner: Banner) => (
                     <TableRow key={banner._id}>
                       <TableCell>
                         <Image
@@ -217,6 +335,14 @@ export function BannersTable() {
             </TableBody>
           </Table>
         </div>
+        <PaginationControls
+          page={page}
+          totalPages={totalPages}
+          isFetching={isFetching}
+          onPrev={() => setPage((p) => Math.max(1, p - 1))}
+          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+          onPageChange={(p) => setPage(p)}
+        />
       </CardContent>
 
       <BannerFormDialog

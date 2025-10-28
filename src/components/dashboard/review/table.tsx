@@ -1,9 +1,8 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
-import Image from "next/image";
-import { useMemo, useState } from "react";
+import { MoreHorizontal, Trash2, Eye, Funnel, X, Check } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
 import { EmptyState } from "@/components/dashboard/common/empty-state";
@@ -27,29 +26,34 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CustomAlertDialog } from "../common/custom-alert-dialog";
+import { ReviewViewDialog } from "./view-dialog";
 import { reviewService } from "@/services/review.service";
-import { Review } from "@/types/review";
+import { Review, ReviewQueryOptions } from "@/types/review";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Product, User } from "@/types";
 export function ReviewsTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [viewingReview, setViewingReview] = useState<Review | null>(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterDraft, setFilterDraft] = useState<Partial<ReviewQueryOptions>>({});
+  const [appliedFilters, setAppliedFilters] = useState<Partial<ReviewQueryOptions>>({});
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["reviews", { page, limit }],
-    queryFn: async () => await reviewService.getAllReviews(page, limit),
+    queryKey: ["reviews", { page, limit, filters: appliedFilters, searchTerm }],
+    queryFn: async () =>
+      await reviewService.getAllReviews({
+        page,
+        limit,
+        search: searchTerm || undefined,
+        ...appliedFilters,
+      }),
   });
 
   const reviews = data?.data?.reviews ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
-  const filteredReviews = useMemo(
-    () =>
-      reviews.filter(
-        (review: Review) =>
-          review.comment?.toLowerCase().includes(searchTerm.toLowerCase()),
-      ),
-    [reviews, searchTerm],
-  );
 
   const deleteMutation = useMutation({
     mutationFn: reviewService.delete,
@@ -64,27 +68,140 @@ export function ReviewsTable() {
     },
   });
 
+  function applyFilters() {
+    const sanitized: Partial<ReviewQueryOptions> = Object.entries(filterDraft).reduce((acc, [k, v]) => {
+      if (typeof v === "string") {
+        const trimmed = v.trim();
+        if (trimmed !== "" && trimmed !== "all") (acc as Record<string, unknown>)[k] = trimmed;
+      } else {
+        (acc as Record<string, unknown>)[k] = v;
+      }
+      return acc;
+    }, {} as Record<string, unknown>);
+    setAppliedFilters(sanitized);
+    setPage(1);
+  }
 
+  function resetFilters() {
+    setFilterDraft({});
+    setAppliedFilters({});
+    setPage(1);
+    setSearchTerm("");
+  }
+
+  const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
+    if (v === undefined || v === null) return false;
+    if (typeof v === "string") return v.trim() !== "";
+    return true;
+  });
 
   return (
     <Card>
       <CardHeader>
-        <TableHeaderControls
-          title="Reviews"
-          count={filteredReviews?.length ?? 0}
-          countNoun="review"
-          isFetching={isFetching}
-          onRefresh={refetch}
-          searchTerm={searchTerm}
-          onSearch={setSearchTerm}
-          searchPlaceholder="Search reviews..."
-          pageSize={limit}
-          onChangePageSize={(v) => {
-            const n = Number(v);
-            setLimit(n);
-            setPage(1);
-          }}
-        />
+        <div className="flex flex-col gap-2">
+          <TableHeaderControls
+            title="Reviews"
+            count={reviews?.length ?? 0}
+            countNoun="review"
+            isFetching={isFetching}
+            onRefresh={refetch}
+            searchTerm={searchTerm}
+            onSearch={setSearchTerm}
+            searchPlaceholder="Search reviews..."
+            pageSize={limit}
+            onChangePageSize={(v) => {
+              const n = Number(v);
+              setLimit(n);
+              setPage(1);
+            }}
+          />
+
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label="toggle filters"
+                onClick={() => setIsFilterOpen((s) => !s)}
+                className="flex items-center gap-1"
+              >
+                <Funnel className="h-4 w-4" />
+                <span className="hidden sm:inline">Filters</span>
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasFiltersSelected && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetFilters}
+                  aria-label="reset filters"
+                  className="flex items-center gap-1"
+                >
+                  <X className="h-4 w-4 text-muted-foreground" />
+                  <span className="hidden md:inline text-sm">Reset</span>
+                </Button>
+              )}
+              <Button
+                size="sm"
+                onClick={applyFilters}
+                aria-label="apply filters"
+                className="flex items-center gap-1"
+              >
+                <Check className="h-4 w-4" />
+                <span className="hidden md:inline text-sm">Apply</span>
+              </Button>
+            </div>
+          </div>
+
+          {isFilterOpen && (
+            <div className="mt-3 p-4 bg-white dark:bg-slate-800 border rounded-lg shadow-sm">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-muted-foreground">Rating</label>
+                  <Select
+                    value={filterDraft.rating?.toString() || ""}
+                    onValueChange={(v) => setFilterDraft((d) => ({ ...d, rating: v === "all" ? undefined : Number(v) }))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="All" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="5">5 stars</SelectItem>
+                      <SelectItem value="4">4 stars</SelectItem>
+                      <SelectItem value="3">3 stars</SelectItem>
+                      <SelectItem value="2">2 stars</SelectItem>
+                      <SelectItem value="1">1 star</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-muted-foreground">User</label>
+                  <input
+                    type="text"
+                    placeholder="User ID or name"
+                    value={filterDraft.user || ""}
+                    onChange={(e) => setFilterDraft((d) => ({ ...d, user: e.target.value || undefined }))}
+                    className="w-full px-3 py-2 text-sm border rounded-md"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-muted-foreground">Product</label>
+                  <input
+                    type="text"
+                    placeholder="Product ID or name"
+                    value={filterDraft.product || ""}
+                    onChange={(e) => setFilterDraft((d) => ({ ...d, product: e.target.value || undefined }))}
+                    className="w-full px-3 py-2 text-sm border rounded-md"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <div className="relative rounded-md border">
@@ -112,7 +229,7 @@ export function ReviewsTable() {
                     "h-8 w-12 rounded",
                   ]}
                 />
-              ) : filteredReviews.length === 0 ? (
+              ) : reviews.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="p-6">
                     <EmptyState
@@ -123,13 +240,13 @@ export function ReviewsTable() {
                 </TableRow>
               ) : (
                 <>
-                  {filteredReviews.map((review: Review) => (
+                  {reviews.map((review: Review) => (
                     <TableRow key={review._id}>
                       <TableCell className="font-medium">
-                        {typeof review.user === 'object' ? review.user.name : review.user}
+                        {(review.user as User).name}
                       </TableCell>
                       <TableCell className="font-medium">
-                        {typeof review.product === 'object' ? review.product.name : review.product}
+                        {(review.product as Product).name}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {review.rating}/5
@@ -154,6 +271,13 @@ export function ReviewsTable() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              className="gap-2"
+                              onClick={() => setViewingReview(review)}
+                            >
+                              <Eye className="h-4 w-4" />
+                              View
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-2 text-destructive"
                               onClick={() => {
@@ -192,6 +316,12 @@ export function ReviewsTable() {
           if (pendingDeleteId)
             deleteMutation.mutate(pendingDeleteId);
         }}
+      />
+
+      <ReviewViewDialog
+        review={viewingReview}
+        open={!!viewingReview}
+        onOpenChange={(open) => !open && setViewingReview(null)}
       />
     </Card>
   );

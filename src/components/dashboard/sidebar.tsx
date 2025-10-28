@@ -8,20 +8,25 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { Newspaper, Image as ImageIcon, Building2, Users, HelpCircle, Star } from "lucide-react"
+import { FileText, Image, Building2, Users, FolderOpen, Box, Star, MapPin, Wallet, ShoppingCart, Receipt, LayoutDashboard } from "lucide-react"
 import { NavUser } from "./nav-user"
 import { Link } from "next-view-transitions"
 import { User } from "@/types"
 const items = [
   {
-    title: "Blogs",
-    url: "/blogs",
-    icon: Newspaper,
+    title: "Addresses",
+    url: "/addresses",
+    icon: MapPin,
   },
   {
     title: "Banners",
     url: "/banners",
-    icon: HelpCircle,
+    icon: Image,
+  },
+  {
+    title: "Blogs",
+    url: "/blogs",
+    icon: FileText,
   },
   {
     title: "Brands",
@@ -29,19 +34,24 @@ const items = [
     icon: Building2,
   },
   {
+    title: "Carts",
+    url: "/carts",
+    icon: ShoppingCart,
+  },
+  {
     title: "Categories",
     url: "/categories",
-    icon: ImageIcon,
+    icon: FolderOpen,
   },
   {
     title: "Orders",
     url: "/orders",
-    icon: Star,
+    icon: Receipt,
   },
   {
     title: "Products",
     url: "/products",
-    icon: ImageIcon,
+    icon: Box,
   },
   {
     title: "Reviews",
@@ -52,6 +62,11 @@ const items = [
     title: "Users",
     url: "/users",
     icon: Users,
+  },
+  {
+    title: "Wallets",
+    url: "/wallets",
+    icon: Wallet,
   }
 ]
 export const AppSidebar = ({ user }: { user: User }) => {
@@ -63,7 +78,7 @@ export const AppSidebar = ({ user }: { user: User }) => {
             <SidebarMenuButton asChild size="lg" className="data-[slot=sidebar-menu-button]:p-3!">
               <Link href="/" className="flex items-center gap-3">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Building2 className="size-4" />
+                  <LayoutDashboard className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold text-base">Pravesh</span>
@@ -96,8 +111,8 @@ export const AppSidebar = ({ user }: { user: User }) => {
       <SidebarFooter className="border-t border-sidebar-border p-2">
         <NavUser
           user={{
-            name: user?.name!,
-            email: user?.email!,
+            name: user.name,
+            email: user.email || "",
             avatar: "https://i.pravatar.cc/150?img=3",
           }}
         />

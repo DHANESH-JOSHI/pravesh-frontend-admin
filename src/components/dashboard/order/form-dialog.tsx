@@ -1,8 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronsUpDown, ImageIcon, Loader2, Trash, Upload } from "lucide-react";
+import { Check, ChevronsUpDown, ImageIcon, Loader2, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import { useFieldArray, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,7 +29,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
-} from "@/components/ui/command"; 
+} from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import {
   AdminUpdateOrder,
@@ -54,8 +55,8 @@ export function OrderFormDialog({
     resolver: zodResolver(adminUpdateOrderSchema),
     defaultValues: {
       feedback: initialData?.feedback || "",
-      status: initialData?.status || "" as any,
-      items: initialData?.items || [] as any,
+      status: initialData?.status,
+      items: initialData?.items,
     },
   });
 
@@ -69,8 +70,8 @@ export function OrderFormDialog({
   useEffect(() => {
     form.reset({
       feedback: initialData?.feedback || "",
-      status: initialData?.status || "" as any,
-      items: initialData?.items || [] as any,
+      status: initialData?.status,
+      items: initialData?.items,
     });
     setImagePreview(initialData?.image || initialData?.image || null);
   }, [initialData, form]);
@@ -144,8 +145,6 @@ export function OrderFormDialog({
               <div className="flex items-center gap-4">
                 <div className="w-28 h-28 rounded-md border flex items-center justify-center overflow-hidden bg-muted">
                   {imagePreview ? (
-                    // using img tag for preview simplicity
-                    // if you prefer next/image, provide width/height
                     <img
                       src={imagePreview}
                       alt="preview"
@@ -224,7 +223,7 @@ export function OrderFormDialog({
                 variant="outline"
                 size="sm"
                 className="mt-2"
-                onClick={() => append({ product: "", quantity: 1 } as any)}
+                onClick={() => append({ product: "", quantity: 1, price: 0 })}
               >
                 Add Item
               </Button>
@@ -251,7 +250,16 @@ export function OrderFormDialog({
 
 function ProductSearchableSelect({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
+
+  const debouncedSetSearch = useDebouncedCallback((value: string) => {
+    setSearch(value);
+  }, 300);
+
+  useEffect(() => {
+    debouncedSetSearch(inputValue);
+  }, [inputValue, debouncedSetSearch]);
 
   const { data: productsData, isLoading: isLoadingProducts } = useQuery({
     queryKey: ["products", "search", search],
@@ -262,7 +270,7 @@ function ProductSearchableSelect({ value, onChange }: { value: string; onChange:
   const { data: selectedProductData } = useQuery({
     queryKey: ["products", value],
     queryFn: () => productService.getById(value),
-    enabled: !!value && !open, // Fetch only when there's a value and the popover is closed
+    enabled: !!value && !open,
   });
 
   const products: Product[] = productsData?.data?.products ?? [];
@@ -288,8 +296,8 @@ function ProductSearchableSelect({ value, onChange }: { value: string; onChange:
         <Command shouldFilter={false}>
           <CommandInput
             placeholder="Search product..."
-            value={search}
-            onValueChange={setSearch}
+            value={inputValue}
+            onValueChange={setInputValue}
           />
           <CommandEmpty>
             {isLoadingProducts ? "Searching..." : "No product found."}
