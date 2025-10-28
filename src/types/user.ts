@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PaginatedData } from ".";
 
 export const userSchema = z.object({
   _id: z.string(),
@@ -13,3 +14,17 @@ export const userSchema = z.object({
 });
 
 export type User = z.infer<typeof userSchema>;
+
+
+export interface PaginatedUsers extends PaginatedData {
+  users: User[]
+}
+
+export interface UserQueryOptions {
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: string;
+  status?: string;
+  isDeleted?: string;
+}

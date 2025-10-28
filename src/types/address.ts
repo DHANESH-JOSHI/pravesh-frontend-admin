@@ -1,25 +1,7 @@
 import { z } from "zod";
-import { userSchema } from "./user"; // assuming you have a Zod userSchema
+import { User } from "./user"; // assuming you have a Zod userSchema
+import { PaginatedData } from ".";
 
-// ✅ Address Schema
-export const addressSchema = z.object({
-  _id: z.string(),
-  user: z.union([z.string(), userSchema.partial()]), // string or partial user
-  fullname: z.string(),
-  phone: z.string(),
-  line1: z.string(),
-  line2: z.string().optional(),
-  landmark: z.string().optional(),
-  city: z.string(),
-  state: z.string(),
-  postalCode: z.string(),
-  country: z.string(),
-  isDeleted: z.boolean(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
-
-// ✅ CreateAddress Schema
 export const createAddressSchema = z.object({
   fullname: z.string(),
   phone: z.string(),
@@ -32,10 +14,36 @@ export const createAddressSchema = z.object({
   country: z.string(),
 });
 
-// ✅ UpdateAddress Schema
 export const updateAddressSchema = createAddressSchema.partial();
 
-// ✅ Export Types
-export type Address = z.infer<typeof addressSchema>;
+export type Address = {
+  _id: string;
+  user: string | Partial<User>;
+  fullname: string;
+  phone: string;
+  line1: string;
+  line2?: string;
+  landmark?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
 export type CreateAddress = z.infer<typeof createAddressSchema>;
 export type UpdateAddress = z.infer<typeof updateAddressSchema>;
+
+export interface PaginatedAddresses extends PaginatedData {
+  addresses: Address[];
+}
+
+
+export interface AddressQueryOptions {
+  page?: number;
+  limit?: number;
+  search?: string;
+  user?: string;
+  isDeleted?: boolean;
+}

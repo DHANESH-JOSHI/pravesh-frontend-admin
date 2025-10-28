@@ -1,39 +1,25 @@
 import { z } from "zod";
+import { User } from "./user";
+import { PaginatedData } from ".";
 
-/* -----------------------------
-   ENUM: TransactionType
------------------------------ */
 export const transactionTypeEnum = z.enum(["credit", "debit"]);
 export type TransactionType = z.infer<typeof transactionTypeEnum>;
 
-/* -----------------------------
-   SCHEMA: WalletTransaction
------------------------------ */
-export const walletTransactionSchema = z.object({
-  amount: z.number().positive(),
-  description: z.string().optional(),
-  createdAt: z.string(),
-});
+type WalletTransaction = {
+  amount: number;
+  description: string;
+  createdAt: Date;
+};
 
-export type WalletTransaction = z.infer<typeof walletTransactionSchema>;
+export type Wallet = {
+  _id: string;
+  user: string | Partial<User>;
+  balance: number;
+  transactions: WalletTransaction[];
+  createdAt: string;
+  updatedAt: string;
+};
 
-/* -----------------------------
-   SCHEMA: Wallet
------------------------------ */
-export const walletSchema = z.object({
-  _id: z.string(),
-  user: z.string(),
-  balance: z.number().nonnegative(),
-  transactions: z.array(walletTransactionSchema).optional(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
-
-export type Wallet = z.infer<typeof walletSchema>;
-
-/* -----------------------------
-   SCHEMA: AddFunds
------------------------------ */
 export const addFundsSchema = z.object({
   userId: z.string(),
   amount: z.number().positive(),
@@ -41,3 +27,13 @@ export const addFundsSchema = z.object({
 });
 
 export type AddFunds = z.infer<typeof addFundsSchema>;
+
+export type WalletQueryOptions = {
+  user?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedWallets extends PaginatedData {
+  wallets: Wallet[];
+}
