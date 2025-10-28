@@ -1,0 +1,282 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { MoreHorizontal, Eye, Funnel, X, Check } from "lucide-react";
+import { useState } from "react";
+import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
+import { EmptyState } from "@/components/dashboard/common/empty-state";
+import { OverlaySpinner as CommonOverlaySpinner } from "@/components/dashboard/common/overlay-spinner";
+import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
+import TableHeaderControls from "@/components/dashboard/common/table-header-controls";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { AddressViewDialog } from "./view-dialog";
+import { addressService } from "@/services/address.service";
+import { Address, AddressQueryOptions } from "@/types/address";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+export function AddressesTable() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [viewingAddress, setViewingAddress] = useState<Address | null>(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterDraft, setFilterDraft] = useState<Partial<AddressQueryOptions>>({});
+  const [appliedFilters, setAppliedFilters] = useState<Partial<AddressQueryOptions>>({});
+
+  const { data, isLoading, isFetching, refetch } = useQuery({
+    queryKey: ["addresses", { page, limit, filters: appliedFilters, searchTerm }],
+    queryFn: async () =>
+      await addressService.getAllAddresses({
+        search: searchTerm || undefined,
+        page,
+        limit,
+        ...appliedFilters,
+      }),
+  });
+
+  const addresses = data?.data?.addresses ?? [];
+  const totalPages = data?.data?.totalPages ?? 1;
+
+  function applyFilters() {
+    const sanitized: Partial<AddressQueryOptions> = Object.entries(filterDraft).reduce((acc, [k, v]) => {
+      if (typeof v === "string") {
+        const trimmed = v.trim();
+        if (trimmed !== "" && trimmed !== "all") (acc as Record<string, unknown>)[k] = trimmed;
+      } else {
+        (acc as Record<string, unknown>)[k] = v;
+      }
+      return acc;
+    }, {} as Record<string, unknown>);
+    setAppliedFilters(sanitized);
+    setPage(1);
+  }
+
+  function resetFilters() {
+    setFilterDraft({});
+    setAppliedFilters({});
+    setPage(1);
+    setSearchTerm("");
+  }
+
+  const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
+    if (v === undefined || v === null) return false;
+    if (typeof v === "string") return v.trim() !== "";
+    return true;
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex flex-col gap-2">
+          <TableHeaderControls
+            title="Addresses"
+            count={addresses?.length ?? 0}
+            countNoun="address"
+            isFetching={isFetching}
+            onRefresh={refetch}
+            searchTerm={searchTerm}
+            onSearch={setSearchTerm}
+            searchPlaceholder="Search addresses..."
+            pageSize={limit}
+            onChangePageSize={(v) => {
+              const n = Number(v);
+              setLimit(n);
+              setPage(1);
+            }}
+          />
+
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label="toggle filters"
+                onClick={() => setIsFilterOpen((s) => !s)}
+                className="flex items-center gap-1"
+              >
+                <Funnel className="h-4 w-4" />
+                <span className="hidden sm:inline">Filters</span>
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasFiltersSelected && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetFilters}
+                  aria-label="reset filters"
+                  className="flex items-center gap-1"
+                >
+                  <X className="h-4 w-4 text-muted-foreground" />
+                  <span className="hidden md:inline text-sm">Reset</span>
+                </Button>
+              )}
+              <Button
+                size="sm"
+                onClick={applyFilters}
+                aria-label="apply filters"
+                className="flex items-center gap-1"
+              >
+                <Check className="h-4 w-4" />
+                <span className="hidden md:inline text-sm">Apply</span>
+              </Button>
+            </div>
+          </div>
+
+          {isFilterOpen && (
+            <div className="mt-3 p-4 bg-white dark:bg-slate-800 border rounded-lg shadow-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-muted-foreground">User</label>
+                  <input
+                    type="text"
+                    placeholder="User ID or name"
+                    value={filterDraft.user || ""}
+                    onChange={(e) => setFilterDraft((d) => ({ ...d, user: e.target.value || undefined }))}
+                    className="w-full px-3 py-2 text-sm border rounded-md"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-xs font-medium text-muted-foreground">Deleted Status</label>
+                  <Select
+                    value={filterDraft.isDeleted?.toString() || ""}
+                    onValueChange={(v) => setFilterDraft((d) => ({ ...d, isDeleted:v === "true" }))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Active" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="false">Active</SelectItem>
+                      <SelectItem value="true">Deleted</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="relative rounded-md border">
+          <CommonOverlaySpinner show={isFetching && !isLoading} />
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Full Name</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Address</TableHead>
+                <TableHead>City</TableHead>
+                <TableHead>State</TableHead>
+                <TableHead>Updated</TableHead>
+                <TableHead className="w-16">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableLoadingRows
+                  rows={6}
+                  columns={[
+                    "h-4 w-40",
+                    "h-4 w-32",
+                    "h-4 w-48",
+                    "h-4 w-24",
+                    "h-4 w-20",
+                    "h-4 w-24",
+                    "h-8 w-12 rounded",
+                  ]}
+                />
+              ) : addresses.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="p-6">
+                    <EmptyState
+                      title="No addresses found"
+                      description="Try a different search."
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                <>
+                  {addresses.map((address: Address) => (
+                    <TableRow key={address._id}>
+                      <TableCell className="font-medium">
+                        {address.fullname}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {address.phone}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground max-w-xs">
+                        <div className="truncate" title={`${address.line1}${address.line2 ? ', ' + address.line2 : ''}`}>
+                          {address.line1}{address.line2 ? ', ' + address.line2 : ''}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {address.city}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {address.state}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {address.updatedAt}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              className="gap-2"
+                              onClick={() => setViewingAddress(address)}
+                            >
+                              <Eye className="h-4 w-4" />
+                              View
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <PaginationControls
+          page={page}
+          totalPages={totalPages}
+          isFetching={isFetching}
+          onPrev={() => setPage((p) => Math.max(1, p - 1))}
+          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+          onPageChange={(p) => setPage(p)}
+        />
+      </CardContent>
+      <AddressViewDialog
+        address={viewingAddress}
+        open={!!viewingAddress}
+        onOpenChange={(open) => !open && setViewingAddress(null)}
+      />
+    </Card>
+  );
+}
