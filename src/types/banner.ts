@@ -7,7 +7,7 @@ export type BannerType = z.infer<typeof bannerTypeSchema>;
 export const createBannerSchema = z.object({
   title: z.string(),
   image: z.instanceof(File),
-  targetUrl: z.url().optional(),
+  targetUrl: z.string().optional(),
   type: bannerTypeSchema.optional(),
   targetId: z.string().optional(),
   order: z.number().optional(),

@@ -1,10 +1,8 @@
 import instance from "@/lib/axios";
-import { ApiResponse, PaginatedData } from "@/types";
-import { CreateOrder, CreateCustomOrder, AdminUpdateOrder, OrderQuery, Order } from "@/types/order";
+import { ApiResponse } from "@/types";
+import { CreateOrder, CreateCustomOrder, AdminUpdateOrder, Order, OrderQueryOptions, PaginatedOrders } from "@/types/order";
 
-interface PaginatedOrders extends PaginatedData {
-  orders: Order[];
-}
+
 
 class OrderService {
   async create(data: CreateOrder) {
@@ -23,21 +21,9 @@ class OrderService {
     return response.data;
   }
 
-  async confirmCustomOrder(orderId: string) {
-    const response = await instance.post<ApiResponse<Order>>(`/orders/confirm/${orderId}`);
-    return response.data;
-  }
-
-  async getMyOrders(query?: OrderQuery) {
-    const response = await instance.get<ApiResponse<PaginatedOrders>>("/orders/me", {
-      params: query
-    });
-    return response.data;
-  }
-
-  async getAllOrders(query?: OrderQuery) {
+  async getAllOrders(options?: OrderQueryOptions) {
     const response = await instance.get<ApiResponse<PaginatedOrders>>("/orders", {
-      params: query
+      params: options
     });
     return response.data;
   }

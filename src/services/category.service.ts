@@ -1,25 +1,12 @@
 import instance from "@/lib/axios";
-import { ApiResponse, PaginatedData } from "@/types";
-import { CreateCategory, UpdateCategory, Category } from "@/types/category";
-
-export interface PaginatedCategory extends PaginatedData {
-  categories: Category[];
-}
+import { ApiResponse } from "@/types";
+import { CreateCategory, UpdateCategory, Category, PaginatedCategories, CategoryQueryOptions } from "@/types/category";
 
 class CategoryService {
-  async getAll(query?: string, page = 1, limit = 10) {
-    const response = await instance.get<ApiResponse<PaginatedCategory>>("/categories", {
-      params: {
-        query,
-        page,
-        limit
-      }
+  async getAll(options: CategoryQueryOptions) {
+    const response = await instance.get<ApiResponse<PaginatedCategories>>("/categories", {
+      params: options
     });
-    return response.data;
-  }
-
-  async getChildCategories(parentId: string) {
-    const response = await instance.get<ApiResponse<Category[]>>(`/children/${parentId}`);
     return response.data;
   }
 

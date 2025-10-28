@@ -1,10 +1,7 @@
 import instance from "@/lib/axios";
-import { ApiResponse, PaginatedData } from "@/types";
-import { User } from "@/types/user";
+import { ApiResponse } from "@/types";
+import { PaginatedUsers, User, UserQueryOptions } from "@/types/user";
 
-interface PaginatedUsers extends PaginatedData {
-  users: User[]
-}
 
 class UserService {
   async getMe() {
@@ -12,23 +9,13 @@ class UserService {
     return response.data;
   }
 
-  async getAll() {
-    const response = await instance.get<ApiResponse<PaginatedUsers>>("/users");
-    return response.data
+  async getAll(options: UserQueryOptions) {
+    const response = await instance.get<ApiResponse<PaginatedUsers>>("/users", { params: options });
+    return response.data;
   }
 
   async getById(id: string) {
     const response = await instance.get<ApiResponse<User>>(`/users/${id}`);
-    return response.data;
-  }
-
-  async existsByEmail(email: string) {
-    const response = await instance.post<ApiResponse<boolean>>(`/users/email/${email}`);
-    return response.data;
-  }
-
-  async existsByPhone(phone: string) {
-    const response = await instance.post<ApiResponse<boolean>>(`/users/phone/${phone}`);
     return response.data;
   }
 

@@ -1,15 +1,11 @@
 import instance from "@/lib/axios";
 import { ApiResponse } from "@/types";
-import { CreateBanner, UpdateBanner, Banner } from "@/types/banner";
+import { CreateBanner, UpdateBanner, Banner, BannerQueryOptions, PaginatedBanners } from "@/types/banner";
 
 class BannerService {
-  async getActiveBanners() {
-    const response = await instance.get<ApiResponse<Banner[]>>("/banners");
-    return response.data;
-  }
 
-  async getAllBanners() {
-    const response = await instance.get<ApiResponse<Banner[]>>("/banners/all");
+  async getAllBanners(options: BannerQueryOptions) {
+    const response = await instance.get<ApiResponse<PaginatedBanners>>("/banners", { params: options });
     return response.data;
   }
 

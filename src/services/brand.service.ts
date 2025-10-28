@@ -1,18 +1,11 @@
 import instance from "@/lib/axios";
-import { ApiResponse, PaginatedData } from "@/types";
-import { CreateBrand, UpdateBrand, Brand } from "@/types/brand";
+import { ApiResponse } from "@/types";
+import { CreateBrand, UpdateBrand, Brand, BrandQueryOptions, PaginatedBrands } from "@/types/brand";
 
-interface PaginatedBrand extends PaginatedData {
-  brands: Brand[];
-}
 class BrandService {
-  async getAll(query?:string,page = 1, limit = 10) {
-    const response = await instance.get<ApiResponse<PaginatedBrand>>("/brands", {
-      params: {
-        query,
-        page,
-        limit
-      }
+  async getAll(options: BrandQueryOptions) {
+    const response = await instance.get<ApiResponse<PaginatedBrands>>("/brands", {
+      params: options
     });
     return response.data;
   }

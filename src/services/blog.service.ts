@@ -1,20 +1,17 @@
 import instance from "@/lib/axios";
 import { ApiResponse } from "@/types";
-import { CreateBlog, UpdateBlog, Blog } from "@/types/blog";
+import { CreateBlog, UpdateBlog, Blog, BlogQueryOptions, PaginatedBlogs } from "@/types/blog";
+
+
 
 class BlogService {
-  async getPublishedPosts() {
-    const response = await instance.get<ApiResponse<Blog[]>>("/blogs");
-    return response.data;
-  }
-
   async getPostBySlug(slug: string) {
     const response = await instance.get<ApiResponse<Blog>>(`/blogs/${slug}`);
     return response.data;
   }
 
-  async getAllPosts() {
-    const response = await instance.get<ApiResponse<Blog[]>>("/blogs/all");
+  async getAllPosts(options: BlogQueryOptions) {
+    const response = await instance.get<ApiResponse<PaginatedBlogs>>("/blogs", { params: options });
     return response.data;
   }
 
