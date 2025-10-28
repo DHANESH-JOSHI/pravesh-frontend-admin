@@ -169,7 +169,7 @@ export default function LoginPage() {
                 <Button
                   size="lg"
                   type="submit"
-                  className="w-full hover:bg-orange-400 hover:text-white"
+                  className="w-full"
                 >
                   {(method === "otp" ? isSendingOtp : isLoggingIn) ? <Loader2 className="animate-spin h-4 w-4" /> : (method === "otp" ? "Send OTP →" : "Sign in")}
                 </Button>
