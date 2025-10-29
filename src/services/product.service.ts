@@ -96,12 +96,8 @@ class ProductService {
   //   return response.data;
   // }
 
-  async getById(id: string, populate: boolean = false) {
-    const response = await instance.get<ApiResponse<Product>>(`/products/${id}`, {
-      params: {
-        populate
-      }
-    });
+  async getById(id: string) {
+    const response = await instance.get<ApiResponse<Product>>(`/products/${id}`, { params: { populate: true } });
     return response.data;
   }
 

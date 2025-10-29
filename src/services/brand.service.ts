@@ -11,7 +11,7 @@ class BrandService {
   }
 
   async getById(id: string) {
-    const response = await instance.get<ApiResponse<Brand>>(`/brands/${id}`);
+    const response = await instance.get<ApiResponse<Brand>>(`/brands/${id}`, { params: { populate: true } });
     return response.data;
   }
 

@@ -33,8 +33,13 @@ class OrderService {
     return response.data;
   }
 
-  async adminUpdate(orderId: string, data: AdminUpdateOrder) {
+  async updateOrder(orderId: string, data: AdminUpdateOrder) {
     const response = await instance.patch<ApiResponse<Order>>(`/orders/${orderId}`, data);
+    return response.data;
+  }
+
+  async updateOrderStatus(orderId: string, status: string) {
+    const response = await instance.patch<ApiResponse<Order>>(`/orders/${orderId}/status`, { status });
     return response.data;
   }
 }

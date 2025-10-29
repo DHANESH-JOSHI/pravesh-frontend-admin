@@ -10,6 +10,14 @@ class ReviewService {
     return response.data;
   }
 
+  async getById(id: string): Promise<ApiResponse<Review>> {
+    if (!id) {
+      throw new Error("Review ID is required");
+    }
+    const response = await instance.get<ApiResponse<Review>>(`/reviews/${id}`, { params: { populate: true } });
+    return response.data;
+  }
+
   // async getProductReviews(productId: string, page = 1, limit = 10) {
   //   const response = await instance.get<ApiResponse<PaginatedReviews>>(`/reviews/${productId}`, {
   //     params: { page, limit }

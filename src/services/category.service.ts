@@ -11,13 +11,13 @@ class CategoryService {
   }
 
   async getById(id: string) {
-    const response = await instance.get<ApiResponse<Category>>(`/categories/${id}`);
+    const response = await instance.get<ApiResponse<Category>>(`/categories/${id}`, { params: { populate: true } });
     return response.data;
   }
 
   async create(data: CreateCategory) {
     const formData = new FormData();
-    formData.append('name', data.title);
+    formData.append('title', data.title);
     if (data.image && data.image instanceof File) formData.append('image', data.image);
     if (data.parentCategoryId) formData.append('parentId', data.parentCategoryId);
 
@@ -31,7 +31,7 @@ class CategoryService {
 
   async update(id: string, data: UpdateCategory) {
     const formData = new FormData();
-    if (data.title) formData.append('name', data.title);
+    if (data.title) formData.append('title', data.title);
     if (data.image && data.image instanceof File) formData.append('image', data.image);
     if (data.parentCategoryId) formData.append('parentId', data.parentCategoryId);
 

@@ -1,10 +1,10 @@
 import instance from "@/lib/axios";
-import { ApiResponse } from "@/types";
+import { ApiResponse, User } from "@/types";
 import { Login } from "@/types/auth";
 
 class AuthService {
   async login(data: Login) {
-    const response = await instance.post<ApiResponse>("/auth/admin-login", data);
+    const response = await instance.post<ApiResponse<User>>("/auth/admin-login", data);
     return response.data;
   }
 
@@ -19,7 +19,7 @@ class AuthService {
   }
 
   async loginViaOtp(phoneOrEmail: string, otp: string) {
-    const response = await instance.post<ApiResponse>("/auth/admin-otp-login", { phoneOrEmail, otp });
+    const response = await instance.post<ApiResponse<User>>("/auth/admin-otp-login", { phoneOrEmail, otp });
     return response.data;
   }
 
