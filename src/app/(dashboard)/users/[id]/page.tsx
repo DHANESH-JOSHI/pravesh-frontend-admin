@@ -1,0 +1,594 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, User, Mail, Shield, Calendar, ShoppingCart, MapPin, Heart, Package, Star, Wallet, Eye, MoreHorizontal } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
+
+import { userService } from "@/services/user.service";
+import { User as UserType } from "@/types/user";
+import { Link, useTransitionRouter } from "next-view-transitions";
+
+export default function UserDetailPage() {
+  const params = useParams();
+  const router = useTransitionRouter();
+  const userId = params.id as string;
+
+  const [addressesPage, setAddressesPage] = useState(1);
+  const [ordersPage, setOrdersPage] = useState(1);
+  const [reviewsPage, setReviewsPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["user", userId],
+    queryFn: async () => await userService.getById(userId),
+    enabled: !!userId,
+  });
+
+  const user = data?.data as UserType;
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
+        <div className="animate-pulse">
+          <div className="h-8 rounded w-1/4 mb-4"></div>
+          <div className="h-64 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !user) {
+    return (
+      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600">User not found</h1>
+          <p className="text-muted-foreground">The user you're looking for doesn't exist.</p>
+          <Link href="/users">
+            <Button className="mt-4">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Users
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "active": return "bg-green-100 text-green-800";
+      case "inactive": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case "admin": return "bg-purple-100 text-purple-800";
+      case "user": return "bg-blue-100 text-blue-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  return (
+    <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+
+          <Link href="/users">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Users
+            </Button>
+          </Link>
+          <h1 className="text-xl font-bold">{user._id}</h1>
+        </div>
+        <Badge variant={user.isDeleted ? "destructive" : "secondary"}>
+          {user.isDeleted ? "Deleted" : "Active"}
+        </Badge>
+      </div>
+
+      {/* Basic Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Basic Information
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Full Name</label>
+                <p className="text-lg font-semibold">{user.name}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  Email
+                </label>
+                <p className="font-mono text-sm">{user.email || "N/A"}</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  Role
+                </label>
+                <Badge className={getRoleColor(user.role)}>
+                  {user.role.toUpperCase()}
+                </Badge>
+              </div>
+              <div>
+                <label className="text-sm font-medium mr-3">Status</label>
+                <Badge className={getStatusColor(user.status)}>
+                  {user.status.toUpperCase()}
+                </Badge>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Account Created
+                </label>
+                <p className="text-sm">{user.createdAt}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Last Updated</label>
+                <p className="text-sm">{user.updatedAt}</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Wallet Information */}
+      {user.wallet && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Wallet className="h-5 w-5" />
+              Wallet Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="text-sm font-medium">Balance</label>
+                <p className="text-2xl font-bold text-green-600">
+                  ₹{user.wallet.balance?.toFixed(2) || "0.00"}
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Transactions</label>
+                <p className="text-xl">{user.wallet.transactions?.length || 0}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Wallet ID</label>
+                <p className="font-mono text-xs">{user.wallet._id || "N/A"}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Cart Information */}
+      {user.cart && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShoppingCart className="h-5 w-5" />
+              Cart Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="text-sm font-medium">Items Count</label>
+                <p className="text-2xl font-bold">{user.cart.items?.length || 0}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Cart ID</label>
+                <p className="font-mono text-xs">{user.cart._id || "N/A"}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Addresses Table */}
+      {user.addresses && user.addresses.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Addresses ({user.addresses.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Full Name</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>Address</TableHead>
+                    <TableHead>City</TableHead>
+                    <TableHead>State</TableHead>
+                    <TableHead>Postal Code</TableHead>
+                    <TableHead>Country</TableHead>
+                    <TableHead className="w-16">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(user.addresses || [])
+                    .slice((addressesPage - 1) * itemsPerPage, addressesPage * itemsPerPage)
+                    .map((address, index) => (
+                      <TableRow key={address._id || index}>
+                        <TableCell className="font-medium">
+                          {address.fullname || "N/A"}
+                        </TableCell>
+                        <TableCell>{address.phone || "N/A"}</TableCell>
+                        <TableCell>
+                          <div className="max-w-xs">
+                            <p className="truncate">{address.line1 || "N/A"}</p>
+                            {address.line2 && (
+                              <p className="truncate text-sm text-muted-foreground">
+                                {address.line2}
+                              </p>
+                            )}
+                            {address.landmark && (
+                              <p className="truncate text-sm text-muted-foreground">
+                                Landmark: {address.landmark}
+                              </p>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>{address.city || "N/A"}</TableCell>
+                        <TableCell>{address.state || "N/A"}</TableCell>
+                        <TableCell>{address.postalCode || "N/A"}</TableCell>
+                        <TableCell>{address.country || "N/A"}</TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem asChild>
+                                <Link href={`/addresses/${address._id}`}>
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  View
+                                </Link>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+          {(user.addresses || []).length > itemsPerPage && (
+            <div className="px-6 pb-4">
+              <PaginationControls
+                page={addressesPage}
+                totalPages={Math.ceil((user.addresses || []).length / itemsPerPage)}
+                isFetching={false}
+                onPrev={() => setAddressesPage((p) => Math.max(1, p - 1))}
+                onNext={() => setAddressesPage((p) => Math.min(Math.ceil((user.addresses || []).length / itemsPerPage), p + 1))}
+                onPageChange={setAddressesPage}
+              />
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Wishlist */}
+      {user.wishlist && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Heart className="h-5 w-5" />
+              Wishlist
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="text-sm font-medium">Items Count</label>
+                <p className="text-2xl font-bold">{user.wishlist.items?.length || 0}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Wishlist ID</label>
+                <p className="font-mono text-xs">{user.wishlist._id || "N/A"}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Orders Table */}
+      {user.orders && user.orders.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Package className="h-5 w-5" />
+                Orders ({user.orders.length})
+              </div>
+              <Button variant="outline" size="sm">
+                <Eye className="h-4 w-4 mr-2" />
+                View All Orders
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Order Statistics */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <p className="text-2xl font-bold text-green-600">
+                  {user.orders.filter(order => order.status === "delivered").length}
+                </p>
+                <p className="text-sm text-muted-foreground">Completed</p>
+              </div>
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <p className="text-2xl font-bold text-blue-600">
+                  {user.orders.filter(order => ["pending", "processing", "shipped"].includes(order.status || "")).length}
+                </p>
+                <p className="text-sm text-muted-foreground">In Progress</p>
+              </div>
+              <div className="text-center p-4 bg-yellow-50 rounded-lg">
+                <p className="text-2xl font-bold text-yellow-600">
+                  {user.orders.filter(order => order.status === "cancelled").length}
+                </p>
+                <p className="text-sm text-muted-foreground">Cancelled</p>
+              </div>
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <p className="text-2xl font-bold text-gray-600">
+                  {user.orders.length}
+                </p>
+                <p className="text-sm text-muted-foreground">Total</p>
+              </div>
+            </div>
+
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Order ID</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Created Date</TableHead>
+                    <TableHead>Updated Date</TableHead>
+                    <TableHead className="w-16">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(user.orders || [])
+                    .slice((ordersPage - 1) * itemsPerPage, ordersPage * itemsPerPage)
+                    .map((order, index) => (
+                      <TableRow key={order._id || index}>
+                        <TableCell className="font-medium font-mono">
+                          {order._id?.slice(-8) || `ORD-${index + 1}`}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={
+                            order.status === "delivered" ? "default" :
+                              order.status === "cancelled" ? "destructive" :
+                                "secondary"
+                          }>
+                            {order.status || "pending"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {order.createdAt || "N/A"}
+                        </TableCell>
+                        <TableCell>
+                          {order.updatedAt || "N/A"}
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => router.push(`/orders/${order._id}`)}
+                              >
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Order
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+          {(user.orders || []).length > itemsPerPage && (
+            <div className="px-6 pb-4">
+              <PaginationControls
+                page={ordersPage}
+                totalPages={Math.ceil((user.orders || []).length / itemsPerPage)}
+                isFetching={false}
+                onPrev={() => setOrdersPage((p) => Math.max(1, p - 1))}
+                onNext={() => setOrdersPage((p) => Math.min(Math.ceil((user.orders || []).length / itemsPerPage), p + 1))}
+                onPageChange={setOrdersPage}
+              />
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Reviews Table */}
+      {user.reviews && user.reviews.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Star className="h-5 w-5" />
+                Reviews ({user.reviews.length})
+              </div>
+              <Button variant="outline" size="sm">
+                <Eye className="h-4 w-4 mr-2" />
+                View All Reviews
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Review Statistics */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="text-center p-4 bg-yellow-50 rounded-lg">
+                <p className="text-2xl font-bold text-yellow-600">
+                  {(user.reviews.reduce((acc, review) => acc + (review.rating || 0), 0) / user.reviews.length).toFixed(1)}
+                </p>
+                <p className="text-sm text-muted-foreground">Average Rating</p>
+              </div>
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <p className="text-2xl font-bold text-blue-600">
+                  {user.reviews.length}
+                </p>
+                <p className="text-sm text-muted-foreground">Total Reviews</p>
+              </div>
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <p className="text-2xl font-bold text-green-600">
+                  {user.reviews.filter(review => review.rating && review.rating >= 4).length}
+                </p>
+                <p className="text-sm text-muted-foreground">Positive Reviews</p>
+              </div>
+            </div>
+
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Rating</TableHead>
+                    <TableHead>Comment</TableHead>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Created Date</TableHead>
+                    <TableHead className="w-16">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(user.reviews || [])
+                    .slice((reviewsPage - 1) * itemsPerPage, reviewsPage * itemsPerPage)
+                    .map((review, index) => (
+                      <TableRow key={review._id || index}>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="flex">
+                              {Array.from({ length: 5 }, (_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-4 w-4 ${i < (review.rating || 0) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                                />
+                              ))}
+                            </div>
+                            <span className="font-medium">{review.rating}/5</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="max-w-xs">
+                            <p className="truncate">
+                              {review.comment || "No comment"}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="max-w-xs">
+                            <p className="truncate font-medium">
+                              {typeof review.product === 'object' && review.product?.name
+                                ? review.product.name
+                                : "Product"}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {review.createdAt || "N/A"}
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem asChild>
+                                <Link href={`/reviews/${review._id}`}>
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  View Review
+                                </Link>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </div>
+            {(user.reviews || []).length > itemsPerPage && (
+              <div className="mt-4">
+                <PaginationControls
+                  page={reviewsPage}
+                  totalPages={Math.ceil((user.reviews || []).length / itemsPerPage)}
+                  isFetching={false}
+                  onPrev={() => setReviewsPage((p) => Math.max(1, p - 1))}
+                  onNext={() => setReviewsPage((p) => Math.min(Math.ceil((user.reviews || []).length / itemsPerPage), p + 1))}
+                  onPageChange={setReviewsPage}
+                />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* No Relations Message */}
+      {!user.wallet && !user.cart && (!user.addresses || user.addresses.length === 0) && !user.wishlist && (!user.orders || user.orders.length === 0) && (!user.reviews || user.reviews.length === 0) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Related Data</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground text-center py-8">
+              No related data (wallet, cart, addresses, wishlist, orders, reviews) found for this user.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+
+    </div>
+  );
+}
