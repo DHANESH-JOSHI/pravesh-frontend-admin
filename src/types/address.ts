@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { User } from "./user"; // assuming you have a Zod userSchema
-import { PaginatedData } from ".";
+import { Order, PaginatedData } from ".";
 
 export const createAddressSchema = z.object({
   fullname: z.string(),
@@ -31,6 +31,8 @@ export type Address = {
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
+  // relations
+  orders?: Partial<Order>[];
 };
 export type CreateAddress = z.infer<typeof createAddressSchema>;
 export type UpdateAddress = z.infer<typeof updateAddressSchema>;

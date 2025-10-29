@@ -1,19 +1,23 @@
-import { z } from "zod";
-import { PaginatedData } from ".";
+import { Address, Cart, Order, PaginatedData, Review, Wallet, Wishlist } from ".";
 
-export const userSchema = z.object({
-  _id: z.string(),
-  name: z.string(),
-  phone: z.string(),
-  role: z.enum(["user", "admin"]),
-  email: z.email().optional(),
-  img: z.string().optional(),
-  isDeleted: z.boolean(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
+export type User = {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  // relations
+  wallet?: Partial<Wallet>;
+  cart?:Partial<Cart>;
+  addresses?:Partial<Address>[];
+  wishlist?:Partial<Wishlist>;
+  orders?:Partial<Order>[];
+  reviews?:Partial<Review>[];
+}
 
-export type User = z.infer<typeof userSchema>;
 
 
 export interface PaginatedUsers extends PaginatedData {

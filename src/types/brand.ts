@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PaginatedData } from ".";
+import { PaginatedData, Product } from ".";
 
 export const createBrandSchema = z.object({
   name: z.string(),
@@ -15,6 +15,8 @@ export type Brand = {
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
+  // relations
+  products?: Partial<Product>[];
 };
 export type CreateBrand = z.infer<typeof createBrandSchema>;
 export type UpdateBrand = z.infer<typeof updateBrandSchema>;

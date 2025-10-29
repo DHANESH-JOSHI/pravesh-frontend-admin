@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Brand, Category, PaginatedData } from ".";
+import { Brand, Category, PaginatedData, Review } from ".";
 
 export const stockStatusSchema = z.enum(["in-stock", "out-of-stock", "low-stock"]);
 export const productStatusSchema = z.enum(["active", "inactive", "discontinued"]);
@@ -81,37 +81,39 @@ export type UpdateProduct = z.infer<typeof updateProductSchema>;
 
 export type Product = {
   _id: string;
-  name:string,
-  sku:string,
-  slug:string,
-  description?:string,
-  shortDescription?:string,
-  brand?:string | Partial<Brand>,
-  category:string | Partial<Category>,
-  thumbnail:string,
-  images:string[],
-  originalPrice:number,
-  discountValue:number,
-  discountType:discountType,
-  finalPrice:number,
-  stock:number,
-  status:productStatus,
-  stockStatus:stockStatus,
-  unit:unit,
-  minStock:number,
-  features?:string[],
-  specifications:Record<string,string>,
-  tags:string[],
-  isFeatured:boolean,
-  isNewArrival:boolean,
-  isDiscount:boolean,
-  reviewCount:number,
-  rating:number,
-  totalSold:number,
-  salesCount:number,
-  createdAt:string,
-  updatedAt:string,
-  isDeleted:boolean,
+  name: string,
+  sku: string,
+  slug: string,
+  description?: string,
+  shortDescription?: string,
+  brand?: string | Partial<Brand>,
+  category: string | Partial<Category>,
+  thumbnail: string,
+  images: string[],
+  originalPrice: number,
+  discountValue: number,
+  discountType: discountType,
+  finalPrice: number,
+  stock: number,
+  status: productStatus,
+  stockStatus: stockStatus,
+  unit: unit,
+  minStock: number,
+  features?: string[],
+  specifications: Record<string, string>,
+  tags: string[],
+  isFeatured: boolean,
+  isNewArrival: boolean,
+  isDiscount: boolean,
+  reviewCount: number,
+  rating: number,
+  totalSold: number,
+  salesCount: number,
+  createdAt: string,
+  updatedAt: string,
+  isDeleted: boolean,
+  // relations
+  reviews?: Partial<Review>[];
 };
 
 
