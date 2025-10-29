@@ -2,15 +2,16 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, User, Package, DollarSign } from "lucide-react";
-import {Link} from "next-view-transitions"
+import { Link } from "next-view-transitions"
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cartService } from "@/services/cart.service";
 import { Cart } from "@/types/cart";
-import { Product, User as UserType } from "@/types";
+import { Brand, Category, Product, User as UserType } from "@/types";
+import Image from "next/image";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 
 export default function CartDetailPage() {
   const params = useParams();
@@ -23,10 +24,9 @@ export default function CartDetailPage() {
   });
 
   const cart = data?.data as Cart;
-
   if (isLoading) {
     return (
-      <div className="flex flex-1 flex-col gap-4 sm:max-w-6xl mx-auto w-full space-y-8 p-4">
+      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
         <div className="animate-pulse">
           <div className="h-8 rounded w-1/4 mb-4"></div>
           <div className="h-64 rounded"></div>
@@ -37,7 +37,7 @@ export default function CartDetailPage() {
 
   if (error || !cart) {
     return (
-      <div className="flex flex-1 flex-col gap-4 sm:max-w-6xl mx-auto w-full space-y-8 p-4">
+      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600">Cart not found</h1>
           <p className="text-muted-foreground">The cart you're looking for doesn't exist.</p>
@@ -60,7 +60,7 @@ export default function CartDetailPage() {
   const totalItems = cart.items.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <div className="flex flex-1 flex-col gap-4 sm:max-w-6xl mx-auto w-full space-y-8 p-4">
+    <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
       <Link href="/carts">
         <Button variant="outline" size="sm">
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -92,12 +92,12 @@ export default function CartDetailPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Amount</CardTitle>
+            <CardTitle className="text-sm font-medium">Wallet</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹{totalAmount.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">Estimated total</p>
+            <div className="text-2xl font-bold">₹{user.wallet?.balance?.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">balance</p>
           </CardContent>
         </Card>
       </div>
@@ -107,40 +107,57 @@ export default function CartDetailPage() {
           <CardTitle>Cart Items</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {cart.items.map((item, index) => {
-              const product = item.product as Partial<Product>;
-              return (
-                <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
-                      {product.images && product.images.length > 0 ? (
-                        <img
-                          src={product.images[0]}
-                          alt={product.name}
-                          className="w-full h-full object-cover rounded-md"
-                        />
-                      ) : (
-                        <Package className="h-8 w-8 text-gray-400" />
-                      )}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">{product.name || "Unknown Product"}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        ₹{product.finalPrice?.toFixed(2) || "N/A"} each
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <Badge variant="secondary">Qty: {item.quantity}</Badge>
-                    <p className="text-sm font-semibold mt-1">
-                      ₹{((product.finalPrice || 0) * item.quantity).toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Thumbnail</TableHead>
+                <TableHead>Product</TableHead>
+                <TableHead>Brand</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead className="text-right">Original</TableHead>
+                <TableHead className="text-right">Final</TableHead>
+                <TableHead className="text-right">Qty</TableHead>
+                <TableHead className="text-right">Line Total</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {cart.items.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="p-6 text-center">
+                    No items in cart
+                  </TableCell>
+                </TableRow>
+              ) : (
+                cart.items.map((item, idx) => {
+                  const product = item.product as Partial<Product>;
+                  const brand = product.brand as Partial<Brand>;
+                  const category = product.category as Partial<Category>;
+                  const lineTotal = (product.finalPrice ?? 0) * item.quantity;
+                  return (
+                    <TableRow key={idx}>
+                      <TableCell>
+                        {product.thumbnail ? (
+                          <Image src={product.thumbnail} alt={product.name || "thumb"} width={24} height={24} className="rounded-md object-cover" />
+                        ) : (
+                          <div className="w-14 h-14 rounded-md flex items-center justify-center">
+                            <Package className="h-6 w-6" />
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell><Link className="hover:underline" href={`/products/${product._id}`}>{product.name || "N/A"}</Link></TableCell>
+                      <TableCell><Link className="hover:underline" href={`/brands/${brand._id}`}>{brand.name || "N/A"}</Link></TableCell>
+                      <TableCell><Link className="hover:underline" href={`/categories/${category._id}`}>{category.title || "N/A"}</Link>
+                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground">₹{(product.originalPrice ?? 0).toFixed(2)}</TableCell>
+                      <TableCell className="text-right font-semibold">₹{(product.finalPrice ?? 0).toFixed(2)}</TableCell>
+                      <TableCell className="text-right">{item.quantity}</TableCell>
+                      <TableCell className="text-right font-medium">₹{lineTotal.toFixed(2)}</TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
           <Separator className="my-4" />
           <div className="flex justify-between items-center">
             <span className="text-lg font-semibold">Total:</span>
@@ -154,7 +171,7 @@ export default function CartDetailPage() {
           <CardTitle>Cart Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 justify-between items-center">
             <div>
               <label className="text-sm font-medium">Cart ID</label>
               <p className="font-mono text-sm">{cart._id}</p>

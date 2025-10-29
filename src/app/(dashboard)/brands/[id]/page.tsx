@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Tag, Package, Image as ImageIcon, Edit, BarChart3, TrendingUp } from "lucide-react";
+import { ArrowLeft, Tag, Package, Image as ImageIcon, BarChart3, TrendingUp } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +18,6 @@ import {
 import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
 
 import { brandService } from "@/services/brand.service";
-import { Brand } from "@/types/brand";
 import { Link } from "next-view-transitions";
 
 export default function BrandDetailPage() {

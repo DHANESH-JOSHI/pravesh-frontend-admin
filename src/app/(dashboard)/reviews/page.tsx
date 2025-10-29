@@ -8,7 +8,7 @@ export default function ReviewsPage() {
       <PageHeader
         icon={Star}
         title="Review Management"
-        subtitle="View and manage customer reviews with a modern interface."
+        subtitle="View and manage user reviews with a modern interface."
       />
       <ReviewsTable />
     </div>

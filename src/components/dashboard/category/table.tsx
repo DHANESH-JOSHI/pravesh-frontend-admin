@@ -115,7 +115,6 @@ export function CategoriesTable() {
   });
   const createMutation = useMutation({
     mutationFn: async (values: CreateCategory) => {
-      console.log(values)
       const data = await categoryService.create(values);
       return data.data;
     },

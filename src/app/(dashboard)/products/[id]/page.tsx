@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Star, Tag, Calendar } from "lucide-react";
-import {Link} from "next-view-transitions"
+import { Link } from "next-view-transitions"
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,7 @@ export default function ProductDetailPage() {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["product", productId],
-    queryFn: async () => await productService.getById(productId, true),
+    queryFn: async () => await productService.getById(productId),
     enabled: !!productId,
   });
 
@@ -25,10 +25,10 @@ export default function ProductDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-1 flex-col gap-4 sm:max-w-6xl mx-auto w-full space-y-8 p-4">
+      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
+          <div className="h-8 rounded w-1/4 mb-4"></div>
+          <div className="h-64 rounded"></div>
         </div>
       </div>
     );
@@ -36,7 +36,7 @@ export default function ProductDetailPage() {
 
   if (error || !product) {
     return (
-      <div className="flex flex-1 flex-col gap-4 sm:max-w-6xl mx-auto w-full space-y-8 p-4">
+      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600">Product not found</h1>
           <p className="text-muted-foreground">The product you're looking for doesn't exist.</p>
@@ -83,13 +83,21 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="flex flex-1 flex-col gap-4 sm:max-w-6xl mx-auto w-full space-y-8 p-4">
-      <Link href="/products">
-        <Button variant="outline" size="sm">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Products
-        </Button>
-      </Link>
+    <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link href="/products">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Products
+            </Button>
+          </Link>
+          <h1 className="text-xl font-bold">{product._id}</h1>
+        </div>
+        <Badge variant={product.isDeleted ? "destructive" : "secondary"}>
+          {product.isDeleted ? "Deleted" : "Active"}
+        </Badge>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Product Images */}
@@ -329,28 +337,29 @@ export default function ProductDetailPage() {
       </div>
 
       {/* Specifications */}
-      {product.specifications && Object.keys(product.specifications).length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Specifications</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {Object.entries(product.specifications).map(([key, value], index) => (
-                <div
-                  key={key}
-                  className={`flex justify-between items-center py-3 px-4 rounded-lg ${
-                    index % 2 === 0 ? 'bg-muted/30' : 'bg-background'
-                  }`}
-                >
-                  <span className="font-medium text-sm">{key}</span>
-                  <span className="text-sm text-muted-foreground font-mono">{value}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {
+        product.specifications && Object.keys(product.specifications).length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Specifications</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {Object.entries(product.specifications).map(([key, value], index) => (
+                  <div
+                    key={key}
+                    className={`flex justify-between items-center py-3 px-4 rounded-lg ${index % 2 === 0 ? 'bg-muted/30' : 'bg-background'
+                      }`}
+                  >
+                    <span className="font-medium text-sm">{key}</span>
+                    <span className="text-sm text-muted-foreground font-mono">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )
+      }
 
       {/* Special Flags */}
       <Card>
@@ -415,6 +424,6 @@ export default function ProductDetailPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </div >
   );
 }

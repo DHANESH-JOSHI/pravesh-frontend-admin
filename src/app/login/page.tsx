@@ -1,5 +1,4 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -25,6 +24,7 @@ import { Login, loginSchema } from "@/types";
 import { authService } from "@/services/auth.service";
 
 export default function LoginPage() {
+  const { login } = useAuth();
   const router = useTransitionRouter();
   const { loading, user } = useAuth();
   const [showOTP, setShowOTP] = useState(false);
@@ -57,10 +57,13 @@ export default function LoginPage() {
   });
 
   const { mutate: loginWithPassword, isPending: isLoggingIn } = useMutation({
-    mutationFn: (data: Login) => {
-      return authService.login(data);
+    mutationFn: async (data: Login) => {
+      const response = await authService.login(data);
+      return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (!data) return;
+      login(data);
       toast.success("Logged in");
       router.push("/");
     },

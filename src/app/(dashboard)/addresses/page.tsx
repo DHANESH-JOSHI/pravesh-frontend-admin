@@ -1,4 +1,4 @@
- import { PageHeader } from "@/components/dashboard/common/page-header";
+import { PageHeader } from "@/components/dashboard/common/page-header";
 import { AddressesTable } from "@/components/dashboard/address/table";
 import { MapPin } from "lucide-react";
 

@@ -25,7 +25,7 @@ export default function AdminLayout({
               <main className="min-h-screen vt-page">{children}</main>
             </QueryProvider>
           </AuthProvider>
-          <Toaster richColors />
+          <Toaster richColors theme="light" />
         </body>
       </html>
     </ViewTransitions>
