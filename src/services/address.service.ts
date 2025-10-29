@@ -9,9 +9,7 @@ class AddressService {
   }
 
   async getById(id: string) {
-    console.log(id)
     const response = await instance.get<ApiResponse<Address>>(`/addresses/${id}`, { params: { populate: true } });
-    console.log(response);
     return response.data;
   }
 }

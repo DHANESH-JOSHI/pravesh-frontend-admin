@@ -17,7 +17,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const fetched = useRef(false);
-
   useEffect(() => {
     if (fetched.current) return;
     fetched.current = true;
@@ -25,7 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const res = await userService.getMe();
         setUser(res?.data || null);
-      } catch (error: any) {
+      } catch (e:any) {
         setUser(null);
       } finally {
         setLoading(false);

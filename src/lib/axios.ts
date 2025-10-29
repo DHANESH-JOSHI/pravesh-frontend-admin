@@ -1,58 +1,49 @@
+import axios, { AxiosError, AxiosInstance } from "axios";
 import { authService } from "@/services/auth.service";
-import axios from "axios";
 
-const instance = axios.create({
+const instance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
+  timeout: 30000,
 });
 
-// Single-flight refresh state
 let isRefreshing = false;
-let waitQueue: Array<{ resolve: (value: any) => void; reject: (reason?: any) => void }> = [];
+let refreshQueue: Array<() => void> = [];
 
-function flushQueue(err?: any) {
-  if (err) {
-    waitQueue.forEach(p => p.reject(err));
-  } else {
-    waitQueue.forEach(p => p.resolve(true));
-  }
-  waitQueue = [];
-}
+const processQueue = (error?: any) => {
+  refreshQueue.forEach((cb) => cb());
+  refreshQueue = [];
+};
 
 instance.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const status = error?.response?.status;
-    const original = error.config;
-    if (status !== 401 || !original) {
+  (res) => res,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as any;
+
+    if (!error.response || error.response.status !== 401) {
       return Promise.reject(error);
     }
-    // Avoid re-refreshing same request
-    if (original._retry) {
+
+    if (originalRequest.url?.includes("/auth/refresh-tokens")) {
       return Promise.reject(error);
     }
-    original._retry = true;
 
     if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        waitQueue.push({
-          resolve: () => resolve(instance(original)),
-          reject,
-        });
+      return new Promise((resolve) => {
+        refreshQueue.push(() => resolve(instance(originalRequest)));
       });
     }
 
     isRefreshing = true;
+
     try {
       await authService.refreshTokens();
-      flushQueue();
-      return instance(original);
-    } catch (e) {
-      flushQueue(e);
-      return Promise.reject(error);
+      processQueue();
+      return instance(originalRequest);
+    } catch (err) {
+      processQueue(err);
+      return Promise.reject(err);
     } finally {
       isRefreshing = false;
     }
