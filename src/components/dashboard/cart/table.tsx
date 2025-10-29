@@ -58,7 +58,7 @@ export function CartsTable() {
           onRefresh={refetch}
           searchTerm={searchTerm}
           onSearch={setSearchTerm}
-          searchPlaceholder="Search carts by user ID or name..."
+          searchPlaceholder="Search carts by user..."
           pageSize={limit}
           onChangePageSize={(v) => {
             const n = Number(v);
@@ -73,7 +73,8 @@ export function CartsTable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>User Name</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead>Items</TableHead>
                 <TableHead>Quantity</TableHead>
                 <TableHead>Total Amount</TableHead>
@@ -109,6 +110,9 @@ export function CartsTable() {
                     <TableRow key={cart._id}>
                       <TableCell className="font-medium font-mono text-sm">
                         {(cart.user as User).name}
+                      </TableCell>
+                       <TableCell className="font-medium font-mono text-sm">
+                        {(cart.user as User).email}
                       </TableCell>
                       <TableCell className="text-muted-foreground max-w-xs">
                         {cart.items.length}

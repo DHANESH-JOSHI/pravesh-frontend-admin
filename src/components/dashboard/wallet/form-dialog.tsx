@@ -38,7 +38,6 @@ export function WalletFormDialog({
   isLoading,
   viewOnly = false,
 }: WalletFormDialogProps) {
-  console.log({wallet})
   const form = useForm<AddFunds>({
     resolver: zodResolver(addFundsSchema),
     defaultValues: {

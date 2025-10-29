@@ -22,8 +22,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Category, CreateCategory, FormDialogProps, UpdateCategory, createCategorySchema, updateCategorySchema } from "@/types";
+import { Category, CreateCategory, FormDialogProps, createCategorySchema } from "@/types";
+import { CategorySearchableSelect } from "../product/form-dialog";
 
 export function CategoryFormDialog({
   open,
@@ -96,8 +96,19 @@ export function CategoryFormDialog({
             />
             <FormField
               control={form.control}
-              name="image"
+              name="parentCategoryId"
               render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel>Parent Category *</FormLabel>
+                  <CategorySearchableSelect value={field.value || ""} onChange={field.onChange} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="image"
+              render={() => (
                 <FormItem className="space-y-2">
                   <FormLabel>Image</FormLabel>
                   <Card className="relative border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
@@ -191,7 +202,7 @@ export function CategoryFormDialog({
             </div>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+      </DialogContent >
+    </Dialog >
   );
 }

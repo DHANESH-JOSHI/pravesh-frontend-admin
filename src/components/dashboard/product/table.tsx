@@ -3,7 +3,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check, Tag, Box, Palette, DollarSign } from "lucide-react";
 import Image from "next/image";
-import {Link} from "next-view-transitions"
 import { useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
@@ -39,6 +38,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Category } from "@/types";
 
 export function ProductsTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -122,7 +122,6 @@ export function ProductsTable() {
   });
 
   function applyFilters() {
-    // sanitize string values (trim) to avoid accidental trailing spaces that become '+' in query
     const sanitized: Partial<QueryOptions> = Object.entries(filterDraft).reduce((acc, [k, v]) => {
       if (typeof v === "string") {
         const trimmed = v.trim();
@@ -359,12 +358,12 @@ export function ProductsTable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Thumbnail</TableHead>
+                <TableHead className="w-24">Thumbnail</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>SKU</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Updated</TableHead>
+                <TableHead>Brand</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead className="text-right">Final Price</TableHead>
+                <TableHead className="text-right">Stock</TableHead>
                 <TableHead className="w-16">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -373,11 +372,13 @@ export function ProductsTable() {
                 <TableLoadingRows
                   rows={6}
                   columns={[
-                    "h-12 w-40 rounded-md",
-                    "h-4 w-40",
-                    "h-4 w-40",
-                    "h-4 w-40",
-                    "h-8 w-12 rounded",
+                    "h-12 w-24 rounded-md",
+                    "h-4 w-24",
+                    "h-4 w-24",
+                    "h-4 w-24",
+                    "h-4 w-24",
+                    "h-4 w-24",
+                    "h-4 w-20",
                   ]}
                 />
               ) : products.length === 0 ? (
@@ -390,17 +391,16 @@ export function ProductsTable() {
                   </TableCell>
                 </TableRow>
               ) : (
-                <>
-                  {products.map((product: Product) => (
+                products.map((product: Product) => {
+                  const brandName = typeof product.brand === "string" ? product.brand : product.brand?.name ?? "N/A";
+                  const categoryName = typeof product.category === "string" ? product.category : (product.category as Category)?.title ?? "N/A";
+                  return (
                     <TableRow key={product._id}>
                       <TableCell>
                         <Image
-                          src={
-                            product.thumbnail ||
-                            "/placeholder.svg"
-                          }
-                          width={50}
-                          height={50}
+                          src={product.thumbnail || "/placeholder.svg"}
+                          width={56}
+                          height={56}
                           alt={product.name}
                           className="h-12 w-12 rounded-md object-cover"
                         />
@@ -410,18 +410,10 @@ export function ProductsTable() {
                           {product.name}
                         </div>
                       </TableCell>
-                      <TableCell className="text-muted-foreground font-mono text-sm">
-                        {product.sku}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        ₹{product.finalPrice}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {product.stock}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {product.updatedAt}
-                      </TableCell>
+                      <TableCell className="text-muted-foreground">{brandName}</TableCell>
+                      <TableCell className="text-muted-foreground">{categoryName}</TableCell>
+                      <TableCell className="text-center font-semibold">₹{product.finalPrice}</TableCell>
+                      <TableCell className="text-center">{product.stock}</TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -435,16 +427,14 @@ export function ProductsTable() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild className="gap-2">
-                              <Link href={`/products/${product._id}`}>
+                              <a href={`/products/${product._id}`} className="flex items-center gap-2">
                                 <Eye className="h-4 w-4" />
                                 View
-                              </Link>
+                              </a>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-2"
-                              onClick={() =>
-                                setEditingProduct(product)
-                              }
+                              onClick={() => setEditingProduct(product)}
                             >
                               <Edit className="h-4 w-4" />
                               Edit
@@ -453,8 +443,7 @@ export function ProductsTable() {
                               className="gap-2 text-destructive"
                               onClick={() => {
                                 setIsOpen(true);
-                                pendingDeleteId =
-                                  product._id;
+                                pendingDeleteId = product._id;
                               }}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -464,8 +453,8 @@ export function ProductsTable() {
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
-                  ))}
-                </>
+                  );
+                })
               )}
             </TableBody>
           </Table>

@@ -137,7 +137,7 @@ export function BlogFormDialog({
                 <FormField
                   control={form.control}
                   name="featuredImage"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem className="space-y-2">
                       <FormLabel>Thumbnail *</FormLabel>
                       <Card className="relative border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">

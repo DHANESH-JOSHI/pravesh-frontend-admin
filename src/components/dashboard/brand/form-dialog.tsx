@@ -101,7 +101,7 @@ export function BrandFormDialog({
                         <FormField
                             control={form.control}
                             name="image"
-                            render={({ field }) => (
+                            render={() => (
                                 <FormItem className="space-y-2">
                                     <FormLabel>Image</FormLabel>
                                     <Card className="relative border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">

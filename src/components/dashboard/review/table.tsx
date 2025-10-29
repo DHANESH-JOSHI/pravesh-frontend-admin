@@ -26,17 +26,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CustomAlertDialog } from "../common/custom-alert-dialog";
-import { ReviewViewDialog } from "./view-dialog";
 import { reviewService } from "@/services/review.service";
 import { Review, ReviewQueryOptions } from "@/types/review";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Product, User } from "@/types";
+import { Link } from "next-view-transitions";
 export function ReviewsTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [viewingReview, setViewingReview] = useState<Review | null>(null);
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterDraft, setFilterDraft] = useState<Partial<ReviewQueryOptions>>({});
   const [appliedFilters, setAppliedFilters] = useState<Partial<ReviewQueryOptions>>({});
@@ -271,12 +271,11 @@ export function ReviewsTable() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              className="gap-2"
-                              onClick={() => setViewingReview(review)}
-                            >
-                              <Eye className="h-4 w-4" />
-                              View
+                            <DropdownMenuItem asChild className="gap-2">
+                              <Link href={`/reviews/${review._id}`}>
+                                <Eye className="h-4 w-4" />
+                                View
+                              </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-2 text-destructive"
@@ -318,11 +317,7 @@ export function ReviewsTable() {
         }}
       />
 
-      <ReviewViewDialog
-        review={viewingReview}
-        open={!!viewingReview}
-        onOpenChange={(open) => !open && setViewingReview(null)}
-      />
+
     </Card>
   );
 }

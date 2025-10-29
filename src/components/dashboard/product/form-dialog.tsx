@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, ChevronsUpDown, ImageIcon, Loader2, Plus, Trash, Upload } from "lucide-react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { Button } from "@/components/ui/button";
@@ -335,7 +335,7 @@ export function ProductFormDialog({
                   <FormField
                     control={form.control}
                     name="thumbnail"
-                    render={({ field }) => (
+                    render={() => (
                       <FormItem className="space-y-2">
                         <FormLabel>Thumbnail</FormLabel>
                         <Card className="relative border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
@@ -555,7 +555,7 @@ function BrandSearchableSelect({ value, onChange }: { value: string; onChange: (
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 min-w-sm">
         <Command shouldFilter={false}>
           <CommandInput placeholder="Search brand..." value={inputValue} onValueChange={setInputValue} />
           <CommandEmpty>{isLoadingBrands ? "Searching..." : "No brand found."}</CommandEmpty>
@@ -575,7 +575,7 @@ function BrandSearchableSelect({ value, onChange }: { value: string; onChange: (
   );
 }
 
-function CategorySearchableSelect({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+export function CategorySearchableSelect({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
@@ -615,7 +615,7 @@ function CategorySearchableSelect({ value, onChange }: { value: string; onChange
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 min-w-sm">
         <Command shouldFilter={false}>
           <CommandInput placeholder="Search category..." value={inputValue} onValueChange={setInputValue} />
           <CommandEmpty>{isLoadingCategories ? "Searching..." : "No category found."}</CommandEmpty>

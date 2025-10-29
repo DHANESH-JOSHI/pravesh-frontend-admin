@@ -24,16 +24,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AddressViewDialog } from "./view-dialog";
 import { addressService } from "@/services/address.service";
 import { Address, AddressQueryOptions } from "@/types/address";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Link } from "next-view-transitions";
 
 export function AddressesTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [viewingAddress, setViewingAddress] = useState<Address | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterDraft, setFilterDraft] = useState<Partial<AddressQueryOptions>>({});
   const [appliedFilters, setAppliedFilters] = useState<Partial<AddressQueryOptions>>({});
@@ -246,12 +245,11 @@ export function AddressesTable() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              className="gap-2"
-                              onClick={() => setViewingAddress(address)}
-                            >
-                              <Eye className="h-4 w-4" />
-                              View
+                            <DropdownMenuItem asChild className="gap-2">
+                              <Link href={`/addresses/${address._id}`}>
+                                <Eye className="h-4 w-4" />
+                                View
+                              </Link>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -272,11 +270,6 @@ export function AddressesTable() {
           onPageChange={(p) => setPage(p)}
         />
       </CardContent>
-      <AddressViewDialog
-        address={viewingAddress}
-        open={!!viewingAddress}
-        onOpenChange={(open) => !open && setViewingAddress(null)}
-      />
     </Card>
   );
 }

@@ -23,8 +23,10 @@ import { Loader2 } from "lucide-react";
 import { VerifyOtp, verifyOtpSchema } from "@/types";
 import { authService } from "@/services/auth.service";
 import { useTransitionRouter } from "next-view-transitions";
+import { useAuth } from "@/providers/auth";
 
 export function InputOTPForm({ phoneOrEmail }: { phoneOrEmail: string }) {
+  const { login } = useAuth();
   const router = useTransitionRouter();
   const form = useForm<VerifyOtp>({
     resolver: zodResolver(verifyOtpSchema),
@@ -35,8 +37,13 @@ export function InputOTPForm({ phoneOrEmail }: { phoneOrEmail: string }) {
   });
 
   const { mutate, isPending } = useMutation({
-    mutationFn: (values: VerifyOtp) => authService.loginViaOtp(values.phoneOrEmail, values.otp),
-    onSuccess: () => {
+    mutationFn: async (values: VerifyOtp) => {
+      const data = await authService.loginViaOtp(values.phoneOrEmail, values.otp)
+      return data.data;
+    },
+    onSuccess: (data) => {
+      if (!data) return;
+      login(data);
       toast.success("Login successful!")
       router.push("/");
     },

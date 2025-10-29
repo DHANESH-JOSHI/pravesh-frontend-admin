@@ -78,7 +78,7 @@ export function WalletsTable() {
             onRefresh={refetch}
             searchTerm={searchTerm}
             onSearch={setSearchTerm}
-            searchPlaceholder="Search wallets by user ID or name..."
+            searchPlaceholder="Search wallets by user..."
             pageSize={limit}
             onChangePageSize={(v) => {
               const n = Number(v);
@@ -94,7 +94,8 @@ export function WalletsTable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>User ID</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead>Balance</TableHead>
                 <TableHead>Transactions</TableHead>
                 <TableHead>Created</TableHead>
@@ -109,6 +110,7 @@ export function WalletsTable() {
                   columns={[
                     "h-4 w-32",
                     "h-4 w-24",
+                    "h-4 w-24",
                     "h-4 w-16",
                     "h-4 w-24",
                     "h-4 w-24",
@@ -117,7 +119,7 @@ export function WalletsTable() {
                 />
               ) : wallets.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="p-6">
+                  <TableCell colSpan={7} className="p-6">
                     <EmptyState
                       title="No wallets found"
                       description="Wallets will appear here when users register."
@@ -130,6 +132,9 @@ export function WalletsTable() {
                     <TableRow key={wallet._id}>
                       <TableCell className="font-medium font-mono text-sm">
                         {(wallet.user as User).name}
+                      </TableCell>
+                      <TableCell className="font-medium font-mono text-sm">
+                        {(wallet.user as User).email}
                       </TableCell>
                       <TableCell className="text-muted-foreground font-semibold">
                         ₹{wallet.balance.toFixed(2)}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2, Funnel, X, Check } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ import { BrandFormDialog } from "./form-dialog";
 import { brandService } from "@/services/brand.service";
 import { Brand, CreateBrand, UpdateBrand, BrandQueryOptions } from "@/types/brand";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Link } from "next-view-transitions";
 export function BrandsTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -274,6 +275,12 @@ export function BrandsTable() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild className="gap-2">
+                              <Link href={`/brands/${brand._id}`}>
+                                <Eye className="h-4 w-4" />
+                                View
+                              </Link>
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-2"
                               onClick={() =>

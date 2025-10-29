@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2, Funnel, X, Check } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ import { CategoryFormDialog } from "./form-dialog";
 import { Category, CreateCategory, UpdateCategory, CategoryQueryOptions } from "@/types";
 import { categoryService } from "@/services/category.service";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Link } from "next-view-transitions";
 
 export function CategoriesTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -114,6 +115,7 @@ export function CategoriesTable() {
   });
   const createMutation = useMutation({
     mutationFn: async (values: CreateCategory) => {
+      console.log(values)
       const data = await categoryService.create(values);
       return data.data;
     },
@@ -285,6 +287,12 @@ export function CategoriesTable() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild className="gap-2">
+                              <Link href={`/categories/${category._id}`}>
+                                <Eye className="h-4 w-4" />
+                                View
+                              </Link>
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-2"
                               onClick={() =>

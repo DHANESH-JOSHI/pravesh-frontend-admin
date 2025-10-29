@@ -58,7 +58,7 @@ export function OrdersTable() {
   const updatemutation = useMutation({
     mutationFn: async (values: AdminUpdateOrder) => {
       if (!editingOrder) return;
-      const data = await orderService.adminUpdate(editingOrder._id, values);
+      const data = await orderService.updateOrder(editingOrder._id, values);
       return data.data;
     },
     onSuccess: () => {
@@ -110,7 +110,7 @@ export function OrdersTable() {
             onRefresh={refetch}
             searchTerm={searchTerm}
             onSearch={setSearchTerm}
-            searchPlaceholder="Search orders..."
+            searchPlaceholder="Search orders by user..."
             pageSize={limit}
             onChangePageSize={(v) => {
               const n = Number(v);

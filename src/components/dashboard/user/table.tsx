@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { MoreHorizontal, Trash2, Funnel, X, Check } from "lucide-react";
+import { MoreHorizontal, Trash2, Funnel, X, Check, Eye } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
@@ -29,6 +29,7 @@ import { CustomAlertDialog } from "../common/custom-alert-dialog";
 import { userService } from "@/services/user.service";
 import { User, UserQueryOptions } from "@/types/user";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Link } from "next-view-transitions";
 export function UsersTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -216,7 +217,6 @@ export function UsersTable() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead className="w-16">Actions</TableHead>
@@ -236,7 +236,7 @@ export function UsersTable() {
                 />
               ) : users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="p-6">
+                  <TableCell colSpan={5} className="p-6">
                     <EmptyState
                       title="No users found"
                       description="Try a different search."
@@ -252,9 +252,6 @@ export function UsersTable() {
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {user.email || "N/A"}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {user.phone}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {user.role}
@@ -274,6 +271,12 @@ export function UsersTable() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                              <Link href={`/users/${user._id}`} className="gap-2">
+                                <Eye className="h-4 w-4" />
+                                View
+                              </Link>
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-2 text-destructive"
                               onClick={() => {
