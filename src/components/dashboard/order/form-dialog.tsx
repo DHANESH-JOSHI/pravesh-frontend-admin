@@ -56,7 +56,11 @@ export function OrderFormDialog({
     defaultValues: {
       feedback: initialData?.feedback || "",
       status: initialData?.status,
-      items: initialData?.items,
+      items: initialData?.items?.map((item) => ({
+        product: (item.product as Product)._id,
+        quantity: item.quantity,
+        price: item.price,
+      })),
     },
   });
 
@@ -65,16 +69,11 @@ export function OrderFormDialog({
     name: "items",
   });
 
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(initialData?.image || null);
 
   useEffect(() => {
-    form.reset({
-      feedback: initialData?.feedback || "",
-      status: initialData?.status,
-      items: initialData?.items,
-    });
-    setImagePreview(initialData?.image || initialData?.image || null);
-  }, [initialData, form]);
+    setImagePreview(initialData?.image || null);
+  }, [initialData]);
 
   useEffect(() => {
     return () => {
@@ -126,7 +125,7 @@ export function OrderFormDialog({
               name="feedback"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel>Feedback</FormLabel>
+                  <FormLabel>Feedback (optional)</FormLabel>
                   <FormControl>
                     <textarea
                       {...field}
@@ -140,7 +139,7 @@ export function OrderFormDialog({
               )}
             />
 
-            <FormItem className="space-y-2">
+            {initialData?.isCustomOrder && <FormItem className="space-y-2">
               <FormLabel>Image</FormLabel>
               <div className="flex items-center gap-4">
                 <div className="w-28 h-28 rounded-md border flex items-center justify-center overflow-hidden bg-muted">
@@ -159,7 +158,7 @@ export function OrderFormDialog({
                 </div>
               </div>
               <FormMessage />
-            </FormItem>
+            </FormItem>}
 
             <FormItem className="space-y-2">
               <FormLabel>Items</FormLabel>
@@ -174,13 +173,12 @@ export function OrderFormDialog({
                           <FormField
                             control={form.control}
                             name={`items.${index}.product`}
-                            render={({ field }) => (
+                            render={() => (
                               <FormItem className="flex flex-col grow">
                                 <ProductSearchableSelect
-                                  value={field.value ?? ""
-                                  }
-                                  onChange={(value) => {
-                                    form.setValue(`items.${index}.product`, value);
+                                  product={initialData?.items?.[index]?.product as Product}
+                                  onChange={(v) => {
+                                    form.setValue(`items.${index}.product`, v);
                                   }}
                                 />
                                 <FormMessage />
@@ -248,34 +246,27 @@ export function OrderFormDialog({
   );
 }
 
-function ProductSearchableSelect({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+function ProductSearchableSelect({ product, onChange }: { product: Partial<Product>; onChange: (value: string) => void }) {
   const [open, setOpen] = useState(false);
-  const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
-
+  const [selectedId, setSelectedId] = useState<string>("");
   const debouncedSetSearch = useDebouncedCallback((value: string) => {
     setSearch(value);
   }, 300);
 
   useEffect(() => {
-    debouncedSetSearch(inputValue);
-  }, [inputValue, debouncedSetSearch]);
+    debouncedSetSearch(search);
+  }, [search, debouncedSetSearch]);
 
   const { data: productsData, isLoading: isLoadingProducts } = useQuery({
-    queryKey: ["products", "search", search],
+    queryKey: ["products", search],
     queryFn: () => productService.search(search, 1, 20),
     enabled: open,
   });
 
-  const { data: selectedProductData } = useQuery({
-    queryKey: ["products", value],
-    queryFn: () => productService.getById(value),
-    enabled: !!value && !open,
-  });
-
   const products: Product[] = productsData?.data?.products ?? [];
 
-  const selectedProduct = products.find((p) => p._id === value);
+  const selectedProduct = products.find((p) => p._id === selectedId);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -286,8 +277,8 @@ function ProductSearchableSelect({ value, onChange }: { value: string; onChange:
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {value
-            ? selectedProduct?.name ?? selectedProductData?.data?.name ?? "Select product..."
+          {product
+            ? selectedProduct?.name ?? product.name ?? "Select product..."
             : "Select product..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -296,32 +287,33 @@ function ProductSearchableSelect({ value, onChange }: { value: string; onChange:
         <Command shouldFilter={false}>
           <CommandInput
             placeholder="Search product..."
-            value={inputValue}
-            onValueChange={setInputValue}
+            value={search}
+            onValueChange={setSearch}
           />
           <CommandEmpty>
             {isLoadingProducts ? "Searching..." : "No product found."}
           </CommandEmpty>
           <CommandGroup>
             <ScrollArea className="h-48">
-              {products.map((product) => (
+              {products.map((p) => (
                 <CommandItem
-                  key={product._id}
-                  value={product._id}
-                  onSelect={(currentValue) => {
-                    onChange(currentValue === value ? "" : currentValue);
+                  key={p._id}
+                  value={p._id}
+                  onSelect={(p) => {
+                    onChange(p);
+                    setSelectedId(p)
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === product._id ? "opacity-100" : "opacity-0"
+                      product._id === p._id ? "opacity-100" : "opacity-0"
                     )}
                   />
                   <div className="flex flex-col">
-                    <span>{product.name}</span>
-                    <span className="text-xs text-muted-foreground">SKU: {product.sku} | Stock: {product.stock}</span>
+                    <span>{p.name}</span>
+                    <span className="text-xs text-muted-foreground">SKU: {p.sku} | Stock: {p.stock}</span>
                   </div>
                 </CommandItem>
               ))}

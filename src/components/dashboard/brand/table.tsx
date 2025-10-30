@@ -244,7 +244,7 @@ export function BrandsTable() {
                   {brands.map((brand: Brand) => (
                     <TableRow key={brand._id}>
                       <TableCell>
-                        <Image
+                        {brand.image ? <Image
                           src={
                             brand.image ||
                             "/placeholder.svg"
@@ -252,8 +252,8 @@ export function BrandsTable() {
                           width={50}
                           height={50}
                           alt={brand.name}
-                          className="h-12 w-12 rounded-md object-cover"
-                        />
+                          className="h-12 w-12 rounded-md object-cover text-center"
+                        /> : <div className="h-12 w-12 flex items-center justify-center">N/A</div> }
                       </TableCell>
                       <TableCell className="font-medium max-w-xs">
                         <div className="truncate" title={brand.name}>

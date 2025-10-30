@@ -1,10 +1,9 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Eye, Palette, Funnel, X, Check } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Eye, Palette, Funnel, X, Check } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
-import {Link} from "next-view-transitions"
+import { Link } from "next-view-transitions"
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
 import { EmptyState } from "@/components/dashboard/common/empty-state";
 import { OverlaySpinner as CommonOverlaySpinner } from "@/components/dashboard/common/overlay-spinner";
@@ -14,12 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Table,
   TableBody,
   TableCell,
@@ -27,49 +20,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { OrderFormDialog } from "./form-dialog";
 import { orderService } from "@/services/order.service";
-import { Order, AdminUpdateOrder, OrderQueryOptions } from "@/types/order";
+import { Order, OrderQueryOptions } from "@/types/order";
 import { User } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 export function OrdersTable() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterDraft, setFilterDraft] = useState<Partial<OrderQueryOptions>>({});
   const [appliedFilters, setAppliedFilters] = useState<Partial<OrderQueryOptions>>({});
-  const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["orders", { page, limit, filters: appliedFilters, searchTerm }],
     queryFn: async () =>
       await orderService.getAllOrders({
         page,
         limit,
-        user:searchTerm,
+        user: searchTerm,
         ...appliedFilters,
       }),
   });
 
   const orders = data?.data?.orders ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
-
-  const updatemutation = useMutation({
-    mutationFn: async (values: AdminUpdateOrder) => {
-      if (!editingOrder) return;
-      const data = await orderService.updateOrder(editingOrder._id, values);
-      return data.data;
-    },
-    onSuccess: () => {
-      toast.success("Order updated successfully!");
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
-      setEditingOrder(null);
-    },
-    onError: () => {
-      toast.error("Failed to update order. Please try again.");
-    },
-  });
 
   function applyFilters() {
     const sanitized: Partial<OrderQueryOptions> = Object.entries(filterDraft).reduce((acc, [k, v]) => {
@@ -117,7 +91,6 @@ export function OrdersTable() {
               setLimit(n);
               setPage(1);
             }}
-            onCreate={() => { }}
           />
 
           <div className="flex items-center justify-between gap-3">
@@ -159,7 +132,7 @@ export function OrdersTable() {
           </div>
 
           {isFilterOpen && (
-            <div className="mt-3 p-4 bg-white dark:bg-slate-800 border rounded-lg shadow-sm">
+            <div className="mt-3 p-4 border rounded-lg shadow-sm">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground">Status</label>
@@ -265,36 +238,11 @@ export function OrdersTable() {
                         {order.updatedAt}
                       </TableCell>
                       <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild className="gap-2">
-                              <Link href={`/orders/${order._id}`}>
-                                <Eye className="h-4 w-4" />
-                                View
-                              </Link>
-                            </DropdownMenuItem>
-                            {order.isCustomOrder && (
-                              <DropdownMenuItem
-                                className="gap-2"
-                                onClick={() =>
-                                  setEditingOrder(order)
-                                }
-                              >
-                                <Edit className="h-4 w-4" />
-                                Edit
-                              </DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <Link href={`/orders/${order._id}`}>
+                          <Button variant="ghost">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </Link>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -312,15 +260,6 @@ export function OrdersTable() {
           onPageChange={(p) => setPage(p)}
         />
       </CardContent>
-
-      <OrderFormDialog
-        isLoading={updatemutation.isPending}
-        key={editingOrder?._id || "edit-dialog"}
-        open={!!editingOrder}
-        onOpenChange={(open) => !open && setEditingOrder(null)}
-        onSubmit={(data) => updatemutation.mutate(data)}
-        initialData={editingOrder || undefined}
-      />
     </Card>
   );
 }

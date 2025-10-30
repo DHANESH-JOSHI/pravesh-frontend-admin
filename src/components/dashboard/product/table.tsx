@@ -329,23 +329,6 @@ export function ProductsTable() {
                     })}
                   </div>
                 </div>
-                <div className="space-y-3">
-                  <label className="text-xs font-medium text-muted-foreground">Status</label>
-                  <Select
-                    value={filterDraft.status}
-                    onValueChange={(v) => setFilterDraft((d) => ({ ...d, status: v === "all" ? undefined : v as any }))}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                      <SelectItem value="discontinued">Discontinued</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
 
               </div>
             </div>

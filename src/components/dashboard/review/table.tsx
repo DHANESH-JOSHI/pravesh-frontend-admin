@@ -1,9 +1,8 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { MoreHorizontal, Trash2, Eye, Funnel, X, Check } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Eye, Funnel, X, Check } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
 import { EmptyState } from "@/components/dashboard/common/empty-state";
 import { OverlaySpinner as CommonOverlaySpinner } from "@/components/dashboard/common/overlay-spinner";
@@ -12,12 +11,6 @@ import TableHeaderControls from "@/components/dashboard/common/table-header-cont
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Table,
   TableBody,
   TableCell,
@@ -25,14 +18,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CustomAlertDialog } from "../common/custom-alert-dialog";
 import { reviewService } from "@/services/review.service";
 import { Review, ReviewQueryOptions } from "@/types/review";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Product, User } from "@/types";
 import { Link } from "next-view-transitions";
 export function ReviewsTable() {
-  const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -40,7 +31,6 @@ export function ReviewsTable() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterDraft, setFilterDraft] = useState<Partial<ReviewQueryOptions>>({});
   const [appliedFilters, setAppliedFilters] = useState<Partial<ReviewQueryOptions>>({});
-  const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["reviews", { page, limit, filters: appliedFilters, searchTerm }],
     queryFn: async () =>
@@ -54,19 +44,6 @@ export function ReviewsTable() {
 
   const reviews = data?.data?.reviews ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
-
-  const deleteMutation = useMutation({
-    mutationFn: reviewService.delete,
-    onSuccess: () => {
-      setIsOpen(false);
-      toast.success("Review deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["reviews"], exact: false });
-    },
-    onError: () => {
-      setIsOpen(false);
-      toast.error("Failed to delete review. Please try again.");
-    },
-  });
 
   function applyFilters() {
     const sanitized: Partial<ReviewQueryOptions> = Object.entries(filterDraft).reduce((acc, [k, v]) => {
@@ -260,36 +237,11 @@ export function ReviewsTable() {
                         {review.createdAt}
                       </TableCell>
                       <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild className="gap-2">
-                              <Link href={`/reviews/${review._id}`}>
-                                <Eye className="h-4 w-4" />
-                                View
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="gap-2 text-destructive"
-                              onClick={() => {
-                                setIsOpen(true);
-                                pendingDeleteId =
-                                  review._id;
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <Link href={`/reviews/${review._id}`}>
+                          <Button variant="ghost">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </Link>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -307,19 +259,6 @@ export function ReviewsTable() {
           onPageChange={(p) => setPage(p)}
         />
       </CardContent>
-
-      <CustomAlertDialog
-        isOpen={isOpen}
-        onCancel={() => setIsOpen(false)}
-        onContinue={() => {
-          if (pendingDeleteId)
-            deleteMutation.mutate(pendingDeleteId);
-        }}
-      />
-
-
     </Card>
   );
 }
-
-let pendingDeleteId: string | null = null;

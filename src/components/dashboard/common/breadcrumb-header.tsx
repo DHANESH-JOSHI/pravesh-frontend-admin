@@ -20,7 +20,7 @@ type Crumb = { label: string; href?: string };
 export function BreadcrumbHeader() {
     const pathname = usePathname();
     const segments = (pathname || "/").split("/").filter(Boolean);
-    const dashIdx = Math.max(segments.indexOf("dashboard"), 0);
+    const dashIdx = segments.indexOf("dashboard");
     const trail = segments.slice(dashIdx + 1);
     let href = "/";
     const crumbs: Crumb[] = trail.map((seg, idx) => {

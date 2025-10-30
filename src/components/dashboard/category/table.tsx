@@ -219,7 +219,6 @@ export function CategoriesTable() {
               <TableRow>
                 <TableHead>Image</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Parent Category</TableHead>
                 <TableHead>Updated</TableHead>
                 <TableHead className="w-16">Actions</TableHead>
               </TableRow>
@@ -232,13 +231,12 @@ export function CategoriesTable() {
                     "h-12 w-40 rounded-md",
                     "h-4 w-40",
                     "h-4 w-40",
-                    "h-4 w-40",
                     "h-8 w-12 rounded",
                   ]}
                 />
               ) : categories.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="p-6">
+                  <TableCell colSpan={4} className="p-6">
                     <EmptyState
                       title="No categories found"
                       description="Try a different search."
@@ -250,7 +248,7 @@ export function CategoriesTable() {
                   {categories.map((category) => (
                     <TableRow key={category._id}>
                       <TableCell>
-                        <Image
+                        {category.image ? <Image
                           src={
                             category.image ||
                             "/placeholder.svg"
@@ -258,17 +256,12 @@ export function CategoriesTable() {
                           width={50}
                           height={50}
                           alt={category.title}
-                          className="h-12 w-12 rounded-md object-cover"
-                        />
+                          className="h-12 w-12 rounded-md object-cover text-center"
+                        /> : <div className="h-12 w-12 flex items-center justify-center">N/A</div>}
                       </TableCell>
                       <TableCell className="font-medium max-w-xs">
                         <div className="truncate" title={category.title}>
                           {category.title}
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium max-w-xs">
-                        <div className="truncate" title={typeof category.parentCategory === 'object' ? category.parentCategory?.title : category.parentCategory}>
-                          {typeof category.parentCategory === 'object' ? category.parentCategory?.title || "N/A" : category.parentCategory || "N/A"}
                         </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground">

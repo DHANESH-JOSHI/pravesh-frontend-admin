@@ -23,12 +23,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Category, CreateCategory, FormDialogProps, createCategorySchema } from "@/types";
-import { CategorySearchableSelect } from "../product/form-dialog";
-
 export function CategoryFormDialog({
   open,
   onOpenChange,
   onSubmit,
+  title,
   initialData,
   isLoading,
 }: FormDialogProps<CreateCategory, Category>) {
@@ -43,7 +42,6 @@ export function CategoryFormDialog({
     defaultValues: {
       title: initialData?.title || "",
       image: undefined,
-      parentCategoryId: typeof initialData?.parentCategory === "string" ? initialData?.parentCategory : initialData?.parentCategory?._id || "",
     },
   });
 
@@ -69,7 +67,7 @@ export function CategoryFormDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            {initialData ? "Edit Category" : "Create Category"}
+            {title || "Create Category"}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -96,21 +94,10 @@ export function CategoryFormDialog({
             />
             <FormField
               control={form.control}
-              name="parentCategoryId"
-              render={({ field }) => (
-                <FormItem className="space-y-2">
-                  <FormLabel>Parent Category *</FormLabel>
-                  <CategorySearchableSelect value={field.value || ""} onChange={field.onChange} />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="image"
               render={() => (
                 <FormItem className="space-y-2">
-                  <FormLabel>Image</FormLabel>
+                  <FormLabel>Image (optional)</FormLabel>
                   <Card className="relative border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
                     <CardContent className="p-6">
                       {imagePreview ? (

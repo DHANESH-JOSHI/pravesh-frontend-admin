@@ -14,9 +14,19 @@ import { Link } from "next-view-transitions"
 import { User } from "@/types"
 const items = [
   {
-    title: "Addresses",
-    url: "/addresses",
-    icon: MapPin,
+    title: "Brands",
+    url: "/brands",
+    icon: Building2,
+  },
+  {
+    title: "Products",
+    url: "/products",
+    icon: Box,
+  },
+  {
+    title: "Categories",
+    url: "/categories",
+    icon: FolderOpen,
   },
   {
     title: "Banners",
@@ -29,29 +39,9 @@ const items = [
     icon: FileText,
   },
   {
-    title: "Brands",
-    url: "/brands",
-    icon: Building2,
-  },
-  {
-    title: "Carts",
-    url: "/carts",
-    icon: ShoppingCart,
-  },
-  {
-    title: "Categories",
-    url: "/categories",
-    icon: FolderOpen,
-  },
-  {
     title: "Orders",
     url: "/orders",
     icon: Receipt,
-  },
-  {
-    title: "Products",
-    url: "/products",
-    icon: Box,
   },
   {
     title: "Reviews",
@@ -67,7 +57,12 @@ const items = [
     title: "Wallets",
     url: "/wallets",
     icon: Wallet,
-  }
+  },
+  {
+    title: "Addresses",
+    url: "/addresses",
+    icon: MapPin,
+  },
 ]
 export const AppSidebar = ({ user }: { user: User }) => {
   return (

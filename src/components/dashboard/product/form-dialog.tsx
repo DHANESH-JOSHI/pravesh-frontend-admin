@@ -65,9 +65,15 @@ export function ProductFormDialog({
   });
 
   const thumbnailRef = useRef<HTMLInputElement>(null);
+  const imagesRef = useRef<HTMLInputElement>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
     initialData?.thumbnail || null,
   );
+  const [imagesPreviews, setImagesPreviews] = useState<string[]>(
+    initialData?.images || [],
+  );
+  const [imagesFiles, setImagesFiles] = useState<File[]>([]);
+  const initialImagesCount = initialData?.images?.length || 0;
   const form = useForm<any>({
     resolver: zodResolver(
       formSchema
@@ -85,6 +91,7 @@ export function ProductFormDialog({
       discountValue: initialData?.discountValue || 0,
       stock: initialData?.stock || 0,
       thumbnail: undefined,
+      images: undefined,
       features: initialData?.features || [],
       specifications: initialData?.specifications ? Object.entries(initialData.specifications).map(([key, value]) => ({ key, value })) : [],
       unit: initialData?.unit || undefined,
@@ -115,10 +122,13 @@ export function ProductFormDialog({
         specifications: initialData.specifications ? Object.entries(initialData.specifications).map(([key, value]) => ({ key, value })) : [],
         tags: initialData.tags || [],
         thumbnail: undefined,
+        images: undefined,
       })
       if (initialData.thumbnail) {
         setThumbnailPreview(initialData.thumbnail)
       }
+      setImagesPreviews(initialData.images || []);
+      setImagesFiles([]);
     }
   }, [initialData, form])
 
@@ -133,8 +143,9 @@ export function ProductFormDialog({
     return () => {
       if (thumbnailPreview?.startsWith("blob:"))
         URL.revokeObjectURL(thumbnailPreview);
+      imagesPreviews.filter(p => p.startsWith("blob:")).forEach(URL.revokeObjectURL);
     };
-  }, [thumbnailPreview]);
+  }, [thumbnailPreview, imagesPreviews]);
 
   const handleFileChange = (file: File | undefined) => {
     form.setValue("thumbnail", file, { shouldDirty: true });
@@ -145,6 +156,30 @@ export function ProductFormDialog({
     } else {
       setThumbnailPreview(null);
     }
+  };
+
+  const handleImagesChange = (files: FileList | null) => {
+    if (!files) return;
+    const newFiles = Array.from(files);
+    setImagesFiles(prev => [...prev, ...newFiles]);
+    const newPreviews = newFiles.map(f => URL.createObjectURL(f));
+    setImagesPreviews(prev => [...prev, ...newPreviews]);
+    form.setValue("images", [...imagesFiles, ...newFiles], { shouldDirty: true });
+  };
+
+  const removeImage = (index: number) => {
+    const newPreviews = [...imagesPreviews];
+    const newFiles = [...imagesFiles];
+    if (index < initialImagesCount) {
+      return;
+    }
+    const fileIndex = index - initialImagesCount;
+    if (newPreviews[index]?.startsWith("blob:")) URL.revokeObjectURL(newPreviews[index]);
+    newPreviews.splice(index, 1);
+    newFiles.splice(fileIndex, 1);
+    setImagesPreviews(newPreviews);
+    setImagesFiles(newFiles);
+    form.setValue("images", newFiles, { shouldDirty: true });
   };
   return (<>{open && <div className="fixed inset-0 bg-black/50 pointer-events-none z-40" />}
     <Dialog open={open} onOpenChange={onOpenChange} modal={false} >
@@ -163,7 +198,7 @@ export function ProductFormDialog({
                 const transformedData = {
                   ...data,
                   features: data.features,
-                  specifications: data.specifications ? Object.fromEntries(data.specifications.filter((s:any) => s.key).map((s: { key: string, value: string }) => [s.key, s.value])) : undefined,
+                  specifications: data.specifications ? Object.fromEntries(data.specifications.filter((s: any) => s.key).map((s: { key: string, value: string }) => [s.key, s.value])) : undefined,
                 };
                 onSubmit(transformedData as CreateProduct);
               },
@@ -491,6 +526,82 @@ export function ProductFormDialog({
                       />
                     </div>
                   </Card>
+                  <FormField
+                    control={form.control}
+                    name="images"
+                    render={() => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Images</FormLabel>
+                        <Card className="relative border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
+                          <CardContent className="p-6">
+                            {imagesPreviews.length > 0 ? (
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {imagesPreviews.map((src, index) => (
+                                  <div key={index} className="relative">
+                                    <Image
+                                      src={src}
+                                      alt={`Image ${index + 1}`}
+                                      width={100}
+                                      height={100}
+                                      className="w-full h-24 object-cover rounded"
+                                    />
+                                    {index >= initialImagesCount && (
+                                      <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="absolute top-1 right-1 h-6 w-6 p-0"
+                                        onClick={() => removeImage(index)}
+                                      >
+                                        <Trash className="h-3 w-3" />
+                                      </Button>
+                                    )}
+                                  </div>
+                                ))}
+                                <div className="flex items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded h-24">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => imagesRef.current?.click()}
+                                  >
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Add More
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="text-center">
+                                <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                                <div className="space-y-2">
+                                  <p className="text-sm text-muted-foreground">
+                                    Upload product images
+                                  </p>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="gap-2 bg-accent"
+                                    onClick={() => imagesRef.current?.click()}
+                                  >
+                                    <Upload className="h-4 w-4" />
+                                    Choose Images
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
+                            <Input
+                              ref={imagesRef}
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              hidden
+                              onChange={(e) => handleImagesChange(e.target.files)}
+                            />
+                          </CardContent>
+                        </Card>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </div>
             </ScrollArea>
@@ -531,8 +642,8 @@ function BrandSearchableSelect({ value, onChange }: { value: string; onChange: (
   const { data: brandsData, isLoading: isLoadingBrands } = useQuery({
     queryKey: ["brands", "search", search],
     queryFn: () => brandService.getAll({
-      page:1,
-      limit:20,
+      page: 1,
+      limit: 20,
       search: search,
     }),
     enabled: open,
@@ -591,8 +702,8 @@ export function CategorySearchableSelect({ value, onChange }: { value: string; o
   const { data: categoriesData, isLoading: isLoadingCategories } = useQuery({
     queryKey: ["categories", "search", search],
     queryFn: () => categoryService.getAll({
-      page:1,
-      limit:20,
+      page: 1,
+      limit: 20,
       search,
     }),
     enabled: open,
