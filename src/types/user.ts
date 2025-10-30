@@ -4,6 +4,7 @@ export type User = {
   _id: string;
   name: string;
   email: string;
+  img?: string;
   role: string;
   status: string;
   isDeleted: boolean;

@@ -14,13 +14,16 @@ export const orderStatusSchema = z.enum([
 export type OrderStatus = z.infer<typeof orderStatusSchema>;
 
 
-export const orderItemSchema = z.object({
+export const orderUpdateItemSchema = z.object({
   product: z.string(),
   quantity: z.number().min(1, "Quantity must be at least 1"),
   price: z.number().min(1, "Price must be at least 0"),
 });
-
-export type OrderItem = z.infer<typeof orderItemSchema>;
+type OrderItem = {
+  product: string | Partial<Product>;
+  quantity: number;
+  price: number;
+}
 
 export type Order = {
   _id: string;
@@ -47,7 +50,7 @@ export const createCustomOrderSchema = z.object({
 export const adminUpdateOrderSchema = z.object({
   items: z
     .array(
-      orderItemSchema
+      orderUpdateItemSchema
     )
     .optional(),
   status: orderStatusSchema.optional(),

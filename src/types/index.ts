@@ -12,6 +12,7 @@ export interface PaginatedData {
 }
 
 export interface FormDialogProps<T, U> {
+  title?: string;
     open: boolean;
     isLoading: boolean;
     onOpenChange: (open: boolean) => void;

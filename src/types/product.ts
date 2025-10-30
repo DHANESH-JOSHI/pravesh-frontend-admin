@@ -2,7 +2,6 @@ import { z } from "zod";
 import { Brand, Category, PaginatedData, Review } from ".";
 
 export const stockStatusSchema = z.enum(["in-stock", "out-of-stock", "low-stock"]);
-export const productStatusSchema = z.enum(["active", "inactive", "discontinued"]);
 export const discountTypeSchema = z.enum(["percentage", "fixed"]);
 export const unitSchema = z.enum([
   "bag",
@@ -17,7 +16,6 @@ export const unitSchema = z.enum([
   "set",
 ]);
 export type stockStatus = z.infer<typeof stockStatusSchema>;
-export type productStatus = z.infer<typeof productStatusSchema>;
 export type discountType = z.infer<typeof discountTypeSchema>;
 export type unit = z.infer<typeof unitSchema>;
 
@@ -31,7 +29,6 @@ export const queryOptionsSchema = z.object({
   minPrice: z.number().nonnegative().optional(),
   maxPrice: z.number().nonnegative().optional(),
   stockStatus: stockStatusSchema.optional(),
-  status: productStatusSchema.optional(),
 
   isFeatured: z.boolean().optional(),
   isNewArrival: z.boolean().optional(),
@@ -95,7 +92,6 @@ export type Product = {
   discountType: discountType,
   finalPrice: number,
   stock: number,
-  status: productStatus,
   stockStatus: stockStatus,
   unit: unit,
   minStock: number,
