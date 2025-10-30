@@ -1,7 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, MapPin, Phone, User, Calendar, Package, Eye, MoreHorizontal } from "lucide-react";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,8 +24,11 @@ import {
 import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
 import { addressService } from "@/services/address.service";
 import { Order } from "@/types/order";
+import { Link, useTransitionRouter } from "next-view-transitions";
+import Loader from "@/components/ui/loader";
 
 export default function AddressDetailPage() {
+  const router = useTransitionRouter()
   const params = useParams();
   const addressId = params.id as string;
 
@@ -46,14 +48,7 @@ export default function AddressDetailPage() {
   const paginatedOrders = orders.slice((ordersPage - 1) * itemsPerPage, ordersPage * itemsPerPage);
 
   if (isLoading) {
-    return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-        <div className="animate-pulse">
-          <div className="h-8 rounded w-1/4 mb-4"></div>
-          <div className="h-64 rounded"></div>
-        </div>
-      </div>
-    );
+    return <Loader/>
   }
 
   if (error || !address) {
@@ -75,12 +70,18 @@ export default function AddressDetailPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-      <Link href="/addresses">
-        <Button variant="outline" size="sm">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Addresses
-        </Button>
-      </Link>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" onClick={() => router.back()} >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <h1 className="text-xl font-bold">{address._id}</h1>
+        </div>
+        <Badge variant={address.isDeleted ? "destructive" : "secondary"}>
+          {address.isDeleted ? "Deleted" : "Active"}
+        </Badge>
+      </div>
 
       {/* Address Details */}
       <Card>
@@ -108,10 +109,11 @@ export default function AddressDetailPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium">Status</label>
-                <Badge variant={address.isDeleted ? "destructive" : "secondary"}>
-                  {address.isDeleted ? "Deleted" : "Active"}
-                </Badge>
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Updated At
+                </label>
+                <p className="text-sm">{address.updatedAt}</p>
               </div>
               <div>
                 <label className="text-sm font-medium flex items-center gap-2">
@@ -168,19 +170,6 @@ export default function AddressDetailPage() {
               <p>{address.country}</p>
             </div>
           </div>
-
-          <Separator className="my-6" />
-
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Address ID</p>
-              <p className="font-mono text-xs">{address._id}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm font-medium text-muted-foreground">Last Updated</p>
-              <p className="text-xs">{address.updatedAt}</p>
-            </div>
-          </div>
         </CardContent>
       </Card>
 
@@ -194,22 +183,27 @@ export default function AddressDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="text-sm font-medium">Full Name</label>
-                <p className="text-lg font-semibold">{user.name || "Unknown User"}</p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-12 md:gap-20">
+                <div>
+                  <label className="text-sm font-medium">ID</label>
+                  <p className="font-mono text-sm">{user._id || "N/A"}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Full Name</label>
+                  <p className="text-lg font-semibold">{user.name || "Unknown User"}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Email</label>
+                  <p className="font-mono text-sm">{user.email || "N/A"}</p>
+                </div>
               </div>
-              <div>
-                <label className="text-sm font-medium">Email</label>
-                <p className="font-mono text-sm">{user.email || "N/A"}</p>
-              </div>
-            </div>
-            <Separator className="my-6" />
-            <div className="flex justify-start items-center">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">User ID</p>
-                <p className="font-mono text-xs">{user._id}</p>
-              </div>
+              <Button asChild variant="outline">
+                <Link href={`/users/${user._id}`}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  View User
+                </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -251,8 +245,8 @@ export default function AddressDetailPage() {
                       <TableCell>
                         <Badge variant={
                           order.status === "delivered" ? "default" :
-                          order.status === "cancelled" ? "destructive" :
-                          "secondary"
+                            order.status === "cancelled" ? "destructive" :
+                              "secondary"
                         }>
                           {order.status || "pending"}
                         </Badge>
@@ -274,7 +268,7 @@ export default function AddressDetailPage() {
                             <DropdownMenuItem asChild>
                               <Link href={`/orders/${order._id}`}>
                                 <Eye className="h-4 w-4 mr-2" />
-                                View Order
+                                View
                               </Link>
                             </DropdownMenuItem>
                           </DropdownMenuContent>

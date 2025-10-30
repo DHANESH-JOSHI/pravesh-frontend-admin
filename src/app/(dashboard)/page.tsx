@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/dashboard/common/page-header';
 import { useQuery } from '@tanstack/react-query';
 import instance from '@/lib/axios';
 import { ApiResponse } from '@/types';
+import Loader from '@/components/ui/loader';
 
 interface IDashboardStats {
   totalUsers: number;
@@ -82,9 +83,7 @@ export default function DashboardPage() {
   });
   if (isLoading) {
     return (
-      <div className="min-h-screen p-8 flex items-center justify-center">
-        <div className="text-xl">Loading dashboard...</div>
-      </div>
+      <Loader/>
     );
   }
 

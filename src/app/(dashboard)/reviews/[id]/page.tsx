@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Star, User, Package, Calendar, MessageSquare } from "lucide-react";
+import { ArrowLeft, Star, User, Package, Calendar, MessageSquare, Eye } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,11 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { reviewService } from "@/services/review.service";
 import { Review } from "@/types/review";
-import { Link } from "next-view-transitions";
+import { Link, useTransitionRouter } from "next-view-transitions";
+import Loader from "@/components/ui/loader";
 
 export default function ReviewDetailPage() {
+  const router = useTransitionRouter()
   const params = useParams();
   const reviewId = params.id as string;
 
@@ -24,14 +26,7 @@ export default function ReviewDetailPage() {
   const review = data?.data as Review;
 
   if (isLoading) {
-    return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-        <div className="animate-pulse">
-          <div className="h-8 rounded w-1/4 mb-4"></div>
-          <div className="h-64 rounded"></div>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (error || !review) {
@@ -53,7 +48,6 @@ export default function ReviewDetailPage() {
 
   const user = typeof review.user === 'object' ? review.user : null;
   const product = typeof review.product === 'object' ? review.product : null;
-  const productBrand = product?.brand && typeof product.brand === 'object' ? product.brand : null;
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -68,12 +62,10 @@ export default function ReviewDetailPage() {
   return (
     <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
       <div className="flex items-center gap-4">
-        <Link href="/reviews">
-          <Button variant="outline" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Reviews
-          </Button>
-        </Link><h1 className="text-xl font-bold">{review._id}</h1>
+        <Button variant="outline" size="sm" onClick={() => router.back()} >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button><h1 className="text-xl font-bold">{review._id}</h1>
       </div>
 
 
@@ -136,15 +128,6 @@ export default function ReviewDetailPage() {
               </div>
             </>
           )}
-
-          <Separator className="my-6" />
-
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Review ID</p>
-              <p className="font-mono text-xs">{review._id}</p>
-            </div>
-          </div>
         </CardContent>
       </Card>
 
@@ -158,22 +141,27 @@ export default function ReviewDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="text-sm font-medium">Full Name</label>
-                <p className="text-lg font-semibold">{user.name || "Unknown User"}</p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-12 md:gap-20">
+                <div>
+                  <label className="text-sm font-medium">ID</label>
+                  <p className="font-mono text-sm">{user._id || "N/A"}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Full Name</label>
+                  <p className="text-lg font-semibold">{user.name || "Unknown User"}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Email</label>
+                  <p className="font-mono text-sm">{user.email || "N/A"}</p>
+                </div>
               </div>
-              <div>
-                <label className="text-sm font-medium">Email</label>
-                <p className="font-mono text-sm">{user.email || "N/A"}</p>
-              </div>
-            </div>
-            <Separator className="my-6" />
-            <div className="flex justify-start items-center">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">User ID</p>
-                <p className="font-mono text-xs">{user._id}</p>
-              </div>
+              <Button asChild variant="outline">
+                <Link href={`/users/${user._id}`}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  View User
+                </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -189,22 +177,23 @@ export default function ReviewDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="text-sm font-medium">Product Name</label>
-                <p className="text-lg font-semibold">{product.name || "Unknown Product"}</p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-12 md:gap-20">
+                <div>
+                  <label className="text-sm font-medium">ID</label>
+                  <p className="font-mono text-sm">{product._id || "N/A"}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Name</label>
+                  <p className="text-lg font-semibold">{product.name || "Unknown User"}</p>
+                </div>
               </div>
-              <div>
-                <label className="text-sm font-medium">Brand</label>
-                <p className="text-sm">{productBrand?.name || "N/A"}</p>
-              </div>
-            </div>
-            <Separator className="my-6" />
-            <div className="flex justify-start items-center">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Product ID</p>
-                <p className="font-mono text-xs">{product._id}</p>
-              </div>
+              <Button asChild variant="outline">
+                <Link href={`/products/${product._id}`}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  View Product
+                </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>

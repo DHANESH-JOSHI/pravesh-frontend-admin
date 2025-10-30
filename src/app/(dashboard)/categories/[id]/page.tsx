@@ -1,7 +1,6 @@
 "use client";
-
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Folder, Package, Image as ImageIcon, BarChart3, Eye, MoreHorizontal } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Folder, Package, Image as ImageIcon, Eye, MoreHorizontal, Edit, Trash2, Plus } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,13 +23,23 @@ import {
 import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
 
 import { categoryService } from "@/services/category.service";
-import { Category } from "@/types/category";
-import { Link } from "next-view-transitions";
+import { Category, CreateCategory, UpdateCategory } from "@/types/category";
+import { Link, useTransitionRouter } from "next-view-transitions";
+import { toast } from "sonner";
+import { CategoryFormDialog } from "@/components/dashboard/category/form-dialog";
+import { CustomAlertDialog } from "@/components/dashboard/common/custom-alert-dialog";
+import Loader from "@/components/ui/loader";
+import { ApiResponse } from "@/types";
 
 export default function CategoryDetailPage() {
+  const queryClient = useQueryClient();
+  const router = useTransitionRouter()
   const params = useParams();
   const categoryId = params.id as string;
   const [productsPage, setProductsPage] = useState(1);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const itemsPerPage = 10;
 
   const { data, isLoading, error } = useQuery({
@@ -40,16 +49,70 @@ export default function CategoryDetailPage() {
   });
 
   const category = data?.data as Category;
+  const deleteMutation = useMutation({
+    mutationFn: categoryService.delete,
+    onSuccess: () => {
+      setIsOpen(false);
+      toast.success("Category deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["categories"] })
+    },
+    onError: () => {
+      setIsOpen(false);
+      toast.error("Failed to delete category. Please try again.");
+    },
+  });
 
+  const updatemutation = useMutation({
+    mutationFn: async (values: UpdateCategory) => {
+      if (!editingCategory) return;
+      const data = await categoryService.update(editingCategory._id, values);
+      return data.data;
+    },
+    onSuccess: (updatedCategory) => {
+      toast.success("Category updated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.setQueryData(["category", categoryId], (oldData: ApiResponse<Category>) => ({
+        ...oldData,
+        data: {
+          ...oldData.data,
+          children: oldData?.data?.children?.map((child) => {
+            if (child._id === updatedCategory?._id) return updatedCategory;
+            return child;
+          })
+        }
+      }));
+      setEditingCategory(null);
+    },
+    onError: () => {
+      toast.error("Failed to update category. Please try again.");
+    },
+  });
+  const createMutation = useMutation({
+    mutationFn: async (values: CreateCategory) => {
+      const data = await categoryService.create({ ...values, parentCategoryId: categoryId });
+      return data.data;
+    },
+    onSuccess: (createdCategory) => {
+      toast.success("Category created successfully!");
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.setQueryData(["category", categoryId], (oldData: ApiResponse<Category>) => ({
+        ...oldData,
+        data: {
+          ...oldData.data,
+          children: [
+            ...(oldData?.data?.children || []),
+            createdCategory,
+          ]
+        }
+      }));
+      setIsCreateDialogOpen(false);
+    },
+    onError: () => {
+      toast.error("Failed to create category. Please try again.");
+    },
+  });
   if (isLoading) {
-    return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-        <div className="animate-pulse">
-          <div className="h-8 rounded w-1/4 mb-4"></div>
-          <div className="h-64 rounded"></div>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (error || !category) {
@@ -58,10 +121,10 @@ export default function CategoryDetailPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600">Category not found</h1>
           <p className="text-muted-foreground">The category you're looking for doesn't exist.</p>
-          <Link href="/categories">
+          <Link href="/addresses">
             <Button className="mt-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Categories
+              Back to Addresses
             </Button>
           </Link>
         </div>
@@ -74,12 +137,10 @@ export default function CategoryDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/categories">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Categories
-            </Button>
-          </Link>
+          <Button variant="outline" size="sm" onClick={() => router.back()} >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
           <h1 className="text-xl font-bold">{category._id}</h1>
         </div>
         <Badge variant={category.isDeleted ? "destructive" : "secondary"}>
@@ -88,51 +149,51 @@ export default function CategoryDetailPage() {
       </div>
 
       {/* Parent Category */}
-      {category.parentCategory && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Folder className="h-5 w-5" />
-              Parent Category
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                {typeof category.parentCategory === 'object' && category.parentCategory.image ? (
-                  <img
-                    src={category.parentCategory.image}
-                    alt={category.parentCategory.title}
-                    className="h-12 w-12 rounded-lg object-cover border"
-                  />
-                ) : (
-                  <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
-                    <Folder className="h-6 w-6 text-muted-foreground" />
+      {
+        category.parentCategory && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Folder className="h-5 w-5" />
+                Parent Category
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  {typeof category.parentCategory === 'object' && category.parentCategory.image ? (
+                    <img
+                      src={category.parentCategory.image}
+                      alt={category.parentCategory.title}
+                      className="h-12 w-12 rounded-lg object-cover border"
+                    />
+                  ) : (
+                    <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
+                      <Folder className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-semibold text-lg">
+                      {typeof category.parentCategory === 'object'
+                        ? category.parentCategory.title
+                        : category.parentCategory}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {(category.parentCategory as Category)?._id}
+                    </p>
                   </div>
-                )}
-                <div>
-                  <p className="font-semibold text-lg">
-                    {typeof category.parentCategory === 'object'
-                      ? category.parentCategory.title
-                      : category.parentCategory}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {typeof category.parentCategory === 'object'
-                      ? `${category.parentCategory.children?.length || 0} subcategories • ${category.parentCategory.products?.length || 0} products`
-                      : 'Parent category'}
-                  </p>
                 </div>
+                <Button asChild variant="outline">
+                  <Link href={`/categories/${typeof category.parentCategory === 'object' ? category.parentCategory._id : category.parentCategory}`}>
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Parent Category
+                  </Link>
+                </Button>
               </div>
-              <Button asChild variant="outline">
-                <Link href={`/categories/${typeof category.parentCategory === 'object' ? category.parentCategory._id : category.parentCategory}`}>
-                  <Eye className="h-4 w-4 mr-2" />
-                  View Parent Category
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        )
+      }
 
       {/* Category Overview */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -207,58 +268,50 @@ export default function CategoryDetailPage() {
       </div>
 
       {/* Subcategories */}
-      {category.children && category.children.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-start justify-between">
+            <div className="flex items-center gap-2">
               <Folder className="h-5 w-5" />
-              Subcategories ({category.children.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
+              Subcategories ({category.children?.length ?? 0})
+            </div>
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Create Subcategory
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {
+            category.children && category.children.length > 0 && (<div className="rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Products</TableHead>
-                    <TableHead>Subcategories</TableHead>
+                    <TableHead>Image</TableHead>
+                    <TableHead>Name</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead className="w-16">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {category.children.map((child) => (
+                  {category.children?.map((child) => (
                     <TableRow key={child._id}>
                       <TableCell>
-                        <div className="flex items-center gap-3">
-                          {child.image ? (
-                            <img
-                              src={child.image}
-                              alt={child.title}
-                              className="h-8 w-8 rounded object-cover"
-                            />
-                          ) : (
-                            <div className="h-8 w-8 rounded bg-muted flex items-center justify-center">
-                              <Folder className="h-4 w-4 text-muted-foreground" />
-                            </div>
-                          )}
-                          <div>
-                            <p className="font-medium">{child.title}</p>
+                        {child.image ? (
+                          <img
+                            src={child.image}
+                            alt={child.title}
+                            className="h-8 w-8 rounded object-cover"
+                          />
+                        ) : (
+                          <div className="h-8 w-8 rounded bg-muted flex items-center justify-center">
+                            <Folder className="h-4 w-4 text-muted-foreground" />
                           </div>
-                        </div>
+                        )}
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">
-                          {child.products?.length || 0} products
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {child.children?.length || 0} subcategories
-                        </Badge>
-                      </TableCell>
+                      <TableCell>{child.title}</TableCell>
                       <TableCell>
                         <Badge variant={child.isDeleted ? "destructive" : "secondary"}>
                           {child.isDeleted ? "Deleted" : "Active"}
@@ -270,16 +323,40 @@ export default function CategoryDetailPage() {
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild>
+                            <DropdownMenuItem asChild className="gap-2">
                               <Link href={`/categories/${child._id}`}>
-                                <Eye className="h-4 w-4 mr-2" />
-                                View Details
+                                <Eye className="h-4 w-4" />
+                                View
                               </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="gap-2"
+                              onClick={() =>
+                                setEditingCategory(child as Category)
+                              }
+                            >
+                              <Edit className="h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="gap-2 text-destructive"
+                              onClick={() => {
+                                setIsOpen(true);
+                                pendingDeleteSlug =
+                                  child._id || null;
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -289,44 +366,42 @@ export default function CategoryDetailPage() {
                 </TableBody>
               </Table>
             </div>
-          </CardContent>
-        </Card>
-      )}
-
+            )
+          }
+        </CardContent>
+      </Card>
       {/* Products in Category */}
-      {category.products && category.products.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Package className="h-5 w-5" />
-                Products in Category ({category.products.length})
-              </div>
-              <Button variant="outline" size="sm">
-                <BarChart3 className="h-4 w-4 mr-2" />
-                View All Products
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Stock</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="w-16">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(category.products || [])
-                    .slice((productsPage - 1) * itemsPerPage, productsPage * itemsPerPage)
-                    .map((product) => (
-                      <TableRow key={product._id}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
+      {
+        category.products && category.products.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <div className="flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  Products by {category.title} ({category.products.length})
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Thumbnail</TableHead>
+                      <TableHead>SKU</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead>Stock</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="w-16">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(category.products || [])
+                      .slice((productsPage - 1) * itemsPerPage, productsPage * itemsPerPage)
+                      .map((product) => (
+                        <TableRow key={product._id}>
+                          <TableCell className="w-40">
                             {product.thumbnail && (
                               <img
                                 src={product.thumbnail}
@@ -334,90 +409,85 @@ export default function CategoryDetailPage() {
                                 className="h-10 w-10 rounded object-cover"
                               />
                             )}
-                            <div>
-                              <p className="font-medium max-w-xs truncate">{product.name}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {product.sku}
-                              </p>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          ₹{product.finalPrice}
-                        </TableCell>
-                        <TableCell>{product.stock}</TableCell>
-                        <TableCell>
-                          <Badge variant={
-                            product.status === "active" ? "default" :
-                              product.status === "inactive" ? "secondary" :
-                                "destructive"
-                          }>
-                            {product.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Button variant="ghost" size="sm">
-                            <Package className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </div>
-            {(category.products || []).length > itemsPerPage && (
-              <div className="mt-4">
-                <PaginationControls
-                  page={productsPage}
-                  totalPages={Math.ceil((category.products || []).length / itemsPerPage)}
-                  isFetching={false}
-                  onPrev={() => setProductsPage((p) => Math.max(1, p - 1))}
-                  onNext={() => setProductsPage((p) => Math.min(Math.ceil((category.products || []).length / itemsPerPage), p + 1))}
-                  onPageChange={setProductsPage}
-                />
+                          </TableCell>
+                          <TableCell className="font-medium w-32">
+                            {product.sku}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {product.name}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            ₹{product.finalPrice}
+                          </TableCell>
+                          <TableCell>{product.stock}</TableCell>
+                          <TableCell>
+                            <Badge variant={
+                              product.isDeleted ? "destructive" :
+                                "secondary"
+                            }>
+                              {product.isDeleted ? "inactive" : "active"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Link href={`/products/${product._id}`}>
+                              <Button variant="ghost" size="sm">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+              {(category.products || []).length > itemsPerPage && (
+                <div className="mt-4">
+                  <PaginationControls
+                    page={productsPage}
+                    totalPages={Math.ceil((category.products || []).length / itemsPerPage)}
+                    isFetching={false}
+                    onPrev={() => setProductsPage((p) => Math.max(1, p - 1))}
+                    onNext={() => setProductsPage((p) => Math.min(Math.ceil((category.products || []).length / itemsPerPage), p + 1))}
+                    onPageChange={setProductsPage}
+                  />
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )
+      }
+      <CategoryFormDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        onSubmit={(data) =>
+          createMutation.mutate({
+            ...data,
+            image: data.image!,
+          })
+        }
+        isLoading={createMutation.isPending}
+        title="Create Subcategory"
+      />
 
-      {/* Category Analytics */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5" />
-            Category Analytics
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <p className="text-2xl font-bold text-blue-600">
-                {category.products?.length || 0}
-              </p>
-              <p className="text-sm text-muted-foreground">Total Products</p>
-            </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <p className="text-2xl font-bold text-green-600">
-                {category.children?.length || 0}
-              </p>
-              <p className="text-sm text-muted-foreground">Subcategories</p>
-            </div>
-            <div className="text-center p-4 bg-yellow-50 rounded-lg">
-              <p className="text-2xl font-bold text-yellow-600">
-                {category.products?.filter(p => p.stock && p.stock > 0).length || 0}
-              </p>
-              <p className="text-sm text-muted-foreground">In Stock</p>
-            </div>
-            <div className="text-center p-4 bg-red-50 rounded-lg">
-              <p className="text-2xl font-bold text-red-600">
-                {category.products?.filter(p => p.stock === 0).length || 0}
-              </p>
-              <p className="text-sm text-muted-foreground">Out of Stock</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+      <CategoryFormDialog
+        key={editingCategory?._id || "edit-dialog"}
+        open={!!editingCategory}
+        onOpenChange={(open) => !open && setEditingCategory(null)}
+        onSubmit={(data) => updatemutation.mutate(data)}
+        initialData={editingCategory || undefined}
+        isLoading={updatemutation.isPending}
+        title="Edit Subcategory"
+      />
+
+      <CustomAlertDialog
+        isOpen={isOpen}
+        onCancel={() => setIsOpen(false)}
+        onContinue={() => {
+          if (pendingDeleteSlug)
+            deleteMutation.mutate(pendingDeleteSlug);
+        }}
+      />
+    </div >
   );
 }
+let pendingDeleteSlug: string | null = null;

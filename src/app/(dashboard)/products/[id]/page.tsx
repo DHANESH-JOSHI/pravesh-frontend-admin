@@ -1,19 +1,34 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Star, Tag, Calendar } from "lucide-react";
-import { Link } from "next-view-transitions"
+import { ArrowLeft, Star, Tag, Calendar, MessageSquare, Eye, UserIcon } from "lucide-react";
+import { Link, useTransitionRouter } from "next-view-transitions"
 import { useParams } from "next/navigation";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
 
 import { productService } from "@/services/product.service";
 import { Product } from "@/types/product";
+import { Brand, Category, User } from "@/types";
+import Loader from "@/components/ui/loader";
 
 export default function ProductDetailPage() {
+  const router = useTransitionRouter()
   const params = useParams();
   const productId = params.id as string;
+  const [reviewsPage, setReviewsPage] = useState(1);
+  const itemsPerPage = 5;
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["product", productId],
@@ -22,16 +37,11 @@ export default function ProductDetailPage() {
   });
 
   const product = data?.data as Product;
+  const reviews = product?.reviews || [];
+  const totalReviews = reviews?.length || 0;
 
   if (isLoading) {
-    return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-        <div className="animate-pulse">
-          <div className="h-8 rounded w-1/4 mb-4"></div>
-          <div className="h-64 rounded"></div>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (error || !product) {
@@ -51,23 +61,14 @@ export default function ProductDetailPage() {
     );
   }
 
-  const brandName = typeof product.brand === 'object' ? product.brand?.name : product.brand;
-  const categoryName = typeof product.category === 'object' ? product.category?.title : product.category;
+  const brand = product.brand as Brand;
+  const category = product.category as Category;
 
   const getStockStatusColor = (status: string) => {
     switch (status) {
       case "in-stock": return "bg-green-100 text-green-800";
       case "low-stock": return "bg-yellow-100 text-yellow-800";
       case "out-of-stock": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getProductStatusColor = (status: string) => {
-    switch (status) {
-      case "active": return "bg-green-100 text-green-800";
-      case "inactive": return "bg-gray-100 text-gray-800";
-      case "discontinued": return "bg-red-100 text-red-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
@@ -86,12 +87,10 @@ export default function ProductDetailPage() {
     <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/products">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Products
-            </Button>
-          </Link>
+          <Button variant="outline" size="sm" onClick={() => router.back()} >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
           <h1 className="text-xl font-bold">{product._id}</h1>
         </div>
         <Badge variant={product.isDeleted ? "destructive" : "secondary"}>
@@ -146,7 +145,7 @@ export default function ProductDetailPage() {
           <CardHeader>
             <CardTitle>Basic Information</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
@@ -161,13 +160,21 @@ export default function ProductDetailPage() {
                   <label className="text-sm font-medium">Slug</label>
                   <p className="font-mono text-sm">{product.slug}</p>
                 </div>
-                <div>
+                <div className="space-x-2">
                   <label className="text-sm font-medium">Brand</label>
-                  <p>{brandName || "N/A"}</p>
+                  <Link href={`/brands/${brand._id}`}>
+                    <Button variant="link" size="sm">
+                      {brand.name}
+                    </Button>
+                  </Link>
                 </div>
-                <div>
+                <div className="space-x-2">
                   <label className="text-sm font-medium">Category</label>
-                  <p>{categoryName || "N/A"}</p>
+                  <Link href={`/categories/${category._id}`}>
+                    <Button variant="link" size="sm">
+                      {category.title}
+                    </Button>
+                  </Link>
                 </div>
               </div>
 
@@ -175,12 +182,6 @@ export default function ProductDetailPage() {
                 <div>
                   <label className="text-sm font-medium">Unit</label>
                   <p>{product.unit}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium mr-3">Status</label>
-                  <Badge className={getProductStatusColor(product.status)}>
-                    {product.status.replace("-", " ").toUpperCase()}
-                  </Badge>
                 </div>
                 <div>
                   <label className="text-sm font-medium mr-3">Stock Status</label>
@@ -201,6 +202,16 @@ export default function ProductDetailPage() {
                   <label className="text-sm font-medium">Review Count</label>
                   <p>{product.reviewCount}</p>
                 </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="font-medium text-muted-foreground">Created:</span>
+                <p>{product.createdAt}</p>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Updated:</span>
+                <p>{product.updatedAt}</p>
               </div>
             </div>
           </CardContent>
@@ -249,7 +260,7 @@ export default function ProductDetailPage() {
           <CardTitle>Stock Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
               <label className="text-sm font-medium">Current Stock</label>
               <p className="text-2xl font-bold">{product.stock}</p>
@@ -261,6 +272,10 @@ export default function ProductDetailPage() {
             <div>
               <label className="text-sm font-medium">Total Sold</label>
               <p className="text-xl">{product.totalSold}</p>
+            </div>
+            <div>
+              <span className="font-medium text-sm">Sales Count:</span>
+              <p>{product.salesCount}</p>
             </div>
           </div>
         </CardContent>
@@ -398,30 +413,87 @@ export default function ProductDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Metadata */}
+      {/* Reviews */}
       <Card>
         <CardHeader>
-          <CardTitle>Metadata</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <MessageSquare className="h-5 w-5" />
+            Reviews ({totalReviews})
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div>
-              <span className="font-medium text-muted-foreground">Created:</span>
-              <p>{product.createdAt}</p>
-            </div>
-            <div>
-              <span className="font-medium text-muted-foreground">Updated:</span>
-              <p>{product.updatedAt}</p>
-            </div>
-            <div>
-              <span className="font-medium text-muted-foreground">Sales Count:</span>
-              <p>{product.salesCount}</p>
-            </div>
-            <div>
-              <span className="font-medium text-muted-foreground">Product ID:</span>
-              <p className="font-mono text-xs">{product._id}</p>
-            </div>
-          </div>
+          {reviews.length > 0 ? (
+            <>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>User</TableHead>
+                      <TableHead>Rating</TableHead>
+                      <TableHead>Comment</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead className="w-16">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {reviews.map((review) => (
+                      <TableRow key={review._id}>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {(review.user as User)?.img ? (
+                              <img
+                                src={(review.user as User).img}
+                                alt={(review.user as User)?.name || "User"}
+                                className="w-6 h-6 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center">
+                                <UserIcon className="h-3 w-3" />
+                              </div>
+                            )}
+                            <span className="font-medium">{(review.user as User)?.name || "Anonymous"}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            {renderStars(review.rating ?? 0)}
+                            <span className="text-sm text-muted-foreground ml-1">({review.rating})</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="max-w-xs truncate">
+                          {review.comment || "No comment"}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {review.createdAt}
+                        </TableCell>
+                        <TableCell>
+                          <Link href={`/reviews/${review._id}`}>
+                            <Button variant="ghost">
+                              <Eye className="h-4 w-4 mr-2" />
+                            </Button>
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              {totalReviews > itemsPerPage && (
+                <div className="mt-4">
+                  <PaginationControls
+                    page={reviewsPage}
+                    totalPages={Math.ceil(totalReviews / itemsPerPage)}
+                    isFetching={false}
+                    onPrev={() => setReviewsPage((p) => Math.max(1, p - 1))}
+                    onNext={() => setReviewsPage((p) => Math.min(Math.ceil(totalReviews / itemsPerPage), p + 1))}
+                    onPageChange={setReviewsPage}
+                  />
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-muted-foreground">No reviews yet</p>
+          )}
         </CardContent>
       </Card>
     </div >

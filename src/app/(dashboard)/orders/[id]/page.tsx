@@ -1,25 +1,30 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Package, DollarSign, MapPin, Clock, UserIcon } from "lucide-react";
-import { Link } from "next-view-transitions"
+import { ArrowLeft, Package, DollarSign, MapPin, Clock, UserIcon, Edit } from "lucide-react";
+import { Link, useTransitionRouter } from "next-view-transitions"
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { orderService } from "@/services/order.service";
-import { Product, Address, User, Brand, Category, OrderStatus } from "@/types";
+import { Product, Address, User, Brand, Category, OrderStatus, AdminUpdateOrder, ApiResponse, Order } from "@/types";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import Image from "next/image";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { OrderFormDialog } from "@/components/dashboard/order/form-dialog";
+import { useState } from "react";
+import Loader from "@/components/ui/loader";
 
 
 export default function OrderDetailPage() {
+  const router = useTransitionRouter()
   const params = useParams();
   const orderId = params.id as string;
   const queryClient = useQueryClient();
+  const [open, setOpen] = useState<boolean>(false);
   const { data, isLoading, error } = useQuery({
     queryKey: ["order", orderId],
     queryFn: async () => await orderService.getById(orderId),
@@ -33,7 +38,7 @@ export default function OrderDetailPage() {
     mutationFn: (status: OrderStatus) => orderService.updateOrderStatus(orderId, status),
     onSuccess: (_, status) => {
       queryClient.cancelQueries({ queryKey: ["order", orderId] });
-      queryClient.setQueryData(["order", orderId], (oldData: any) => {
+      queryClient.setQueryData(["order", orderId], (oldData: ApiResponse<Order>) => {
         return {
           ...oldData,
           data: {
@@ -49,15 +54,24 @@ export default function OrderDetailPage() {
     }
   })
 
+  const updatemutation = useMutation({
+    mutationFn: async (values: AdminUpdateOrder) => {
+      if (!order) return;
+      const data = await orderService.updateOrder(order._id, values);
+      return data.data;
+    },
+    onSuccess: () => {
+      toast.success("Order updated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      setOpen(false);
+    },
+    onError: () => {
+      toast.error("Failed to update order. Please try again.");
+    },
+  });
+
   if (isLoading) {
-    return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-        <div className="animate-pulse">
-          <div className="h-8 rounded w-1/4 mb-4"></div>
-          <div className="h-64 rounded"></div>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (error || !order) {
@@ -96,12 +110,19 @@ export default function OrderDetailPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-      <Link href="/orders">
-        <Button variant="outline" size="sm">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Orders
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" onClick={() => router.back()} >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <h1 className="text-xl font-bold">{order._id}</h1>
+        </div>
+        <Button size="sm" onClick={() => setOpen(true)}>
+          <Edit className="h-4 w-4 mr-2" />
+          Edit
         </Button>
-      </Link>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
@@ -205,14 +226,27 @@ export default function OrderDetailPage() {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell><Link className="hover:underline" href={`/products/${product._id}`}>{product.name || "N/A"}</Link></TableCell>
-                      <TableCell><Link className="hover:underline" href={`/brands/${brand._id}`}>{brand.name || "N/A"}</Link></TableCell>
-                      <TableCell><Link className="hover:underline" href={`/categories/${category._id}`}>{category.title || "N/A"}</Link>
+                      <TableCell>
+                        <Link className="hover:underline" href={`/products/${product._id}`}>{product.name || "N/A"}</Link>
                       </TableCell>
-                      <TableCell className="text-right text-muted-foreground">₹{(product.originalPrice ?? 0).toFixed(2)}</TableCell>
-                      <TableCell className="text-right font-semibold">₹{(product.finalPrice ?? 0).toFixed(2)}</TableCell>
-                      <TableCell className="text-right">{item.quantity}</TableCell>
-                      <TableCell className="text-right font-medium">₹{lineTotal.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Link className="hover:underline" href={`/brands/${brand._id}`}>{brand.name || "N/A"}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link className="hover:underline" href={`/categories/${category._id}`}>{category.title || "N/A"}
+                        </Link>
+                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground">₹{(product.originalPrice ?? 0).toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-right font-semibold">₹{(product.finalPrice ?? 0).toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {item.quantity}
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        ₹{lineTotal.toFixed(2)}
+                      </TableCell>
                     </TableRow>
                   );
                 })
@@ -295,6 +329,13 @@ export default function OrderDetailPage() {
           </CardContent>
         </Card>
       </div>
+      <OrderFormDialog
+        isLoading={updatemutation.isPending}
+        open={!!open}
+        onOpenChange={setOpen}
+        onSubmit={(data) => updatemutation.mutate(data)}
+        initialData={order}
+      />
     </div >
   );
 }

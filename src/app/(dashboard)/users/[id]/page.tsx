@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, User, Mail, Shield, Calendar, ShoppingCart, MapPin, Heart, Package, Star, Wallet, Eye, MoreHorizontal } from "lucide-react";
+import { ArrowLeft, User, Mail, Shield, Calendar, ShoppingCart, MapPin, Heart, Package, Star, Wallet, Eye, MoreHorizontal, ArrowRight } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +26,7 @@ import { PaginationControls } from "@/components/dashboard/common/pagination-con
 import { userService } from "@/services/user.service";
 import { User as UserType } from "@/types/user";
 import { Link, useTransitionRouter } from "next-view-transitions";
+import Loader from "@/components/ui/loader";
 
 export default function UserDetailPage() {
   const params = useParams();
@@ -46,14 +47,7 @@ export default function UserDetailPage() {
   const user = data?.data as UserType;
 
   if (isLoading) {
-    return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-        <div className="animate-pulse">
-          <div className="h-8 rounded w-1/4 mb-4"></div>
-          <div className="h-64 rounded"></div>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (error || !user) {
@@ -94,12 +88,10 @@ export default function UserDetailPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
 
-          <Link href="/users">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Users
-            </Button>
-          </Link>
+          <Button variant="outline" size="sm" onClick={() => router.back()} >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
           <h1 className="text-xl font-bold">{user._id}</h1>
         </div>
         <Badge variant={user.isDeleted ? "destructive" : "secondary"}>
@@ -273,21 +265,11 @@ export default function UserDetailPage() {
                         <TableCell>{address.postalCode || "N/A"}</TableCell>
                         <TableCell>{address.country || "N/A"}</TableCell>
                         <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem asChild>
-                                <Link href={`/addresses/${address._id}`}>
-                                  <Eye className="h-4 w-4 mr-2" />
-                                  View
-                                </Link>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <Link href={`/addresses/${address._id}`}>
+                            <Button variant="ghost">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </Link>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -338,15 +320,11 @@ export default function UserDetailPage() {
       {user.orders && user.orders.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+            <CardTitle>
               <div className="flex items-center gap-2">
                 <Package className="h-5 w-5" />
                 Orders ({user.orders.length})
               </div>
-              <Button variant="outline" size="sm">
-                <Eye className="h-4 w-4 mr-2" />
-                View All Orders
-              </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -413,21 +391,11 @@ export default function UserDetailPage() {
                           {order.updatedAt || "N/A"}
                         </TableCell>
                         <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => router.push(`/orders/${order._id}`)}
-                              >
-                                <Eye className="h-4 w-4 mr-2" />
-                                View Order
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <Link href={`/orders/${order._id}`}>
+                            <Button variant="ghost">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </Link>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -454,15 +422,11 @@ export default function UserDetailPage() {
       {user.reviews && user.reviews.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+            <CardTitle>
               <div className="flex items-center gap-2">
                 <Star className="h-5 w-5" />
                 Reviews ({user.reviews.length})
               </div>
-              <Button variant="outline" size="sm">
-                <Eye className="h-4 w-4 mr-2" />
-                View All Reviews
-              </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -537,21 +501,11 @@ export default function UserDetailPage() {
                           {review.createdAt || "N/A"}
                         </TableCell>
                         <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem asChild>
-                                <Link href={`/reviews/${review._id}`}>
-                                  <Eye className="h-4 w-4 mr-2" />
-                                  View Review
-                                </Link>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <Link href={`/reviews/${review._id}`}>
+                            <Button variant="ghost">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </Link>
                         </TableCell>
                       </TableRow>
                     ))}
