@@ -112,8 +112,8 @@ class ProductService {
     if (data.brandId) formData.append('brandId', data.brandId);
     formData.append('categoryId', data.categoryId);
     if (data.images && data.images.length > 0) {
-      data.images.forEach((image, index) => {
-        formData.append(`images[${index}]`, image);
+      data.images.forEach((image) => {
+        formData.append("images", image);
       });
     }
     formData.append('sku', data.sku);
@@ -128,6 +128,7 @@ class ProductService {
     if (data.finalPrice) formData.append('finalPrice', data.finalPrice.toString());
     formData.append('stock', data.stock.toString());
     if (data.slug) formData.append('slug', data.slug);
+    console.log(formData)
     const response = await instance.post<ApiResponse<Product>>("/products", formData, {
       headers: {
         'Content-Type': 'multipart/form-data'

@@ -61,7 +61,8 @@ export default function ProductDetailPage() {
     );
   }
 
-  const brand = product.brand as Brand;
+  const brandId = product.brand as string || (product.brand as Brand)?._id;
+  const brandName = (product.brand as Brand)?.name || "N/A";
   const category = product.category as Category;
 
   const getStockStatusColor = (status: string) => {
@@ -162,9 +163,9 @@ export default function ProductDetailPage() {
                 </div>
                 <div className="space-x-2">
                   <label className="text-sm font-medium">Brand</label>
-                  <Link href={`/brands/${brand._id}`}>
+                  <Link href={`/brands/${brandId}`}>
                     <Button variant="link" size="sm">
-                      {brand.name}
+                      {brandName}
                     </Button>
                   </Link>
                 </div>
