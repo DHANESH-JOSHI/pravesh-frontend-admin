@@ -72,7 +72,7 @@ export function BlogsTable() {
   const updatemutation = useMutation({
     mutationFn: async (values: UpdateBlog) => {
       if (!editingBlog) return;
-      const data = await blogService.update(editingBlog.slug, values);
+      const data = await blogService.update(editingBlog._id, values);
       return data.data;
     },
     onSuccess: () => {
@@ -234,7 +234,7 @@ export function BlogsTable() {
               <TableRow>
                 <TableHead>Thumbnail</TableHead>
                 <TableHead>Title</TableHead>
-                <TableHead>Slug</TableHead>
+                <TableHead>ID</TableHead>
                 <TableHead>Updated</TableHead>
                 <TableHead className="w-16">Actions</TableHead>
               </TableRow>
@@ -263,7 +263,7 @@ export function BlogsTable() {
               ) : (
                 <>
                   {blogs.map((blog: Blog) => (
-                    <TableRow key={blog.slug}>
+                    <TableRow key={blog._id}>
                       <TableCell>
                         <Image
                           src={
@@ -282,7 +282,7 @@ export function BlogsTable() {
                         </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground font-mono text-sm">
-                        {blog.slug}
+                        {blog._id}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {blog.updatedAt}
@@ -313,7 +313,7 @@ export function BlogsTable() {
                               onClick={() => {
                                 setIsOpen(true);
                                 pendingDeleteSlug =
-                                  blog.slug;
+                                  blog._id;
                               }}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -353,7 +353,7 @@ export function BlogsTable() {
 
       <BlogFormDialog
         isLoading={updatemutation.isPending}
-        key={editingBlog?.slug || "edit-dialog"}
+        key={editingBlog?._id || "edit-dialog"}
         open={!!editingBlog}
         onOpenChange={(open) => !open && setEditingBlog(null)}
         onSubmit={(data) => updatemutation.mutate(data)}

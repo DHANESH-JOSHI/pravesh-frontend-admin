@@ -5,8 +5,8 @@ import { CreateBlog, UpdateBlog, Blog, BlogQueryOptions, PaginatedBlogs } from "
 
 
 class BlogService {
-  async getPostBySlug(slug: string) {
-    const response = await instance.get<ApiResponse<Blog>>(`/blogs/${slug}`);
+  async getPostById(id: string) {
+    const response = await instance.get<ApiResponse<Blog>>(`/blogs/${id}`);
     return response.data;
   }
 

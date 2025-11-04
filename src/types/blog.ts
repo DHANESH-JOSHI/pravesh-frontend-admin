@@ -15,7 +15,6 @@ export type Blog = {
   _id: string;
   title: string;
   content: string;
-  slug: string;
   featuredImage: string | null;
   tags: string[] | null;
   isPublished: boolean;
