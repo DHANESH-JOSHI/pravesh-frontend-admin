@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { MoreHorizontal, Eye, Funnel, X, Check } from "lucide-react";
+import { Eye, Funnel, X, Check } from "lucide-react";
 import { useState } from "react";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
 import { EmptyState } from "@/components/dashboard/common/empty-state";
@@ -10,12 +10,6 @@ import { PaginationControls } from "@/components/dashboard/common/pagination-con
 import TableHeaderControls from "@/components/dashboard/common/table-header-controls";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,

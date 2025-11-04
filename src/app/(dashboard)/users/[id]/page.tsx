@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, User, Mail, Shield, Calendar, ShoppingCart, MapPin, Heart, Package, Star, Wallet, Eye, MoreHorizontal, ArrowRight } from "lucide-react";
+import { ArrowLeft, User, Mail, Shield, Calendar, ShoppingCart, MapPin, Heart, Package, Star, Wallet, Eye } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,12 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
 
 import { userService } from "@/services/user.service";
