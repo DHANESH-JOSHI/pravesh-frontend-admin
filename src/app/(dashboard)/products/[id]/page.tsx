@@ -164,7 +164,12 @@ export default function ProductDetailPage() {
                 <div className="space-x-2">
                   <label className="text-sm font-medium">Brand</label>
                   <Link href={`/brands/${brandId}`}>
-                    <Button variant="link" size="sm">
+                    <Button variant={brandId ? 'link' : 'ghost'} size="sm" onClick={(e)=>{
+                      if(!brandId){
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }
+                    }}>
                       {brandName}
                     </Button>
                   </Link>
