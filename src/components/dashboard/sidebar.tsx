@@ -19,14 +19,14 @@ const items = [
     icon: Building2,
   },
   {
-    title: "Products",
-    url: "/products",
-    icon: Box,
-  },
-  {
     title: "Categories",
     url: "/categories",
     icon: FolderOpen,
+  },
+  {
+    title: "Products",
+    url: "/products",
+    icon: Box,
   },
   {
     title: "Banners",

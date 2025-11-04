@@ -34,5 +34,6 @@ interface CategoryQueryOptions {
   limit?: number;
   search?: string;
   isDeleted?: string;
+  isParent?: boolean;
 }
 export type { PaginatedCategories, CategoryQueryOptions };

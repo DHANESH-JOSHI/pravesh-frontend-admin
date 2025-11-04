@@ -7,6 +7,7 @@ class CategoryService {
     const response = await instance.get<ApiResponse<PaginatedCategories>>("/categories", {
       params: options
     });
+    console.log(options)
     return response.data;
   }
 

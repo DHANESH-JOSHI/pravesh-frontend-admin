@@ -116,7 +116,6 @@ class ProductService {
         formData.append("images", image);
       });
     }
-    formData.append('sku', data.sku);
     formData.append('unit', data.unit);
     if (data.minStock) formData.append('minStock', data.minStock.toString());
     if (data.thumbnail) formData.append('thumbnail', data.thumbnail);
@@ -125,10 +124,8 @@ class ProductService {
     if (data.specifications) formData.append('specifications', JSON.stringify(data.specifications));
     if (data.isFeatured) formData.append('isFeatured', data.isFeatured.toString());
     if (data.isNewArrival) formData.append('isNewArrival', data.isNewArrival.toString());
-    if (data.finalPrice) formData.append('finalPrice', data.finalPrice.toString());
     formData.append('stock', data.stock.toString());
     if (data.slug) formData.append('slug', data.slug);
-    console.log(formData)
     const response = await instance.post<ApiResponse<Product>>("/products", formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -152,7 +149,6 @@ class ProductService {
         formData.append(`images[${index}]`, image);
       });
     }
-    if (data.sku) formData.append('sku', data.sku);
     if (data.unit) formData.append('unit', data.unit);
     if (data.minStock) formData.append('minStock', data.minStock.toString());
     if (data.thumbnail) formData.append('thumbnail', data.thumbnail);
@@ -161,7 +157,6 @@ class ProductService {
     if (data.specifications) formData.append('specifications', JSON.stringify(data.specifications));
     if (data.isFeatured) formData.append('isFeatured', data.isFeatured.toString());
     if (data.isNewArrival) formData.append('isNewArrival', data.isNewArrival.toString());
-    if (data.finalPrice) formData.append('finalPrice', data.finalPrice.toString());
     if (data.stock) formData.append('stock', data.stock.toString());
     if (data.slug) formData.append('slug', data.slug);
     const response = await instance.patch<ApiResponse<Product>>(`/products/${id}`, formData, {

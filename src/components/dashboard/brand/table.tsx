@@ -1,8 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check } from "lucide-react";
-import Image from "next/image";
+import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check, Folder } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
@@ -244,16 +243,17 @@ export function BrandsTable() {
                   {brands.map((brand: Brand) => (
                     <TableRow key={brand._id}>
                       <TableCell>
-                        {brand.image ? <Image
-                          src={
-                            brand.image ||
-                            "/placeholder.svg"
-                          }
-                          width={50}
-                          height={50}
-                          alt={brand.name}
-                          className="h-12 w-12 rounded-md object-cover text-center"
-                        /> : <div className="h-12 w-12 flex items-center justify-center">N/A</div> }
+                        {brand.image ? (
+                          <img
+                            src={brand.image}
+                            alt={brand.name}
+                            className="h-8 w-8 rounded object-cover"
+                          />
+                        ) : (
+                          <div className="h-8 w-8 rounded bg-muted flex items-center justify-center">
+                            <Folder className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell className="font-medium max-w-xs">
                         <div className="truncate" title={brand.name}>

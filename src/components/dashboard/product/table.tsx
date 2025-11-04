@@ -72,6 +72,7 @@ export function ProductsTable() {
         limit,
         search: searchTerm,
         ...appliedFilters,
+        
       } as QueryOptions),
   });
 

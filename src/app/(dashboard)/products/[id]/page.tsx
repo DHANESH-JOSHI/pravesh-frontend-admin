@@ -61,7 +61,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  const brandId = product.brand as string || (product.brand as Brand)?._id;
+  const brandId = (product.brand as Brand)?._id || product.brand as string;
   const brandName = (product.brand as Brand)?.name || "N/A";
   const category = product.category as Category;
 

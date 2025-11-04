@@ -14,6 +14,7 @@ export const unitSchema = z.enum([
   "box",
   "packet",
   "set",
+  "other"
 ]);
 export type stockStatus = z.infer<typeof stockStatusSchema>;
 export type discountType = z.infer<typeof discountTypeSchema>;
@@ -43,21 +44,19 @@ export const queryOptionsSchema = z.object({
 export type QueryOptions = z.infer<typeof queryOptionsSchema>;
 
 export const createProductSchema = z.object({
-  name: z.string(),
+  name: z.string().nonempty("Name is required"),
   slug: z.string().optional(),
-  sku: z.string(),
   description: z.string().optional(),
   shortDescription: z.string().optional(),
   brandId: z.string().optional(),
-  categoryId: z.string(),
+  categoryId: z.string().nonempty("Category is required"),
 
   thumbnail: z.instanceof(File).optional(),
   images: z.array(z.instanceof(File)).optional(),
 
-  originalPrice: z.number().nonnegative(),
+  originalPrice: z.number().nonnegative().min(1, "Original price must be greater than 0"),
   discountValue: z.number().nonnegative().optional(),
   discountType: discountTypeSchema.optional(),
-  finalPrice: z.number().nonnegative().optional(),
 
   stock: z.number().int().nonnegative(),
   unit: unitSchema,

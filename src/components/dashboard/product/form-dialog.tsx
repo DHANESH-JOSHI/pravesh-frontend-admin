@@ -49,6 +49,7 @@ import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { discountTypeSchema, unitSchema } from "@/types/product";
 import Image from "next/image";
+import z from "zod";
 
 
 export function ProductFormDialog({
@@ -59,9 +60,9 @@ export function ProductFormDialog({
   isLoading,
 }: FormDialogProps<CreateProduct, Product>) {
   const isEditMode = !!initialData;
-
+  const specsArraySchema = z.array(z.object({ key: z.string(), value: z.string() })).optional();
   const formSchema = (isEditMode ? updateProductSchema : createProductSchema).extend({
-    specifications: createProductSchema.shape.specifications.array().optional(),
+    specifications: specsArraySchema,
   });
 
   const thumbnailRef = useRef<HTMLInputElement>(null);
@@ -80,7 +81,6 @@ export function ProductFormDialog({
     ),
     defaultValues: {
       name: initialData?.name || "",
-      sku: initialData?.sku || "",
       slug: initialData?.slug || "",
       description: initialData?.description || "",
       shortDescription: initialData?.shortDescription || "",
@@ -104,7 +104,7 @@ export function ProductFormDialog({
 
   const { fields: featureFields, append: appendFeature, remove: removeFeature } = useFieldArray({
     control: form.control,
-    name: "features"
+    name: "features" as any
   });
 
   const { fields: specFields, append: appendSpec, remove: removeSpec } = useFieldArray({
@@ -131,6 +131,24 @@ export function ProductFormDialog({
       setImagesFiles([]);
     }
   }, [initialData, form])
+
+  const handleSubmit = (data: CreateProduct) => {
+    const specsArr: { key: string; value: string }[] = Array.isArray(data.specifications)
+      ? data.specifications
+      : data.specifications
+      ? Object.entries(data.specifications).map(([key, value]) => ({ key, value }))
+      : [];
+    const specsRecord = specsArr.reduce((acc: Record<string, string>, s) => {
+      if (s?.key) acc[s.key] = s.value ?? "";
+      return acc;
+    }, {});
+    const transformedData = {
+      ...data,
+      features: data.features ?? [],
+      specifications: specsRecord,
+    };
+    onSubmit(transformedData);
+  }
 
   const nameValue = form.watch("name");
   useEffect(() => {
@@ -193,17 +211,7 @@ export function ProductFormDialog({
         </DialogHeader>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(
-              (data: any) => {
-                const transformedData = {
-                  ...data,
-                  features: data.features,
-                  specifications: data.specifications ? Object.fromEntries(data.specifications.filter((s: any) => s.key).map((s: { key: string, value: string }) => [s.key, s.value])) : undefined,
-                };
-                onSubmit(transformedData as CreateProduct);
-              },
-              (errors) => console.error("Form validation errors:", errors)
-            )}
+            onSubmit={form.handleSubmit(handleSubmit)}
             className="w-full flex flex-col h-full"
           >
             <ScrollArea className="grow p-4 -mx-4">
@@ -255,22 +263,6 @@ export function ProductFormDialog({
                       <FormItem>
                         <FormLabel>Minimum Stock</FormLabel>
                         <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="sku"
-                    render={({ field }) => (
-                      <FormItem className="space-y-2">
-                        <FormLabel>SKU *</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter product SKU..."
-                            {...field}
-                          />
-                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}

@@ -10,7 +10,10 @@ class UserService {
 
   async getAll(options?: UserQueryOptions): Promise<ApiResponse<PaginatedUsers>> {
     const response = await instance.get<ApiResponse<PaginatedUsers>>("/users", {
-      params: options || {}
+      params: {
+        ...options,
+        role: "user"
+      }
     });
     return response.data;
   }

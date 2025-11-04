@@ -1,8 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check } from "lucide-react";
-import Image from "next/image";
+import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check, Folder } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
@@ -51,6 +50,7 @@ export function CategoriesTable() {
         page,
         limit,
         search: searchTerm || undefined,
+        isParent: true,
         ...appliedFilters,
       }),
   });
@@ -248,16 +248,17 @@ export function CategoriesTable() {
                   {categories.map((category) => (
                     <TableRow key={category._id}>
                       <TableCell>
-                        {category.image ? <Image
-                          src={
-                            category.image ||
-                            "/placeholder.svg"
-                          }
-                          width={50}
-                          height={50}
-                          alt={category.title}
-                          className="h-12 w-12 rounded-md object-cover text-center"
-                        /> : <div className="h-12 w-12 flex items-center justify-center">N/A</div>}
+                        {category.image ? (
+                          <img
+                            src={category.image}
+                            alt={category.title}
+                            className="h-8 w-8 rounded object-cover"
+                          />
+                        ) : (
+                          <div className="h-8 w-8 rounded bg-muted flex items-center justify-center">
+                            <Folder className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell className="font-medium max-w-xs">
                         <div className="truncate" title={category.title}>
