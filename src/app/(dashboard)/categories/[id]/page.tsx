@@ -121,10 +121,10 @@ export default function CategoryDetailPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600">Category not found</h1>
           <p className="text-muted-foreground">The category you're looking for doesn't exist.</p>
-          <Link href="/addresses">
+          <Link href="/categories">
             <Button className="mt-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Addresses
+              Back to Categories
             </Button>
           </Link>
         </div>

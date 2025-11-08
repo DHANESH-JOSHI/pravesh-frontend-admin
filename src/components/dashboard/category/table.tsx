@@ -220,7 +220,7 @@ export function CategoriesTable() {
                 <TableHead>Image</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Updated</TableHead>
-                <TableHead className="w-16">Actions</TableHead>
+                {!filterDraft?.isDeleted && <TableHead className="w-16">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -268,7 +268,7 @@ export function CategoriesTable() {
                       <TableCell className="text-muted-foreground">
                         {category.updatedAt}
                       </TableCell>
-                      <TableCell>
+                      {!category.isDeleted && <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
@@ -308,7 +308,7 @@ export function CategoriesTable() {
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                      </TableCell>
+                      </TableCell>}
                     </TableRow>
                   ))}
                 </>
