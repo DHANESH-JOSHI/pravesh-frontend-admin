@@ -3,7 +3,6 @@ import { PaginatedData } from ".";
 
 export const createBlogSchema = z.object({
   title: z.string(),
-  slug: z.string().optional(),
   content: z.string(),
   featuredImage: z.instanceof(File).optional(),
   tags: z.array(z.string()).optional(),

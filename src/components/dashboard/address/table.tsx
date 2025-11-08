@@ -227,13 +227,13 @@ export function AddressesTable() {
                       <TableCell className="text-muted-foreground">
                         {address.updatedAt}
                       </TableCell>
-                      <TableCell>
+                      {!address.isDeleted && <TableCell>
                         <Link href={`/addresses/${address._id}`}>
                           <Button variant="ghost">
                             <Eye className="h-4 w-4" />
                           </Button>
                         </Link>
-                      </TableCell>
+                      </TableCell>}
                     </TableRow>
                   ))}
                 </>

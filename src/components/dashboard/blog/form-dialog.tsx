@@ -47,7 +47,6 @@ export function BlogFormDialog({
     defaultValues: {
       content: initialData?.content ?? "",
       title: initialData?.title ?? "",
-      slug: initialData?.slug ?? "",
       featuredImage: undefined,
       tags: initialData?.tags ?? [],
       isPublished: initialData?.isPublished ?? false,
@@ -98,22 +97,6 @@ export function BlogFormDialog({
                       <FormControl>
                         <Input
                           placeholder="Enter blog title..."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="slug"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel>Slug (optional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Optional custom slug..."
                           {...field}
                         />
                       </FormControl>

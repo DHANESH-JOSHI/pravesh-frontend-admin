@@ -125,7 +125,6 @@ class ProductService {
     if (data.isFeatured) formData.append('isFeatured', data.isFeatured.toString());
     if (data.isNewArrival) formData.append('isNewArrival', data.isNewArrival.toString());
     formData.append('stock', data.stock.toString());
-    if (data.slug) formData.append('slug', data.slug);
     const response = await instance.post<ApiResponse<Product>>("/products", formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -158,7 +157,6 @@ class ProductService {
     if (data.isFeatured) formData.append('isFeatured', data.isFeatured.toString());
     if (data.isNewArrival) formData.append('isNewArrival', data.isNewArrival.toString());
     if (data.stock) formData.append('stock', data.stock.toString());
-    if (data.slug) formData.append('slug', data.slug);
     const response = await instance.patch<ApiResponse<Product>>(`/products/${id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'

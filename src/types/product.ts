@@ -45,7 +45,6 @@ export type QueryOptions = z.infer<typeof queryOptionsSchema>;
 
 export const createProductSchema = z.object({
   name: z.string().nonempty("Name is required"),
-  slug: z.string().optional(),
   description: z.string().optional(),
   shortDescription: z.string().optional(),
   brandId: z.string().optional(),

@@ -289,9 +289,6 @@ export function ProductFormDialog({
                       </FormItem>
                     )}
                   />
-
-
-
                   <FormField
                     control={form.control}
                     name="originalPrice"
@@ -482,6 +479,20 @@ export function ProductFormDialog({
 
                   <StringArrayFormArray name="features" title="Features" form={form} fields={featureFields} append={appendFeature} remove={removeFeature} />
                   <KeyValueFormArray name="specifications" title="Specifications" form={form} fields={specFields} append={appendSpec} remove={removeSpec} />
+                  {/* Tags input (editable chips) */}
+                  <FormField
+                    control={form.control}
+                    name="tags"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Tags</FormLabel>
+                        <FormControl>
+                          <TagsInput value={field.value || []} onChange={field.onChange} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
                   <Card className="p-4 space-y-4">
                     <h3 className="text-lg font-medium">Flags</h3>
@@ -826,4 +837,54 @@ function StringArrayFormArray({ name, title, form, fields, append, remove }: { n
       </Card>
     </FormItem>
   )
+}
+
+function TagsInput({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  const [input, setInput] = useState("");
+  const tags = Array.isArray(value) ? value : [];
+
+  function addTagFromInput() {
+    const t = input.trim();
+    if (!t) return;
+    if (!tags.includes(t)) {
+      onChange([...tags, t]);
+    }
+    setInput("");
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addTagFromInput();
+    } else if (e.key === "Backspace" && input === "" && tags.length) {
+      // remove last tag on backspace when input empty
+      onChange(tags.slice(0, -1));
+    }
+  }
+
+  return (
+    <div>
+      <div className="flex flex-wrap gap-2 mb-2">
+        {tags.map((t, i) => (
+          <span key={i} className="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-muted/10 text-sm">
+            <span>{t}</span>
+            <button
+              type="button"
+              className="text-destructive text-xs"
+              onClick={() => onChange(tags.filter((x) => x !== t))}
+            >
+              ×
+            </button>
+          </span>
+        ))}
+      </div>
+      <Input
+        placeholder="Type tag and press Enter"
+        value={input}
+        onChange={(e: any) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onBlur={() => addTagFromInput()}
+      />
+    </div>
+  );
 }
