@@ -234,7 +234,7 @@ export function BlogsTable() {
               <TableRow>
                 <TableHead>Thumbnail</TableHead>
                 <TableHead>Title</TableHead>
-                <TableHead>ID</TableHead>
+                <TableHead>Slug</TableHead>
                 <TableHead>Updated</TableHead>
                 <TableHead className="w-16">Actions</TableHead>
               </TableRow>
@@ -282,7 +282,7 @@ export function BlogsTable() {
                         </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground font-mono text-sm">
-                        {blog._id}
+                        {blog.slug}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {blog.updatedAt}

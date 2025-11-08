@@ -200,10 +200,10 @@ export function BannersTable() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="hero">Hero</SelectItem>
-                      <SelectItem value="featured">Featured</SelectItem>
                       <SelectItem value="category">Category</SelectItem>
-                      <SelectItem value="promotion">Promotion</SelectItem>
+                      <SelectItem value="product">Product</SelectItem>
+                      <SelectItem value="offer">Offer</SelectItem>
+                      <SelectItem value="external">External</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

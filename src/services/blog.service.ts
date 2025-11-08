@@ -22,6 +22,9 @@ class BlogService {
     if (data.featuredImage) {
       formData.append('featuredImage', data.featuredImage);
     }
+    if (data.slug) {
+      formData.append('slug', data.slug);
+    }
     if (data.tags) {
       formData.append('tags', JSON.stringify(data.tags));
     }
@@ -43,6 +46,9 @@ class BlogService {
     }
     if (data.content) {
       formData.append('content', data.content);
+    }
+    if (data.slug) {
+      formData.append('slug', data.slug);
     }
     if (data.featuredImage) {
       formData.append('featuredImage', data.featuredImage);
