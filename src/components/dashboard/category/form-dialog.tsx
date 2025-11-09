@@ -97,7 +97,7 @@ export function CategoryFormDialog({
               name="image"
               render={() => (
                 <FormItem className="space-y-2">
-                  <FormLabel>Image (optional)</FormLabel>
+                  <FormLabel>Image</FormLabel>
                   <Card className="relative border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
                     <CardContent className="p-6">
                       {imagePreview ? (

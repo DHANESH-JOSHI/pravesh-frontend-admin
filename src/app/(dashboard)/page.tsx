@@ -1,7 +1,7 @@
 'use client';
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Users, ShoppingCart, DollarSign, Package, TrendingUp, AlertTriangle, Star, Heart, ShoppingBag, FileText, Activity, LayoutDashboard } from 'lucide-react';
+import { Users, ShoppingCart, Package, TrendingUp, AlertTriangle, Star, Heart, ShoppingBag, FileText, Activity, LayoutDashboard, IndianRupee } from 'lucide-react';
 import { PageHeader } from '@/components/dashboard/common/page-header';
 import { useQuery } from '@tanstack/react-query';
 import instance from '@/lib/axios';
@@ -115,7 +115,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card icon={<Users className="h-8 w-8" />} title="Total Users" value={stats.totalUsers.toLocaleString()} change={stats.newUsersThisMonth} />
           <Card icon={<ShoppingCart className="h-8 w-8" />} title="Total Orders" value={stats.totalOrders.toLocaleString()} />
-          <Card icon={<DollarSign className="h-8 w-8" />} title="Total Revenue" value={`₹${stats.totalRevenue.toLocaleString()}`} />
+          <Card icon={<IndianRupee className="h-8 w-8" />} title="Total Revenue" value={`₹${stats.totalRevenue.toLocaleString()}`} />
           <Card icon={<Package className="h-8 w-8" />} title="Total Products" value={stats.totalProducts.toLocaleString()} />
         </div>
 

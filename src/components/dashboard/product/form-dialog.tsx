@@ -241,7 +241,7 @@ export function ProductFormDialog({
                     name="unit"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Unit</FormLabel>
+                        <FormLabel>Unit *</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -361,7 +361,7 @@ export function ProductFormDialog({
                     name="thumbnail"
                     render={() => (
                       <FormItem className="space-y-2">
-                        <FormLabel>Thumbnail</FormLabel>
+                        <FormLabel>Thumbnail *</FormLabel>
                         <Card className="relative border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
                           <CardContent className="p-6">
                             {thumbnailPreview ? (
@@ -629,7 +629,7 @@ export function ProductFormDialog({
 }
 
 
-function BrandSearchableSelect({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+export function BrandSearchableSelect({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
