@@ -96,8 +96,6 @@ export default function DashboardPage() {
   }
 
   if (!stats) return null;
-  console.log(stats)
-
   const orderStatusData = Object.entries(stats.orderStatusStats).map(([status, count]) => ({
     name: status.replace('_', ' ').toUpperCase(),
     value: count,

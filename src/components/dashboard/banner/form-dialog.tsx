@@ -65,6 +65,12 @@ export function BannerFormDialog({
       order: initialData?.order || 0,
     },
   });
+  useEffect(()=>{
+    if(open){
+      form.reset()
+    }
+
+  },[open,form])
 
   useEffect(() => {
     return () => {

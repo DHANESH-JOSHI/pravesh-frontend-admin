@@ -52,7 +52,12 @@ export function BlogFormDialog({
       isPublished: initialData?.isPublished ?? false,
     },
   });
+  useEffect(() => {
+    if (open) {
+      form.reset()
+    }
 
+  }, [open, form])
   useEffect(() => {
     return () => {
       if (featuredImagePreview?.startsWith("blob:"))

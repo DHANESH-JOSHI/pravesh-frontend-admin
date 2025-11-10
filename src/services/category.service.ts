@@ -7,7 +7,16 @@ class CategoryService {
     const response = await instance.get<ApiResponse<PaginatedCategories>>("/categories", {
       params: options
     });
-    console.log(options)
+    return response.data;
+  }
+
+  async getChilds(id: string | null) {
+    const response = await instance.get<ApiResponse<Category[]>>(`/categories/children/${id}`);
+    return response.data;
+  }
+
+  async getByBrand(brandId:string){
+    const response = await instance.get<ApiResponse<Category[]>>(`/categories/brand/${brandId}`);
     return response.data;
   }
 
@@ -17,29 +26,12 @@ class CategoryService {
   }
 
   async create(data: CreateCategory) {
-    const formData = new FormData();
-    formData.append('title', data.title);
-    if (data.image && data.image instanceof File) formData.append('image', data.image);
-    if (data.parentCategoryId) formData.append('parentCategoryId', data.parentCategoryId);
-    const response = await instance.post<ApiResponse<Category>>("/categories", formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await instance.post<ApiResponse<Category>>("/categories", data);
     return response.data;
   }
 
   async update(id: string, data: UpdateCategory) {
-    const formData = new FormData();
-    if (data.title) formData.append('title', data.title);
-    if (data.image && data.image instanceof File) formData.append('image', data.image);
-    if (data.parentCategoryId) formData.append('parentCategoryId', data.parentCategoryId);
-
-    const response = await instance.patch<ApiResponse<Category>>(`/categories/${id}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await instance.patch<ApiResponse<Category>>(`/categories/${id}`,data);
     return response.data;
   }
 

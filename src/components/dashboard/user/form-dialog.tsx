@@ -26,6 +26,7 @@ import {
   registerSchema,
 } from "@/types/user";
 import { FormDialogProps } from "@/types";
+import { useEffect } from "react";
 
 export function UserFormDialog({
   open,
@@ -45,6 +46,12 @@ export function UserFormDialog({
       img: "",
     },
   });
+  useEffect(()=>{
+    if(open){
+      form.reset()
+    }
+
+  },[open,form])
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>

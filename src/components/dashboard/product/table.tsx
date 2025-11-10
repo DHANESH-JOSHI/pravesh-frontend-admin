@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check, Tag, Box, Palette, DollarSign } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check, Tag, Box, Palette, DollarSign, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -381,13 +381,13 @@ export function ProductsTable() {
                   return (
                     <TableRow key={product._id}>
                       <TableCell>
-                        <Image
+                        {product.thumbnail ? <Image
                           src={product.thumbnail || "/placeholder.svg"}
                           width={56}
                           height={56}
                           alt={product.name}
                           className="h-12 w-12 rounded-md object-cover"
-                        />
+                        /> : <ImageIcon />}
                       </TableCell>
                       <TableCell className="text-center">{product.sku}</TableCell>
                       <TableCell className="font-medium max-w-3xs">

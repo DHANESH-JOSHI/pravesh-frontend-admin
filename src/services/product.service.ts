@@ -104,27 +104,27 @@ class ProductService {
   async create(data: CreateProduct) {
     const formData = new FormData();
     formData.append('name', data.name);
-    if (data.description) formData.append('description', data.description);
-    if (data.shortDescription) formData.append('shortDescription', data.shortDescription);
+    // if (data.description) formData.append('description', data.description);
+    // if (data.shortDescription) formData.append('shortDescription', data.shortDescription);
     formData.append('originalPrice', data.originalPrice.toString());
-    if (data.discountValue) formData.append('discountedPrice', data.discountValue.toString());
-    if (data.discountType) formData.append('discountType', data.discountType);
+    // if (data.discountValue) formData.append('discountedPrice', data.discountValue.toString());
+    // if (data.discountType) formData.append('discountType', data.discountType);
     if (data.brandId) formData.append('brandId', data.brandId);
     formData.append('categoryId', data.categoryId);
-    if (data.images && data.images.length > 0) {
-      data.images.forEach((image) => {
-        formData.append("images", image);
-      });
-    }
+    // if (data.images && data.images.length > 0) {
+    //   data.images.forEach((image) => {
+    //     formData.append("images", image);
+    //   });
+    // }
     formData.append('unit', data.unit);
-    if (data.minStock) formData.append('minStock', data.minStock.toString());
+    // if (data.minStock) formData.append('minStock', data.minStock.toString());
     if (data.thumbnail) formData.append('thumbnail', data.thumbnail);
     if (data.tags) formData.append('tags', JSON.stringify(data.tags));
-    if (data.features) formData.append('features', JSON.stringify(data.features));
+    // if (data.features) formData.append('features', JSON.stringify(data.features));
     if (data.specifications) formData.append('specifications', JSON.stringify(data.specifications));
     if (data.isFeatured) formData.append('isFeatured', data.isFeatured.toString());
     if (data.isNewArrival) formData.append('isNewArrival', data.isNewArrival.toString());
-    formData.append('stock', data.stock.toString());
+    // formData.append('stock', data.stock.toString());
     const response = await instance.post<ApiResponse<Product>>("/products", formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -136,27 +136,27 @@ class ProductService {
   async update(id: string, data: Partial<CreateProduct>) {
     const formData = new FormData();
     if (data.name) formData.append('name', data.name);
-    if (data.description) formData.append('description', data.description);
-    if (data.shortDescription) formData.append('shortDescription', data.shortDescription);
+    // if (data.description) formData.append('description', data.description);
+    // if (data.shortDescription) formData.append('shortDescription', data.shortDescription);
     if (data.originalPrice) formData.append('originalPrice', data.originalPrice.toString());
-    if (data.discountValue) formData.append('discountedPrice', data.discountValue.toString());
-    if (data.discountType) formData.append('discountType', data.discountType);
+    // if (data.discountValue) formData.append('discountedPrice', data.discountValue.toString());
+    // if (data.discountType) formData.append('discountType', data.discountType);
     if (data.brandId) formData.append('brandId', data.brandId);
     if (data.categoryId) formData.append('categoryId', data.categoryId);
-    if (data.images && data.images.length > 0) {
-      data.images.forEach((image, index) => {
-        formData.append(`images[${index}]`, image);
-      });
-    }
+    // if (data.images && data.images.length > 0) {
+    //   data.images.forEach((image, index) => {
+    //     formData.append(`images[${index}]`, image);
+    //   });
+    // }
     if (data.unit) formData.append('unit', data.unit);
-    if (data.minStock) formData.append('minStock', data.minStock.toString());
+    // if (data.minStock) formData.append('minStock', data.minStock.toString());
     if (data.thumbnail) formData.append('thumbnail', data.thumbnail);
     if (data.tags) formData.append('tags', JSON.stringify(data.tags));
-    if (data.features) formData.append('features', JSON.stringify(data.features));
+    // if (data.features) formData.append('features', JSON.stringify(data.features));
     if (data.specifications) formData.append('specifications', JSON.stringify(data.specifications));
     if (data.isFeatured) formData.append('isFeatured', data.isFeatured.toString());
     if (data.isNewArrival) formData.append('isNewArrival', data.isNewArrival.toString());
-    if (data.stock) formData.append('stock', data.stock.toString());
+    // if (data.stock) formData.append('stock', data.stock.toString());
     const response = await instance.patch<ApiResponse<Product>>(`/products/${id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'

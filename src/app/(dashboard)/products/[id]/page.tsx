@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Star, Calendar, MessageSquare, Eye, UserIcon } from "lucide-react";
+import { ArrowLeft, Star, Calendar, MessageSquare, Eye, UserIcon, Images } from "lucide-react";
 import { Link, useTransitionRouter } from "next-view-transitions"
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -102,21 +102,20 @@ export default function ProductDetailPage() {
         {/* Product Images */}
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle>Product Images</CardTitle>
+            <CardTitle>Product Thumbnail</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {product.thumbnail && (
-                <div>
-                  <p className="text-sm font-medium mb-2">Thumbnail</p>
-                  <img
-                    src={product.thumbnail}
-                    alt={product.name}
-                    className="w-full h-48 object-cover rounded-lg border"
-                  />
-                </div>
-              )}
-              {/*{product.images && product.images.length > 0 && (
+          <CardContent className="flex items-center justify-center min-h-full">
+            {product.thumbnail ? (
+              <div>
+                <p className="text-sm font-medium mb-2">Thumbnail</p>
+                <img
+                  src={product.thumbnail}
+                  alt={product.name}
+                  className="w-full h-48 object-cover rounded-lg border"
+                />
+              </div>
+            ) : <Images className="w-20 h-20"/>}
+            {/*{product.images && product.images.length > 0 && (
                 <div>
                   <p className="text-sm font-medium mb-2">Gallery ({product.images.length} images)</p>
                   <div className="grid grid-cols-2 gap-2">
@@ -136,7 +135,6 @@ export default function ProductDetailPage() {
                   )}
                 </div>
               )}*/}
-            </div>
           </CardContent>
         </Card>
 

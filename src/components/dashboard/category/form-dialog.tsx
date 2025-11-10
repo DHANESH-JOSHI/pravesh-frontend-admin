@@ -1,12 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ImageIcon, Loader2, Trash, Upload } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { Loader2 } from "lucide-react";
+// import {  useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+// import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -23,6 +22,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Category, CreateCategory, FormDialogProps, createCategorySchema } from "@/types";
+import { useEffect } from "react";
 export function CategoryFormDialog({
   open,
   onOpenChange,
@@ -31,37 +31,43 @@ export function CategoryFormDialog({
   initialData,
   isLoading,
 }: FormDialogProps<CreateCategory, Category>) {
-  const imageRef = useRef<HTMLInputElement>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(
-    initialData?.image || null,
-  );
+  // const imageRef = useRef<HTMLInputElement>(null);
+  // const [imagePreview, setImagePreview] = useState<string | null>(
+  //   initialData?.image || null,
+  // );
   const form = useForm<CreateCategory>({
     resolver: zodResolver(
       createCategorySchema
     ),
     defaultValues: {
       title: initialData?.title || "",
-      image: undefined,
+      // image: undefined,
     },
   });
-
-  useEffect(() => {
-    return () => {
-      if (imagePreview?.startsWith("blob:"))
-        URL.revokeObjectURL(imagePreview);
-    };
-  }, [imagePreview]);
-
-  const handleFileChange = (file: File | undefined) => {
-    form.setValue("image", file as any, { shouldDirty: true });
-    if (imagePreview?.startsWith("blob:"))
-      URL.revokeObjectURL(imagePreview);
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-    } else {
-      setImagePreview(null);
+  useEffect(()=>{
+    if(open){
+      form.reset()
     }
-  };
+
+  },[open,form])
+
+  // useEffect(() => {
+  //   return () => {
+  //     if (imagePreview?.startsWith("blob:"))
+  //       URL.revokeObjectURL(imagePreview);
+  //   };
+  // }, [imagePreview]);
+
+  // const handleFileChange = (file: File | undefined) => {
+  //   form.setValue("image", file as any, { shouldDirty: true });
+  //   if (imagePreview?.startsWith("blob:"))
+  //     URL.revokeObjectURL(imagePreview);
+  //   if (file) {
+  //     setImagePreview(URL.createObjectURL(file));
+  //   } else {
+  //     setImagePreview(null);
+  //   }
+  // };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -92,7 +98,7 @@ export function CategoryFormDialog({
                 </FormItem>
               )}
             />
-            <FormField
+            {/*<FormField
               control={form.control}
               name="image"
               render={() => (
@@ -173,7 +179,7 @@ export function CategoryFormDialog({
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            />*/}
 
             <div className="flex justify-end gap-3 pt-4 border-t">
               <Button

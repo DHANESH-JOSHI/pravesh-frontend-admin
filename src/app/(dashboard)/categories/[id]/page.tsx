@@ -1,6 +1,6 @@
 "use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Folder, Package, Image as ImageIcon, Eye, MoreHorizontal, Edit, Trash2, Plus } from "lucide-react";
+import { ArrowLeft, Folder, Package, Eye, MoreHorizontal, Edit, Trash2, Plus, ImageIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -161,7 +161,7 @@ export default function CategoryDetailPage() {
             <CardContent>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  {typeof category.parentCategory === 'object' && category.parentCategory.image ? (
+                  {/*{typeof category.parentCategory === 'object' && category.parentCategory.image ? (
                     <img
                       src={category.parentCategory.image}
                       alt={category.parentCategory.title}
@@ -171,7 +171,7 @@ export default function CategoryDetailPage() {
                     <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
                       <Folder className="h-6 w-6 text-muted-foreground" />
                     </div>
-                  )}
+                  )}*/}
                   <div>
                     <p className="font-semibold text-lg">
                       {typeof category.parentCategory === 'object'
@@ -196,9 +196,9 @@ export default function CategoryDetailPage() {
       }
 
       {/* Category Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Category Image */}
-        <Card>
+        {/*<Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ImageIcon className="h-5 w-5" />
@@ -218,10 +218,10 @@ export default function CategoryDetailPage() {
               </div>
             )}
           </CardContent>
-        </Card>
+        </Card>*/}
 
         {/* Category Details */}
-        <Card className="lg:col-span-2">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Folder className="h-5 w-5" />
@@ -288,7 +288,7 @@ export default function CategoryDetailPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Image</TableHead>
+                    {/*<TableHead>Image</TableHead>*/}
                     <TableHead>Name</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Created</TableHead>
@@ -298,7 +298,7 @@ export default function CategoryDetailPage() {
                 <TableBody>
                   {category.children?.map((child) => (
                     <TableRow key={child._id}>
-                      <TableCell>
+                      {/*<TableCell>
                         {child.image ? (
                           <img
                             src={child.image}
@@ -310,7 +310,7 @@ export default function CategoryDetailPage() {
                             <Folder className="h-4 w-4 text-muted-foreground" />
                           </div>
                         )}
-                      </TableCell>
+                      </TableCell>*/}
                       <TableCell>{child.title}</TableCell>
                       <TableCell>
                         <Badge variant={child.isDeleted ? "destructive" : "secondary"}>
@@ -401,13 +401,13 @@ export default function CategoryDetailPage() {
                       .map((product) => (
                         <TableRow key={product._id}>
                           <TableCell className="w-40">
-                            {product.thumbnail && (
+                            {product.thumbnail ? (
                               <img
                                 src={product.thumbnail}
                                 alt={product.name}
                                 className="h-10 w-10 rounded object-cover"
                               />
-                            )}
+                            ) : <ImageIcon />}
                           </TableCell>
                           <TableCell className="font-medium w-32">
                             {product.sku}
@@ -458,10 +458,7 @@ export default function CategoryDetailPage() {
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
         onSubmit={(data) =>
-          createMutation.mutate({
-            ...data,
-            image: data.image!,
-          })
+          createMutation.mutate(data)
         }
         isLoading={createMutation.isPending}
         title="Create Subcategory"

@@ -65,6 +65,12 @@ export function BrandFormDialog({
       image: undefined,
     },
   });
+  useEffect(()=>{
+    if(open){
+      form.reset()
+    }
+
+  },[open,form])
 
   useEffect(() => {
     return () => {

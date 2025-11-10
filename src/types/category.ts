@@ -3,7 +3,7 @@ import { Brand, PaginatedData, Product } from ".";
 
 export const createCategorySchema = z.object({
   title: z.string(),
-  image: z.instanceof(File).optional(),
+  // image: z.instanceof(File).optional(),
   parentCategoryId: z.string().optional(),
 });
 
@@ -12,7 +12,7 @@ export const updateCategorySchema = createCategorySchema.partial();
 export type Category = {
   _id: string;
   title: string;
-  image?: string;
+  // image?: string;
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;

@@ -233,6 +233,8 @@ export function CategoriesTable() {
                     "h-12 w-40 rounded-md",
                     "h-4 w-40",
                     "h-4 w-40",
+                    "h-4 w-40",
+                    "h-4 w-40",
                     "h-8 w-12 rounded",
                   ]}
                 />

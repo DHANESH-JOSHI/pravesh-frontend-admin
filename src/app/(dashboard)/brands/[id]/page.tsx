@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Tag, Package, Image as ImageIcon, BarChart3, Eye } from "lucide-react";
+import { ArrowLeft, Tag, Package, Image as ImageIcon, BarChart3, Eye, Folder, Images } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -154,10 +154,6 @@ export default function BrandDetailPage() {
                 <Package className="h-5 w-5" />
                 Products by {brand.name} ({brand.products.length})
               </div>
-              <Button variant="outline" size="sm">
-                <BarChart3 className="h-4 w-4 mr-2" />
-                View All Products
-              </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -179,13 +175,13 @@ export default function BrandDetailPage() {
                     .map((product) => (
                       <TableRow key={product._id}>
                         <TableCell className="w-40">
-                          {product.thumbnail && (
+                          {product.thumbnail ? (
                             <img
                               src={product.thumbnail}
                               alt={product.name}
                               className="h-10 w-10 rounded object-cover"
                             />
-                          )}
+                          ):<ImageIcon/>}
                         </TableCell>
                         <TableCell className="font-medium w-32">
                           {product.sku}

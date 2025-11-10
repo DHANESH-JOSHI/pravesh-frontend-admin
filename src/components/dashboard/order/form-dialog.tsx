@@ -63,6 +63,12 @@ export function OrderFormDialog({
       })),
     },
   });
+  useEffect(()=>{
+    if(open){
+      form.reset()
+    }
+
+  },[open,form])
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,

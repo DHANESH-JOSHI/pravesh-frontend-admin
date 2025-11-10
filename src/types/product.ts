@@ -58,7 +58,7 @@ export const createProductSchema = z.object({
   // discountType: discountTypeSchema.optional(),
 
   // stock: z.number().int().nonnegative(),
-  unit: z.string().optional(),
+  unit: z.string().nonempty("Unit is required"),
   // minStock: z.number().int().nonnegative().optional(),
 
   // features: z.array(z.string()).optional(),

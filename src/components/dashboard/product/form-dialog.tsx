@@ -50,6 +50,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 // import { unitSchema } from "@/types/product";
 import Image from "next/image";
 import z from "zod";
+import { CategorySelectorField } from "@/components/category-selector-field";
 
 
 export function ProductFormDialog({
@@ -106,6 +107,12 @@ export function ProductFormDialog({
   //   control: form.control,
   //   name: "features" as any
   // });
+  useEffect(()=>{
+    if(open){
+      form.reset()
+    }
+
+  },[open,form])
 
   const { fields: specFields, append: appendSpec, remove: removeSpec } = useFieldArray({
     control: form.control,
@@ -136,8 +143,8 @@ export function ProductFormDialog({
     const specsArr: { key: string; value: string }[] = Array.isArray(data.specifications)
       ? data.specifications
       : data.specifications
-      ? Object.entries(data.specifications).map(([key, value]) => ({ key, value }))
-      : [];
+        ? Object.entries(data.specifications).map(([key, value]) => ({ key, value }))
+        : [];
     const specsRecord = specsArr.reduce((acc: Record<string, string>, s) => {
       if (s?.key) acc[s.key] = s.value ?? "";
       return acc;
@@ -274,16 +281,8 @@ export function ProductFormDialog({
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="categoryId"
-                    render={({ field }) => (
-                      <FormItem className="space-y-2">
-                        <FormLabel>Category *</FormLabel>
-                        <CategorySearchableSelect value={field.value || ""} action={field.onChange} />
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                  <CategorySelectorField
+                    form={form}
                   />
                   <FormField
                     control={form.control}
