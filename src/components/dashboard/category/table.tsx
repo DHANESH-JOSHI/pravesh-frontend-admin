@@ -91,6 +91,7 @@ export function CategoriesTable() {
       setIsOpen(false);
       toast.success("Category deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["categories"] })
+      queryClient.invalidateQueries({ queryKey: ["category"] })
     },
     onError: () => {
       setIsOpen(false);
@@ -104,9 +105,10 @@ export function CategoriesTable() {
       const data = await categoryService.update(editingCategory._id, values);
       return data.data;
     },
-    onSuccess: () => {
+    onSuccess: (_, { parentCategoryId }) => {
       toast.success("Category updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["category", parentCategoryId], exact: true })
       setEditingCategory(null);
     },
     onError: () => {
@@ -118,9 +120,10 @@ export function CategoriesTable() {
       const data = await categoryService.create(values);
       return data.data;
     },
-    onSuccess: () => {
+    onSuccess: (_, { parentCategoryId }) => {
       toast.success("Category created successfully!");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["category", parentCategoryId], exact: true })
       setIsCreateDialogOpen(false);
     },
     onError: () => {

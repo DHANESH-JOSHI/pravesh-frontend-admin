@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Tag, Package, Image as ImageIcon, BarChart3, Eye, Folder, Images } from "lucide-react";
+import { ArrowLeft, Tag, Package, Image as ImageIcon, Eye } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

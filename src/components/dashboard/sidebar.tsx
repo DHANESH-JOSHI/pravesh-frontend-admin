@@ -8,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { FileText, Image, Building2, Users, FolderOpen, Box, Star, MapPin, Wallet, ShoppingCart, Receipt, LayoutDashboard } from "lucide-react"
+import { FileText, Image, Building2, Users, FolderOpen, Box, Star, MapPin, Wallet, Receipt, LayoutDashboard } from "lucide-react"
 import { NavUser } from "./nav-user"
 import { Link } from "next-view-transitions"
 import { User } from "@/types"

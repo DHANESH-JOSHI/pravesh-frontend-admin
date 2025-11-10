@@ -84,7 +84,9 @@ export function ProductsTable() {
     onSuccess: () => {
       setIsOpen(false);
       toast.success("Product deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["products"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["category"] });
+      queryClient.invalidateQueries({ queryKey: ["brand"] });
     },
     onError: () => {
       setIsOpen(false);
@@ -101,6 +103,8 @@ export function ProductsTable() {
     onSuccess: () => {
       toast.success("Product updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["category"] });
+      queryClient.invalidateQueries({ queryKey: ["brand"] });
       setEditingProduct(null);
     },
     onError: () => {
@@ -115,6 +119,8 @@ export function ProductsTable() {
     onSuccess: () => {
       toast.success("Product created successfully!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["category"] });
+      queryClient.invalidateQueries({ queryKey: ["brand"] });
       setIsCreateDialogOpen(false);
     },
     onError: () => {
