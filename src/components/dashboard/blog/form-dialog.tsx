@@ -66,7 +66,7 @@ export function BlogFormDialog({
   }, [featuredImagePreview]);
 
   const handleFileChange = (file: File | undefined) => {
-    form.setValue("featuredImage", file as any, { shouldDirty: true });
+    form.setValue("featuredImage", file, { shouldDirty: true });
     if (featuredImagePreview?.startsWith("blob:"))
       URL.revokeObjectURL(featuredImagePreview);
     if (file) {
@@ -78,7 +78,7 @@ export function BlogFormDialog({
   return (<>{open && <div className="fixed inset-0 bg-black/50 pointer-events-none z-40" />}
     <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
       <DialogContent className="w-full min-w-[80%] xl:min-w-5xl mx-auto max-h-[70vh] overflow-y-auto z-50"
-        onInteractOutside={(e: any) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">

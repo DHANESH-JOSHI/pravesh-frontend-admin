@@ -75,12 +75,12 @@ export function WalletsTable() {
             count={wallets?.length ?? 0}
             countNoun="wallet"
             isFetching={isFetching}
-            onRefresh={refetch}
+            onRefreshAction={refetch}
             searchTerm={searchTerm}
-            onSearch={setSearchTerm}
+            onSearchAction={setSearchTerm}
             searchPlaceholder="Search wallets by user..."
             pageSize={limit}
-            onChangePageSize={(v) => {
+            onChangePageSizeAction={(v) => {
               const n = Number(v);
               setLimit(n);
               setPage(1);

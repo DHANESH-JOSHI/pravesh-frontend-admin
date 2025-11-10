@@ -137,13 +137,13 @@ export function CategoriesTable() {
             count={categories?.length ?? 0}
             countNoun="category"
             isFetching={isFetching}
-            onRefresh={refetch}
-            onCreate={() => setIsCreateDialogOpen(true)}
+            onRefreshAction={refetch}
+            onCreateAction={() => setIsCreateDialogOpen(true)}
             searchTerm={searchTerm}
-            onSearch={setSearchTerm}
+            onSearchAction={setSearchTerm}
             searchPlaceholder="Search categories..."
             pageSize={limit}
-            onChangePageSize={(v) => {
+            onChangePageSizeAction={(v) => {
               setPage(1);
               setLimit(Number(v));
             }}
@@ -343,10 +343,7 @@ export function CategoriesTable() {
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
         onSubmit={(data) =>
-          createMutation.mutate({
-            ...data,
-            image: data.image!,
-          })
+          createMutation.mutate(data)
         }
         isLoading={createMutation.isPending}
       />

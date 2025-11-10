@@ -174,11 +174,11 @@ export function BannerFormDialog({
                   <FormItem className="space-y-2">
                     <FormLabel>Redirect ID *</FormLabel>
                     {form.watch("targetUrl") === "/brands" ? (
-                      <BrandSearchableSelect value={field.value || ""} onChange={field.onChange} />
+                      <BrandSearchableSelect value={field.value || ""} action={field.onChange} />
                     ) : form.watch("targetUrl") === "/categories" ? (
-                      <CategorySearchableSelect value={field.value || ""} onChange={field.onChange} />
+                      <CategorySearchableSelect value={field.value || ""} action={field.onChange} />
                     ) : form.watch("targetUrl") === "/products" ? (
-                      <ProductSearchableSelect value={field.value || ""} onChange={field.onChange} />
+                      <ProductSearchableSelect value={field.value || ""} action={field.onChange} />
                     ) : null}
                     <FormMessage />
                   </FormItem>
@@ -305,7 +305,7 @@ export function BannerFormDialog({
   );
 }
 
-export function ProductSearchableSelect({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+export function ProductSearchableSelect({ value, action }: { value: string; action: (value: string) => void }) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
@@ -352,7 +352,7 @@ export function ProductSearchableSelect({ value, onChange }: { value: string; on
           <CommandGroup>
             <ScrollArea className="h-48">
               {products.map((product) => (
-                <CommandItem key={product._id} value={product._id} onSelect={(currentValue) => { onChange(currentValue === value ? "" : currentValue); setOpen(false); }}>
+                <CommandItem key={product._id} value={product._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
                   <Check className={cn("mr-2 h-4 w-4", value === product._id ? "opacity-100" : "opacity-0")} />
                   {product.name}
                 </CommandItem>

@@ -136,13 +136,13 @@ export function BrandsTable() {
             count={brands?.length ?? 0}
             countNoun="brand"
             isFetching={isFetching}
-            onRefresh={refetch}
-            onCreate={() => setIsCreateDialogOpen(true)}
+            onRefreshAction={refetch}
+            onCreateAction={() => setIsCreateDialogOpen(true)}
             searchTerm={searchTerm}
-            onSearch={(v) => { setSearchTerm(v); setPage(1); }}
+            onSearchAction={(v) => { setSearchTerm(v); setPage(1); }}
             searchPlaceholder="Search brands..."
             pageSize={limit}
-            onChangePageSize={(v) => { const n = Number(v); setLimit(n); setPage(1); }}
+            onChangePageSizeAction={(v) => { const n = Number(v); setLimit(n); setPage(1); }}
           />
 
           <div className="flex items-center justify-between gap-3">

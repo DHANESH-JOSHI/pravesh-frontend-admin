@@ -135,13 +135,13 @@ export function BannersTable() {
             count={banners?.length ?? 0}
             countNoun="banner"
             isFetching={isFetching}
-            onRefresh={refetch}
-            onCreate={() => setIsCreateDialogOpen(true)}
+            onRefreshAction={refetch}
+            onCreateAction={() => setIsCreateDialogOpen(true)}
             searchTerm={searchTerm}
-            onSearch={setSearchTerm}
+            onSearchAction={setSearchTerm}
             searchPlaceholder="Search banners..."
             pageSize={limit}
-            onChangePageSize={(v) => {
+            onChangePageSizeAction={(v) => {
               const n = Number(v);
               setLimit(n);
               setPage(1);

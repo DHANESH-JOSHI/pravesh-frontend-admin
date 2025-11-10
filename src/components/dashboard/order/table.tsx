@@ -81,12 +81,12 @@ export function OrdersTable() {
             count={orders?.length ?? 0}
             countNoun="order"
             isFetching={isFetching}
-            onRefresh={refetch}
+            onRefreshAction={refetch}
             searchTerm={searchTerm}
-            onSearch={setSearchTerm}
+            onSearchAction={setSearchTerm}
             searchPlaceholder="Search orders by user..."
             pageSize={limit}
-            onChangePageSize={(v) => {
+            onChangePageSizeAction={(v) => {
               const n = Number(v);
               setLimit(n);
               setPage(1);

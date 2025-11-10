@@ -81,12 +81,12 @@ export function ReviewsTable() {
             count={reviews?.length ?? 0}
             countNoun="review"
             isFetching={isFetching}
-            onRefresh={refetch}
+            onRefreshAction={refetch}
             searchTerm={searchTerm}
-            onSearch={setSearchTerm}
+            onSearchAction={setSearchTerm}
             searchPlaceholder="Search reviews..."
             pageSize={limit}
-            onChangePageSize={(v) => {
+            onChangePageSizeAction={(v) => {
               const n = Number(v);
               setLimit(n);
               setPage(1);

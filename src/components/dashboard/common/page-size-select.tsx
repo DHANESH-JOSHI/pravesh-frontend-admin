@@ -5,14 +5,14 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   value: number;
-  onChange: (value: string) => void;
+  action: (value: string) => void;
   options?: number[];
   className?: string;
 };
 
-export function PageSizeSelect({ value, onChange, options = [4,8, 10, 12, 16], className }: Props) {
+export function PageSizeSelect({ value, action, options = [4,8, 10, 12, 16], className }: Props) {
   return (
-    <Select value={String(value)} onValueChange={onChange}>
+    <Select value={String(value)} onValueChange={action}>
       <SelectTrigger className={cn("h-9 w-32", className)}>
         <SelectValue placeholder="Per page" />
       </SelectTrigger>

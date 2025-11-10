@@ -13,13 +13,13 @@ type Props = {
   count: number;
   countNoun: string;
   isFetching: boolean;
-  onRefresh: () => void;
-  onCreate?: () => void;
+  onRefreshAction: () => void;
+  onCreateAction?: () => void;
   searchTerm: string;
-  onSearch: (v: string) => void;
+  onSearchAction: (v: string) => void;
   searchPlaceholder: string;
   pageSize?: number;
-  onChangePageSize?: (v: string) => void;
+  onChangePageSizeAction?: (v: string) => void;
 };
 
 export function TableHeaderControls({
@@ -27,16 +27,16 @@ export function TableHeaderControls({
   count,
   countNoun,
   isFetching,
-  onRefresh,
-  onCreate,
+  onRefreshAction,
+  onCreateAction,
   searchTerm,
-  onSearch,
+  onSearchAction,
   searchPlaceholder,
   pageSize,
-  onChangePageSize,
+  onChangePageSizeAction,
 }: Props) {
   const [inputValue, setInputValue] = useState(searchTerm);
-  const debouncedOnSearch = useDebouncedCallback(onSearch, 300);
+  const debouncedOnSearch = useDebouncedCallback(onSearchAction, 300);
 
   useEffect(() => {
     setInputValue(searchTerm);
@@ -52,10 +52,10 @@ export function TableHeaderControls({
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">{title}</h2>
         <div className="flex items-center gap-2">
-          <RefreshButton spinning={isFetching} onClick={onRefresh} />
-          {onCreate && (
+          <RefreshButton spinning={isFetching} onClick={onRefreshAction} />
+          {onCreateAction && (
             <Button
-              onClick={onCreate}
+              onClick={onCreateAction}
               className="gap-2"
             >
               <Plus className="h-4 w-4" />
@@ -78,9 +78,9 @@ export function TableHeaderControls({
           {count} {countNoun.endsWith("y") && count !== 1 ? countNoun.slice(0, -1) : countNoun}
           {count !== 1 ? countNoun.endsWith("s") ? "es" : countNoun.endsWith("h") ? "es" : countNoun.endsWith("y") ? "ies" : countNoun.endsWith("i") ? "es" : "s" : ""}
         </Badge>
-        {pageSize && onChangePageSize && (
+        {pageSize && onChangePageSizeAction && (
           <div className="ml-auto flex items-center gap-2">
-            <PageSizeSelect value={pageSize} onChange={onChangePageSize} />
+            <PageSizeSelect value={pageSize} action={onChangePageSizeAction} />
           </div>
         )}
       </div>

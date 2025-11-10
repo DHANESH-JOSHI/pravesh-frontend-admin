@@ -115,17 +115,17 @@ export function UsersTable() {
             count={users?.length ?? 0}
             countNoun="user"
             isFetching={isFetching}
-            onRefresh={refetch}
+            onRefreshAction={refetch}
             searchTerm={searchTerm}
-            onSearch={setSearchTerm}
+            onSearchAction={setSearchTerm}
             searchPlaceholder="Search users..."
             pageSize={limit}
-            onChangePageSize={(v) => {
+            onChangePageSizeAction={(v) => {
               const n = Number(v);
               setLimit(n);
               setPage(1);
             }}
-            onCreate={() => setCreateDialogOpen(true)}
+            onCreateAction={() => setCreateDialogOpen(true)}
           />
 
           <div className="flex items-center justify-between gap-3">

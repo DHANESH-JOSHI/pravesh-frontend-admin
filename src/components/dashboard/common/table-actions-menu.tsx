@@ -10,11 +10,11 @@ import {
 import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
 
 export type TableActionsMenuProps = {
-    onEdit?: () => void;
-    onDelete?: () => void;
+    onEditAction?: () => void;
+    onDeleteAction?: () => void;
 };
 
-export function TableActionsMenu({ onEdit, onDelete }: TableActionsMenuProps) {
+export function TableActionsMenu({ onEditAction, onDeleteAction }: TableActionsMenuProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -23,16 +23,16 @@ export function TableActionsMenu({ onEdit, onDelete }: TableActionsMenuProps) {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                {onEdit ? (
-                    <DropdownMenuItem className="gap-2" onClick={onEdit}>
+                {onEditAction ? (
+                    <DropdownMenuItem className="gap-2" onClick={onEditAction}>
                         <Edit className="h-4 w-4" />
                         Edit
                     </DropdownMenuItem>
                 ) : null}
-                {onDelete ? (
+                {onDeleteAction ? (
                     <DropdownMenuItem
                         className="gap-2 text-destructive"
-                        onClick={onDelete}
+                        onClick={onDeleteAction}
                     >
                         <Trash2 className="h-4 w-4" />
                         Delete

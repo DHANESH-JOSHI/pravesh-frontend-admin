@@ -135,13 +135,13 @@ export function BlogsTable() {
             count={blogs?.length ?? 0}
             countNoun="blog"
             isFetching={isFetching}
-            onRefresh={refetch}
-            onCreate={() => setIsCreateDialogOpen(true)}
+            onRefreshAction={refetch}
+            onCreateAction={() => setIsCreateDialogOpen(true)}
             searchTerm={searchTerm}
-            onSearch={setSearchTerm}
+            onSearchAction={setSearchTerm}
             searchPlaceholder="Search blogs..."
             pageSize={limit}
-            onChangePageSize={(v) => {
+            onChangePageSizeAction={(v) => {
               const n = Number(v);
               setLimit(n);
               setPage(1);

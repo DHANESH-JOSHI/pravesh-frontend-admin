@@ -159,13 +159,13 @@ export function ProductsTable() {
             count={products?.length ?? 0}
             countNoun="product"
             isFetching={isFetching}
-            onRefresh={refetch}
-            onCreate={() => setIsCreateDialogOpen(true)}
+            onRefreshAction={refetch}
+            onCreateAction={() => setIsCreateDialogOpen(true)}
             searchTerm={searchTerm}
-            onSearch={setSearchTerm}
+            onSearchAction={setSearchTerm}
             searchPlaceholder="Search products..."
             pageSize={limit}
-            onChangePageSize={(v) => {
+            onChangePageSizeAction={(v) => {
               const n = Number(v);
               setLimit(n);
               setPage(1);

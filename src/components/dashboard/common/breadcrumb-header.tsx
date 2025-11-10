@@ -20,9 +20,7 @@ export function BreadcrumbHeader() {
   const segments = (pathname || "/").split("/").filter(Boolean);
   const dashIdx = segments.indexOf("dashboard");
   const trail = segments.slice(dashIdx + 1);
-  let href = "/";
-  const crumbs: string[] = trail.map((seg, idx) => {
-    href += `/${seg}`;
+  const crumbs: string[] = trail.map((seg) => {
     return toLabel(seg)
   });
 
