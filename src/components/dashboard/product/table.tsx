@@ -72,7 +72,7 @@ export function ProductsTable() {
         limit,
         search: searchTerm,
         ...appliedFilters,
-        
+
       } as QueryOptions),
   });
 
@@ -343,11 +343,11 @@ export function ProductsTable() {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-24">Thumbnail</TableHead>
+                <TableHead className="w-24">SKU</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Brand</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead className="text-right">Final Price</TableHead>
-                <TableHead className="text-right">Stock</TableHead>
+                <TableHead className="text-right">Price</TableHead>
                 <TableHead className="w-16">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -389,15 +389,15 @@ export function ProductsTable() {
                           className="h-12 w-12 rounded-md object-cover"
                         />
                       </TableCell>
-                      <TableCell className="font-medium max-w-xs">
+                      <TableCell className="text-center">{product.sku}</TableCell>
+                      <TableCell className="font-medium max-w-3xs">
                         <div className="truncate" title={product.name}>
                           {product.name}
                         </div>
                       </TableCell>
-                      <TableCell className="text-muted-foreground">{brandName}</TableCell>
-                      <TableCell className="text-muted-foreground">{categoryName}</TableCell>
-                      <TableCell className="text-center font-semibold">₹{product.finalPrice}</TableCell>
-                      <TableCell className="text-center">{product.stock}</TableCell>
+                      <TableCell className="text-muted-foreground truncate w-20">{brandName}</TableCell>
+                      <TableCell className="text-muted-foreground truncate w-20">{categoryName}</TableCell>
+                      <TableCell className="text-center font-semibold">₹{product.originalPrice}</TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

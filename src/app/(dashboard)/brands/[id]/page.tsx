@@ -169,7 +169,6 @@ export default function BrandDetailPage() {
                     <TableHead>SKU</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Price</TableHead>
-                    <TableHead>Stock</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="w-16">Actions</TableHead>
                   </TableRow>
@@ -195,9 +194,8 @@ export default function BrandDetailPage() {
                           {product.name}
                         </TableCell>
                         <TableCell className="font-medium">
-                          ₹{product.finalPrice}
+                          ₹{product.originalPrice}
                         </TableCell>
-                        <TableCell>{product.stock}</TableCell>
                         <TableCell>
                           <Badge variant={
                             product.isDeleted ? "destructive" :

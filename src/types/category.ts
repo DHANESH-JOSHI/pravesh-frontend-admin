@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PaginatedData, Product } from ".";
+import { Brand, PaginatedData, Product } from ".";
 
 export const createCategorySchema = z.object({
   title: z.string(),
@@ -18,8 +18,12 @@ export type Category = {
   updatedAt: string;
   parentCategory?: string | Partial<Category>;
   // relations
+  childCount?: number;
+  brandCount?: number;
+  productCount?: number;
   children?: Partial<Category>[];
   products?: Partial<Product>[];
+  brands?: Partial<Brand>[];
 };
 export type CreateCategory = z.infer<typeof createCategorySchema>;
 export type UpdateCategory = z.infer<typeof updateCategorySchema>;

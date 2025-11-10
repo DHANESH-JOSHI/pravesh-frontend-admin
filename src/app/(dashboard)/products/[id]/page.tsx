@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Star, Tag, Calendar, MessageSquare, Eye, UserIcon } from "lucide-react";
+import { ArrowLeft, Star, Calendar, MessageSquare, Eye, UserIcon } from "lucide-react";
 import { Link, useTransitionRouter } from "next-view-transitions"
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -17,7 +17,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
-
 import { productService } from "@/services/product.service";
 import { Product } from "@/types/product";
 import { Brand, Category, User } from "@/types";
@@ -65,14 +64,14 @@ export default function ProductDetailPage() {
   const brandName = (product.brand as Brand)?.name || "N/A";
   const category = product.category as Category;
 
-  const getStockStatusColor = (status: string) => {
-    switch (status) {
-      case "in-stock": return "bg-green-100 text-green-800";
-      case "low-stock": return "bg-yellow-100 text-yellow-800";
-      case "out-of-stock": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
+  // const getStockStatusColor = (status: string) => {
+  //   switch (status) {
+  //     case "in-stock": return "bg-green-100 text-green-800";
+  //     case "low-stock": return "bg-yellow-100 text-yellow-800";
+  //     case "out-of-stock": return "bg-red-100 text-red-800";
+  //     default: return "bg-gray-100 text-gray-800";
+  //   }
+  // };
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -117,7 +116,7 @@ export default function ProductDetailPage() {
                   />
                 </div>
               )}
-              {product.images && product.images.length > 0 && (
+              {/*{product.images && product.images.length > 0 && (
                 <div>
                   <p className="text-sm font-medium mb-2">Gallery ({product.images.length} images)</p>
                   <div className="grid grid-cols-2 gap-2">
@@ -136,7 +135,7 @@ export default function ProductDetailPage() {
                     </p>
                   )}
                 </div>
-              )}
+              )}*/}
             </div>
           </CardContent>
         </Card>
@@ -164,8 +163,8 @@ export default function ProductDetailPage() {
                 <div className="space-x-2">
                   <label className="text-sm font-medium">Brand</label>
                   <Link href={`/brands/${brandId}`}>
-                    <Button variant={brandId ? 'link' : 'ghost'} size="sm" onClick={(e)=>{
-                      if(!brandId){
+                    <Button variant={brandId ? 'link' : 'ghost'} size="sm" onClick={(e) => {
+                      if (!brandId) {
                         e.preventDefault();
                         e.stopPropagation();
                       }
@@ -189,12 +188,12 @@ export default function ProductDetailPage() {
                   <label className="text-sm font-medium">Unit</label>
                   <p>{product.unit}</p>
                 </div>
-                <div>
+                {/*<div>
                   <label className="text-sm font-medium mr-3">Stock Status</label>
                   <Badge className={getStockStatusColor(product.stockStatus)}>
                     {product.stockStatus.replace("-", " ").toUpperCase()}
                   </Badge>
-                </div>
+                </div>*/}
                 <div>
                   <label className="text-sm font-medium">Rating</label>
                   <div className="flex items-center gap-2">
@@ -227,19 +226,27 @@ export default function ProductDetailPage() {
       {/* Pricing Information */}
       <Card>
         <CardHeader>
-          <CardTitle>Pricing Information</CardTitle>
+          <CardTitle>Pricing & Sale Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
             <div>
               <label className="text-sm font-medium">Original Price</label>
               <p className="text-2xl font-bold">₹{product.originalPrice.toFixed(2)}</p>
             </div>
             <div>
+              <label className="text-sm font-medium">Total Sold</label>
+              <p className="text-2xl">{product.totalSold}</p>
+            </div>
+            <div>
+              <span className="font-medium text-sm">Sales Count:</span>
+              <p className="text-2xl">{product.salesCount}</p>
+            </div>
+            {/*<div>
               <label className="text-sm font-medium">Final Price</label>
               <p className="text-2xl font-bold text-green-600">₹{product.finalPrice.toFixed(2)}</p>
-            </div>
-            {product.discountValue > 0 && (
+            </div>*/}
+            {/*{product.discountValue > 0 && (
               <div>
                 <label className="text-sm font-medium">Discount</label>
                 <p className="text-lg font-semibold text-red-600">
@@ -249,21 +256,21 @@ export default function ProductDetailPage() {
                   }
                 </p>
               </div>
-            )}
-            <div>
+            )}*/}
+            {/*<div>
               <label className="text-sm font-medium">Savings</label>
               <p className="text-lg font-semibold text-green-600">
                 ₹{(product.originalPrice - product.finalPrice).toFixed(2)}
               </p>
-            </div>
+            </div>*/}
           </div>
         </CardContent>
       </Card>
 
       {/* Stock Information */}
-      <Card>
+      {/*<Card>
         <CardHeader>
-          <CardTitle>Stock Information</CardTitle>
+          <CardTitle>Sale Information</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -285,10 +292,10 @@ export default function ProductDetailPage() {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card>*/}
 
       {/* Description and Details */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/*<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Description</CardTitle>
@@ -316,10 +323,10 @@ export default function ProductDetailPage() {
             )}
           </CardContent>
         </Card>
-      </div>
+      </div>*/}
 
       {/* Features and Tags */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/*<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {product.features && product.features.length > 0 && (
           <Card>
             <CardHeader>
@@ -355,7 +362,7 @@ export default function ProductDetailPage() {
             </CardContent>
           </Card>
         )}
-      </div>
+      </div>*/}
 
       {/* Specifications */}
       {
@@ -401,19 +408,19 @@ export default function ProductDetailPage() {
                 New Arrival
               </Badge>
             )}
-            {product.isDiscount && (
+            {/*{product.isDiscount && (
               <Badge variant="destructive">
                 <Tag className="h-3 w-3 mr-1" />
                 On Discount
               </Badge>
-            )}
+            )}*/}
             {product.isDeleted && (
               <Badge variant="destructive">
                 Deleted
               </Badge>
             )}
           </div>
-          {(!product.isFeatured && !product.isNewArrival && !product.isDiscount && !product.isDeleted) && (
+          {(!product.isFeatured && !product.isNewArrival && !product.isDeleted) && (
             <p className="text-muted-foreground">No special flags</p>
           )}
         </CardContent>

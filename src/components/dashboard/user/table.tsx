@@ -27,14 +27,16 @@ import {
 } from "@/components/ui/table";
 import { CustomAlertDialog } from "../common/custom-alert-dialog";
 import { userService } from "@/services/user.service";
-import { User, UserQueryOptions } from "@/types/user";
+import { Register, User, UserQueryOptions } from "@/types/user";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "next-view-transitions";
+import { UserFormDialog } from "./form-dialog";
 export function UsersTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterDraft, setFilterDraft] = useState<Partial<UserQueryOptions>>({});
   const [appliedFilters, setAppliedFilters] = useState<Partial<UserQueryOptions>>({});
@@ -63,6 +65,17 @@ export function UsersTable() {
     onError: () => {
       setIsOpen(false);
       toast.error("Failed to delete user. Please try again.");
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: userService.createVerifiedUser,
+    onSuccess: () => {
+      toast.success("User created successfully");
+      queryClient.invalidateQueries({ queryKey: ["users"], exact: false });
+    },
+    onError: () => {
+      toast.error("Failed to create user. Please try again.");
     },
   });
 
@@ -112,6 +125,7 @@ export function UsersTable() {
               setLimit(n);
               setPage(1);
             }}
+            onCreate={() => setCreateDialogOpen(true)}
           />
 
           <div className="flex items-center justify-between gap-3">
@@ -307,6 +321,19 @@ export function UsersTable() {
           onPageChange={(p) => setPage(p)}
         />
       </CardContent>
+      <UserFormDialog
+        isLoading={createMutation.isPending}
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSubmit={(data) => {
+          if(data.email==""){
+            delete data.email;
+          }
+          if(data.img==""){
+            delete data.img;
+          }
+          createMutation.mutate(data as Register)}}
+      />
 
       <CustomAlertDialog
         isOpen={isOpen}

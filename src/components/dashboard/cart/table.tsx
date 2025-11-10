@@ -121,7 +121,7 @@ export function CartsTable() {
                         {cart.items.reduce((acc, item) => acc + item.quantity, 0)}
                       </TableCell>
                       <TableCell className="text-muted-foreground font-semibold">
-                        ₹{cart.items.reduce((acc, item) => acc + (item.product as Product).finalPrice, 0).toFixed(2)}
+                        ₹{cart.items.reduce((acc, item) => acc + (item.product as Product).originalPrice, 0).toFixed(2)}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {cart.updatedAt}

@@ -21,6 +21,7 @@ class BrandService {
     if (data.image && data.image instanceof File) {
       formData.append('image', data.image);
     }
+    formData.append('categoryId', data.categoryId);
     const response = await instance.post<ApiResponse<Brand>>("/brands", formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -37,6 +38,7 @@ class BrandService {
     if (data.image && data.image instanceof File) {
       formData.append('image', data.image);
     }
+    if (data.categoryId) formData.append('categoryId', data.categoryId);
 
     const response = await instance.patch<ApiResponse<Brand>>(`/brands/${id}`, formData, {
       headers: {

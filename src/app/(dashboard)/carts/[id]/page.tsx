@@ -55,7 +55,7 @@ export default function CartDetailPage() {
   const user = cart.user as Partial<UserType>;
   const totalAmount = cart.items.reduce((acc, item) => {
     const product = item.product as Partial<Product>;
-    return acc + (product.finalPrice || 0) * item.quantity;
+    return acc + (product.originalPrice || 0) * item.quantity;
   }, 0);
   const totalItems = cart.items.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -114,8 +114,8 @@ export default function CartDetailPage() {
                 <TableHead>Product</TableHead>
                 <TableHead>Brand</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead className="text-right">Original</TableHead>
-                <TableHead className="text-right">Final</TableHead>
+                <TableHead className="text-right">Price</TableHead>
+                {/*<TableHead className="text-right">Final Price</TableHead>*/}
                 <TableHead className="text-right">Qty</TableHead>
                 <TableHead className="text-right">Line Total</TableHead>
               </TableRow>
@@ -132,7 +132,7 @@ export default function CartDetailPage() {
                   const product = item.product as Partial<Product>;
                   const brand = product.brand as Partial<Brand>;
                   const category = product.category as Partial<Category>;
-                  const lineTotal = (product.finalPrice ?? 0) * item.quantity;
+                  const lineTotal = (product.originalPrice ?? 0) * item.quantity;
                   return (
                     <TableRow key={idx}>
                       <TableCell>
@@ -149,7 +149,7 @@ export default function CartDetailPage() {
                       <TableCell><Link className="hover:underline" href={`/categories/${category._id}`}>{category.title || "N/A"}</Link>
                       </TableCell>
                       <TableCell className="text-right text-muted-foreground">₹{(product.originalPrice ?? 0).toFixed(2)}</TableCell>
-                      <TableCell className="text-right font-semibold">₹{(product.finalPrice ?? 0).toFixed(2)}</TableCell>
+                      {/*<TableCell className="text-right text-muted-foreground">₹{(product.finalPrice ?? 0).toFixed(2)}</TableCell>*/}
                       <TableCell className="text-right">{item.quantity}</TableCell>
                       <TableCell className="text-right font-medium">₹{lineTotal.toFixed(2)}</TableCell>
                     </TableRow>

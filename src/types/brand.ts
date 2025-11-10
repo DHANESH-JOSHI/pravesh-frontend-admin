@@ -1,8 +1,9 @@
 import { z } from "zod";
-import { PaginatedData, Product } from ".";
+import { Category, PaginatedData, Product } from ".";
 
 export const createBrandSchema = z.object({
   name: z.string(),
+  categoryId: z.string(),
   image: z.instanceof(File).optional(),
 });
 
@@ -12,10 +13,12 @@ export type Brand = {
   _id: string;
   name: string;
   image: string;
+  category: string | Partial<Category>;
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
   // relations
+  productCount?: number;
   products?: Partial<Product>[];
 };
 export type CreateBrand = z.infer<typeof createBrandSchema>;

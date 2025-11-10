@@ -1,7 +1,7 @@
 'use client';
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Users, ShoppingCart, Package, TrendingUp, AlertTriangle, Star, Heart, ShoppingBag, FileText, Activity, LayoutDashboard, IndianRupee } from 'lucide-react';
+import { Users, ShoppingCart, Package, TrendingUp, Star, Heart, ShoppingBag, FileText, Activity, LayoutDashboard, IndianRupee } from 'lucide-react';
 import { PageHeader } from '@/components/dashboard/common/page-header';
 import { useQuery } from '@tanstack/react-query';
 import instance from '@/lib/axios';
@@ -53,15 +53,15 @@ interface IDashboardStats {
     orders: number;
   }>;
   orderStatusStats: { [key: string]: number };
-  lowStockProducts: Array<{
-    _id: string;
-    name: string;
-    stock: number;
-  }>;
-  outOfStockList: Array<{
-    _id: string;
-    name: string;
-  }>;
+  // lowStockProducts: Array<{
+  //   _id: string;
+  //   name: string;
+  //   stock: number;
+  // }>;
+  // outOfStockList: Array<{
+  //   _id: string;
+  //   name: string;
+  // }>;
   totalReviews: number;
   averageRating: number;
   totalWishlistItems: number;
@@ -96,6 +96,7 @@ export default function DashboardPage() {
   }
 
   if (!stats) return null;
+  console.log(stats)
 
   const orderStatusData = Object.entries(stats.orderStatusStats).map(([status, count]) => ({
     name: status.replace('_', ' ').toUpperCase(),
@@ -234,7 +235,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Alerts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        {/*<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <div className="bg-accent/50 p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
               <AlertTriangle className="h-5 w-5 mr-2 text-yellow-500" />
@@ -260,7 +261,7 @@ export default function DashboardPage() {
               ))}
             </ul>
           </div>
-        </div>
+        </div>*/}
 
         {/* Additional Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

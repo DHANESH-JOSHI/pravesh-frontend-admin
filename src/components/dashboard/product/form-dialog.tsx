@@ -30,7 +30,7 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn, generateSlug } from "@/lib/utils";
 import {
   type Product,
@@ -39,7 +39,7 @@ import {
   createProductSchema,
 } from "@/types/product";
 import { FormDialogProps } from "@/types";
-import { Textarea } from "@/components/ui/textarea";
+// import { Textarea } from "@/components/ui/textarea";
 import { useQuery } from "@tanstack/react-query";
 import { brandService } from "@/services/brand.service";
 import { categoryService } from "@/services/category.service";
@@ -47,7 +47,7 @@ import { Brand } from "@/types/brand";
 import { Category } from "@/types/category";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { discountTypeSchema, unitSchema } from "@/types/product";
+// import { unitSchema } from "@/types/product";
 import Image from "next/image";
 import z from "zod";
 
@@ -66,15 +66,15 @@ export function ProductFormDialog({
   });
 
   const thumbnailRef = useRef<HTMLInputElement>(null);
-  const imagesRef = useRef<HTMLInputElement>(null);
+  // const imagesRef = useRef<HTMLInputElement>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
     initialData?.thumbnail || null,
   );
-  const [imagesPreviews, setImagesPreviews] = useState<string[]>(
-    initialData?.images || [],
-  );
-  const [imagesFiles, setImagesFiles] = useState<File[]>([]);
-  const initialImagesCount = initialData?.images?.length || 0;
+  // const [imagesPreviews, setImagesPreviews] = useState<string[]>(
+  //   initialData?.images || [],
+  // );
+  // const [imagesFiles, setImagesFiles] = useState<File[]>([]);
+  // const initialImagesCount = initialData?.images?.length || 0;
   const form = useForm<any>({
     resolver: zodResolver(
       formSchema
@@ -82,30 +82,30 @@ export function ProductFormDialog({
     defaultValues: {
       name: initialData?.name || "",
       slug: initialData?.slug || "",
-      description: initialData?.description || "",
-      shortDescription: initialData?.shortDescription || "",
+      // description: initialData?.description || "",
+      // shortDescription: initialData?.shortDescription || "",
       categoryId: initialData?.category as string || "",
       brandId: initialData?.brand as string || "",
       originalPrice: initialData?.originalPrice || 0,
-      discountType: initialData?.discountType || undefined,
-      discountValue: initialData?.discountValue || 0,
-      stock: initialData?.stock || 0,
+      // discountType: initialData?.discountType || undefined,
+      // discountValue: initialData?.discountValue || 0,
+      // stock: initialData?.stock || 0,
       thumbnail: undefined,
-      images: undefined,
-      features: initialData?.features || [],
+      // images: undefined,
+      // features: initialData?.features || [],
       specifications: initialData?.specifications ? Object.entries(initialData.specifications).map(([key, value]) => ({ key, value })) : [],
-      unit: initialData?.unit || undefined,
-      minStock: initialData?.minStock || 0,
+      unit: initialData?.unit || "piece",
+      // minStock: initialData?.minStock || 0,
       tags: initialData?.tags || [],
       isFeatured: initialData?.isFeatured || false,
       isNewArrival: initialData?.isNewArrival || false,
     },
   });
 
-  const { fields: featureFields, append: appendFeature, remove: removeFeature } = useFieldArray({
-    control: form.control,
-    name: "features" as any
-  });
+  // const { fields: featureFields, append: appendFeature, remove: removeFeature } = useFieldArray({
+  //   control: form.control,
+  //   name: "features" as any
+  // });
 
   const { fields: specFields, append: appendSpec, remove: removeSpec } = useFieldArray({
     control: form.control,
@@ -118,17 +118,17 @@ export function ProductFormDialog({
         ...initialData,
         brandId: (initialData.brand as Brand)?._id || initialData.brand,
         categoryId: (initialData.category as Category)?._id || initialData.category,
-        features: initialData.features || [],
+        // features: initialData.features || [],
         specifications: initialData.specifications ? Object.entries(initialData.specifications).map(([key, value]) => ({ key, value })) : [],
         tags: initialData.tags || [],
         thumbnail: undefined,
-        images: undefined,
+        // images: undefined,
       })
       if (initialData.thumbnail) {
         setThumbnailPreview(initialData.thumbnail)
       }
-      setImagesPreviews(initialData.images || []);
-      setImagesFiles([]);
+      // setImagesPreviews(initialData.images || []);
+      // setImagesFiles([]);
     }
   }, [initialData, form])
 
@@ -144,7 +144,7 @@ export function ProductFormDialog({
     }, {});
     const transformedData = {
       ...data,
-      features: data.features ?? [],
+      // features: data.features ?? [],
       specifications: specsRecord,
     };
     onSubmit(transformedData);
@@ -161,9 +161,9 @@ export function ProductFormDialog({
     return () => {
       if (thumbnailPreview?.startsWith("blob:"))
         URL.revokeObjectURL(thumbnailPreview);
-      imagesPreviews.filter(p => p.startsWith("blob:")).forEach(URL.revokeObjectURL);
+      // imagesPreviews.filter(p => p.startsWith("blob:")).forEach(URL.revokeObjectURL);
     };
-  }, [thumbnailPreview, imagesPreviews]);
+  }, [thumbnailPreview]);
 
   const handleFileChange = (file: File | undefined) => {
     form.setValue("thumbnail", file, { shouldDirty: true });
@@ -176,29 +176,29 @@ export function ProductFormDialog({
     }
   };
 
-  const handleImagesChange = (files: FileList | null) => {
-    if (!files) return;
-    const newFiles = Array.from(files);
-    setImagesFiles(prev => [...prev, ...newFiles]);
-    const newPreviews = newFiles.map(f => URL.createObjectURL(f));
-    setImagesPreviews(prev => [...prev, ...newPreviews]);
-    form.setValue("images", [...imagesFiles, ...newFiles], { shouldDirty: true });
-  };
+  // const handleImagesChange = (files: FileList | null) => {
+  //   if (!files) return;
+  //   const newFiles = Array.from(files);
+  //   setImagesFiles(prev => [...prev, ...newFiles]);
+  //   const newPreviews = newFiles.map(f => URL.createObjectURL(f));
+  //   setImagesPreviews(prev => [...prev, ...newPreviews]);
+  //   form.setValue("images", [...imagesFiles, ...newFiles], { shouldDirty: true });
+  // };
 
-  const removeImage = (index: number) => {
-    const newPreviews = [...imagesPreviews];
-    const newFiles = [...imagesFiles];
-    if (index < initialImagesCount) {
-      return;
-    }
-    const fileIndex = index - initialImagesCount;
-    if (newPreviews[index]?.startsWith("blob:")) URL.revokeObjectURL(newPreviews[index]);
-    newPreviews.splice(index, 1);
-    newFiles.splice(fileIndex, 1);
-    setImagesPreviews(newPreviews);
-    setImagesFiles(newFiles);
-    form.setValue("images", newFiles, { shouldDirty: true });
-  };
+  // const removeImage = (index: number) => {
+  //   const newPreviews = [...imagesPreviews];
+  //   const newFiles = [...imagesFiles];
+  //   if (index < initialImagesCount) {
+  //     return;
+  //   }
+  //   const fileIndex = index - initialImagesCount;
+  //   if (newPreviews[index]?.startsWith("blob:")) URL.revokeObjectURL(newPreviews[index]);
+  //   newPreviews.splice(index, 1);
+  //   newFiles.splice(fileIndex, 1);
+  //   setImagesPreviews(newPreviews);
+  //   setImagesFiles(newFiles);
+  //   form.setValue("images", newFiles, { shouldDirty: true });
+  // };
   return (<>{open && <div className="fixed inset-0 bg-black/50 pointer-events-none z-40" />}
     <Dialog open={open} onOpenChange={onOpenChange} modal={false} >
       <DialogContent className="w-full min-w-[90%] xl:min-w-6xl mx-auto max-h-[90vh] overflow-y-auto z-50"
@@ -240,23 +240,19 @@ export function ProductFormDialog({
                     control={form.control}
                     name="unit"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Unit *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a unit" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {unitSchema.options.map(unit => <SelectItem key={unit} value={unit}>{unit}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
+                      <FormItem className="space-y-2">
+                        <FormLabel>Unit</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter unit type..."
+                            {...field}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <FormField
+                  {/*<FormField
                     control={form.control}
                     name="minStock"
                     render={({ field }) => (
@@ -266,14 +262,14 @@ export function ProductFormDialog({
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  />*/}
                   <FormField
                     control={form.control}
                     name="brandId"
                     render={({ field }) => (
                       <FormItem className="space-y-2">
                         <FormLabel>Brand</FormLabel>
-                        <BrandSearchableSelect value={field.value || ""} onChange={field.onChange} />
+                        <BrandSearchableSelect value={field.value || ""} action={field.onChange} />
                         <FormMessage />
                       </FormItem>
                     )}
@@ -284,7 +280,7 @@ export function ProductFormDialog({
                     render={({ field }) => (
                       <FormItem className="space-y-2">
                         <FormLabel>Category *</FormLabel>
-                        <CategorySearchableSelect value={field.value || ""} onChange={field.onChange} />
+                        <CategorySearchableSelect value={field.value || ""} action={field.onChange} />
                         <FormMessage />
                       </FormItem>
                     )}
@@ -307,7 +303,7 @@ export function ProductFormDialog({
                       </FormItem>
                     )}
                   />
-                  <FormField
+                  {/*<FormField
                     control={form.control}
                     name="discountType"
                     render={({ field }) => (
@@ -355,13 +351,102 @@ export function ProductFormDialog({
                         <FormMessage />
                       </FormItem>
                     )}
+                  />*/}
+                  <Card className="p-4 space-y-4">
+                    <h3 className="text-lg font-medium">Flags</h3>
+                    <div className="flex flex-wrap gap-6">
+                      <FormField
+                        control={form.control}
+                        name="isFeatured"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                            <FormLabel className="mr-4">Featured</FormLabel>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="isNewArrival"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                            <FormLabel className="mr-4">New Arrival</FormLabel>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </Card>
+                </div>
+                {/* Right: Description */}
+                <div className="space-y-6 md:w-3/5">
+                  {/*<FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>Description</FormLabel>
+                        <FormControl className="w-full">
+                          <Textarea
+                            placeholder="Enter full product description..."
+                            className="h-40"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="shortDescription"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>Short Description</FormLabel>
+                        <FormControl className="w-full">
+                          <Textarea
+                            placeholder="Enter a short description..."
+                            className="h-24"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <StringArrayFormArray name="features" title="Features" form={form} fields={featureFields} append={appendFeature} remove={removeFeature} />*/}
+                  <KeyValueFormArray name="specifications" title="Specifications" form={form} fields={specFields} append={appendSpec} remove={removeSpec} />
+                  {/* Tags input (editable chips) */}
+                  <FormField
+                    control={form.control}
+                    name="tags"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Tags</FormLabel>
+                        <FormControl>
+                          <TagsInput value={field.value || []} onChange={field.onChange} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                   <FormField
                     control={form.control}
                     name="thumbnail"
                     render={() => (
                       <FormItem className="space-y-2">
-                        <FormLabel>Thumbnail *</FormLabel>
+                        <FormLabel>Thumbnail</FormLabel>
                         <Card className="relative border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
                           <CardContent className="p-6">
                             {thumbnailPreview ? (
@@ -439,97 +524,8 @@ export function ProductFormDialog({
                       </FormItem>
                     )}
                   />
-                </div>
-                {/* Right: Description */}
-                <div className="space-y-6 md:w-3/5">
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel>Description</FormLabel>
-                        <FormControl className="w-full">
-                          <Textarea
-                            placeholder="Enter full product description..."
-                            className="h-40"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="shortDescription"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel>Short Description</FormLabel>
-                        <FormControl className="w-full">
-                          <Textarea
-                            placeholder="Enter a short description..."
-                            className="h-24"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
 
-                  <StringArrayFormArray name="features" title="Features" form={form} fields={featureFields} append={appendFeature} remove={removeFeature} />
-                  <KeyValueFormArray name="specifications" title="Specifications" form={form} fields={specFields} append={appendSpec} remove={removeSpec} />
-                  {/* Tags input (editable chips) */}
-                  <FormField
-                    control={form.control}
-                    name="tags"
-                    render={({ field }) => (
-                      <FormItem className="space-y-2">
-                        <FormLabel>Tags</FormLabel>
-                        <FormControl>
-                          <TagsInput value={field.value || []} onChange={field.onChange} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <Card className="p-4 space-y-4">
-                    <h3 className="text-lg font-medium">Flags</h3>
-                    <div className="flex flex-wrap gap-6">
-                      <FormField
-                        control={form.control}
-                        name="isFeatured"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                            <FormLabel className="mr-4">Featured</FormLabel>
-                            <FormControl>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="isNewArrival"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                            <FormLabel className="mr-4">New Arrival</FormLabel>
-                            <FormControl>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </Card>
-                  <FormField
+                  {/*<FormField
                     control={form.control}
                     name="images"
                     render={() => (
@@ -604,7 +600,7 @@ export function ProductFormDialog({
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  />*/}
                 </div>
               </div>
             </ScrollArea>
@@ -629,7 +625,7 @@ export function ProductFormDialog({
 }
 
 
-export function BrandSearchableSelect({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+export function BrandSearchableSelect({ value, action }: { value: string; action: (value: string) => void }) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
@@ -676,7 +672,7 @@ export function BrandSearchableSelect({ value, onChange }: { value: string; onCh
           <CommandGroup>
             <ScrollArea className="h-48">
               {brands.map((brand) => (
-                <CommandItem key={brand._id} value={brand._id} onSelect={(currentValue) => { onChange(currentValue === value ? "" : currentValue); setOpen(false); }}>
+                <CommandItem key={brand._id} value={brand._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
                   <Check className={cn("mr-2 h-4 w-4", value === brand._id ? "opacity-100" : "opacity-0")} />
                   {brand.name}
                 </CommandItem>
@@ -689,7 +685,7 @@ export function BrandSearchableSelect({ value, onChange }: { value: string; onCh
   );
 }
 
-export function CategorySearchableSelect({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+export function CategorySearchableSelect({ value, action }: { value: string; action: (value: string) => void }) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
@@ -736,7 +732,7 @@ export function CategorySearchableSelect({ value, onChange }: { value: string; o
           <CommandGroup>
             <ScrollArea className="h-48">
               {categories.map((category) => (
-                <CommandItem key={category._id} value={category._id} onSelect={(currentValue) => { onChange(currentValue === value ? "" : currentValue); setOpen(false); }}>
+                <CommandItem key={category._id} value={category._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
                   <Check className={cn("mr-2 h-4 w-4", value === category._id ? "opacity-100" : "opacity-0")} />
                   {category.title}
                 </CommandItem>
@@ -800,44 +796,44 @@ function KeyValueFormArray({ name, title, form, fields, append, remove }: { name
   )
 }
 
-function StringArrayFormArray({ name, title, form, fields, append, remove }: { name: "features", title: string, form: any, fields: any[], append: any, remove: any }) {
-  return (
-    <FormItem>
-      <FormLabel>{title}</FormLabel>
-      <Card className="p-4 space-y-4">
-        {fields.map((field, index) => (
-          <div key={field.id} className="flex items-center gap-4">
-            <FormField
-              control={form.control}
-              name={`${name}.${index}`}
-              render={({ field }) => (
-                <FormItem className="grow">
-                  <FormControl>
-                    <Input placeholder="Feature" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
-              <Trash className="h-4 w-4 text-destructive" />
-            </Button>
-          </div>
-        ))}
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="gap-2"
-          onClick={() => append("")}
-        >
-          <Plus className="h-4 w-4" />
-          Add {title}
-        </Button>
-      </Card>
-    </FormItem>
-  )
-}
+// function StringArrayFormArray({ name, title, form, fields, append, remove }: { name: "features", title: string, form: any, fields: any[], append: any, remove: any }) {
+//   return (
+//     <FormItem>
+//       <FormLabel>{title}</FormLabel>
+//       <Card className="p-4 space-y-4">
+//         {fields.map((field, index) => (
+//           <div key={field.id} className="flex items-center gap-4">
+//             <FormField
+//               control={form.control}
+//               name={`${name}.${index}`}
+//               render={({ field }) => (
+//                 <FormItem className="grow">
+//                   <FormControl>
+//                     <Input placeholder="Feature" {...field} />
+//                   </FormControl>
+//                   <FormMessage />
+//                 </FormItem>
+//               )}
+//             />
+//             <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
+//               <Trash className="h-4 w-4 text-destructive" />
+//             </Button>
+//           </div>
+//         ))}
+//         <Button
+//           type="button"
+//           variant="outline"
+//           size="sm"
+//           className="gap-2"
+//           onClick={() => append("")}
+//         >
+//           <Plus className="h-4 w-4" />
+//           Add {title}
+//         </Button>
+//       </Card>
+//     </FormItem>
+//   )
+// }
 
 function TagsInput({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
   const [input, setInput] = useState("");
@@ -881,7 +877,7 @@ function TagsInput({ value, onChange }: { value: string[]; onChange: (v: string[
       <Input
         placeholder="Type tag and press Enter"
         value={input}
-        onChange={(e: any) => setInput(e.target.value)}
+        onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         onBlur={() => addTagFromInput()}
       />

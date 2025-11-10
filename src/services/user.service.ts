@@ -1,6 +1,6 @@
 import instance from "@/lib/axios";
 import { ApiResponse } from "@/types";
-import { PaginatedUsers, User, UserQueryOptions } from "@/types/user";
+import { PaginatedUsers, Register, User, UserQueryOptions } from "@/types/user";
 
 class UserService {
   async getMe(): Promise<ApiResponse<User>> {
@@ -61,6 +61,11 @@ class UserService {
       currentPassword,
       newPassword
     });
+    return response.data;
+  }
+
+  async createVerifiedUser(data: Register) {
+    const response = await instance.post<ApiResponse<User>>("/users", data);
     return response.data;
   }
 }

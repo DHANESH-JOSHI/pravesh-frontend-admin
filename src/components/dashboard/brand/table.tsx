@@ -31,6 +31,7 @@ import { brandService } from "@/services/brand.service";
 import { Brand, CreateBrand, UpdateBrand, BrandQueryOptions } from "@/types/brand";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "next-view-transitions";
+import { Category } from "@/types";
 export function BrandsTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -213,6 +214,8 @@ export function BrandsTable() {
               <TableRow>
                 <TableHead>Image</TableHead>
                 <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Product Count</TableHead>
                 <TableHead>Updated</TableHead>
                 <TableHead className="w-16">Actions</TableHead>
               </TableRow>
@@ -259,6 +262,14 @@ export function BrandsTable() {
                         <div className="truncate" title={brand.name}>
                           {brand.name}
                         </div>
+                      </TableCell>
+                      <TableCell className="font-medium max-w-xs">
+                        <div className="truncate" title={brand.name}>
+                          {(brand.category as Category)?.title}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {brand.productCount}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {brand.updatedAt}

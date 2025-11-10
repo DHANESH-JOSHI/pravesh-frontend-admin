@@ -313,7 +313,7 @@ function ProductSearchableSelect({ product, onChange }: { product: Partial<Produ
                   />
                   <div className="flex flex-col">
                     <span>{p.name}</span>
-                    <span className="text-xs text-muted-foreground">SKU: {p.sku} | Stock: {p.stock}</span>
+                    <span className="text-xs text-muted-foreground">SKU: {p.sku}</span>
                   </div>
                 </CommandItem>
               ))}

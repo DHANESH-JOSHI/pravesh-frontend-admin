@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check, Folder } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
@@ -144,9 +144,8 @@ export function CategoriesTable() {
             searchPlaceholder="Search categories..."
             pageSize={limit}
             onChangePageSize={(v) => {
-              const n = Number(v);
-              setLimit(n);
               setPage(1);
+              setLimit(Number(v));
             }}
           />
 
@@ -217,8 +216,11 @@ export function CategoriesTable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Image</TableHead>
+                {/*<TableHead>Image</TableHead>*/}
                 <TableHead>Name</TableHead>
+                <TableHead>Child Count</TableHead>
+                <TableHead>Brand Count</TableHead>
+                <TableHead>Product Count</TableHead>
                 <TableHead>Updated</TableHead>
                 {!filterDraft?.isDeleted && <TableHead className="w-16">Actions</TableHead>}
               </TableRow>
@@ -247,7 +249,7 @@ export function CategoriesTable() {
                 <>
                   {categories.map((category) => (
                     <TableRow key={category._id}>
-                      <TableCell>
+                      {/*<TableCell>
                         {category.image ? (
                           <img
                             src={category.image}
@@ -259,11 +261,20 @@ export function CategoriesTable() {
                             <Folder className="h-4 w-4 text-muted-foreground" />
                           </div>
                         )}
-                      </TableCell>
+                      </TableCell>*/}
                       <TableCell className="font-medium max-w-xs">
                         <div className="truncate" title={category.title}>
                           {category.title}
                         </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {category.childCount}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {category.brandCount}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {category.productCount}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {category.updatedAt}
