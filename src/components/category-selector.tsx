@@ -114,7 +114,7 @@ export function CategorySelector({
                 </BreadcrumbLink>
               </BreadcrumbItem>
               {/* Only show separator if we have more levels */}
-              {levels.some((l) => l.selected) && <BreadcrumbSeparator />}
+              {/*{levels.some((l) => l.selected) && <BreadcrumbSeparator />}*/}
             </>
           )}
 

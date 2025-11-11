@@ -5,7 +5,7 @@ import { brandService } from '@/services/brand.service';
 import { Brand, Category } from '@/types';
 import { useWatch } from 'react-hook-form';
 
-export function CategorySelectorField({ form }: { form: any }) {
+export function CategorySelectorField({ form }: { form:any }) {
   const brandId = useWatch({ control: form.control, name: 'brandId' });
   const [brand,setBrand] = useState<Brand | null>(null);
 
