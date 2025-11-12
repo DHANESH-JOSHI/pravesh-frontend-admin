@@ -4,6 +4,7 @@ import { Address, Cart, Order, PaginatedData, Review, Wallet, Wishlist } from ".
 export type User = {
   _id: string;
   name: string;
+  phone: string;
   email?: string;
   img?: string;
   role: string;

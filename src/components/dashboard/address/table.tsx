@@ -28,8 +28,8 @@ export function AddressesTable() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<Partial<AddressQueryOptions>>({});
-  const [appliedFilters, setAppliedFilters] = useState<Partial<AddressQueryOptions>>({});
+  const [filterDraft, setFilterDraft] = useState<AddressQueryOptions>({});
+  const [appliedFilters, setAppliedFilters] = useState<AddressQueryOptions>({});
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["addresses", { page, limit, filters: appliedFilters, searchTerm }],

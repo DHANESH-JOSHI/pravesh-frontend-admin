@@ -237,7 +237,7 @@ export function BannersTable() {
                 <TableHead>Image</TableHead>
                 <TableHead>Title</TableHead>
                 <TableHead>Type</TableHead>
-                <TableHead>Order</TableHead>
+                <TableHead>Priority</TableHead>
                 <TableHead>Updated</TableHead>
                 <TableHead className="w-16">Actions</TableHead>
               </TableRow>

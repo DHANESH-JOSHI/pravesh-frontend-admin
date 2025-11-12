@@ -65,12 +65,12 @@ export function BannerFormDialog({
       order: initialData?.order || 0,
     },
   });
-  useEffect(()=>{
-    if(open){
+  useEffect(() => {
+    if (open) {
       form.reset()
     }
 
-  },[open,form])
+  }, [open, form])
 
   useEffect(() => {
     return () => {
@@ -142,13 +142,13 @@ export function BannerFormDialog({
                 </FormItem>
               )}
             />
-            {form.watch("type") !== "external" && form.watch("type") !== undefined && (<>
+            {form.watch("type") == "external" && (<>
               <FormField
                 control={form.control}
                 name="targetUrl"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <FormLabel>Redirect Url *</FormLabel>
+                    <FormLabel>Redirect Url</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -167,24 +167,26 @@ export function BannerFormDialog({
                   </FormItem>
                 )}
               />
-              <FormField
+            </>)}
+            {["brand","category","product"].includes(form.watch("type") ?? "") &&
+              (<FormField
                 control={form.control}
                 name="targetId"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <FormLabel>Redirect ID *</FormLabel>
-                    {form.watch("targetUrl") === "/brands" ? (
+                    <FormLabel>Redirect ID</FormLabel>
+                    {form.watch("type") === "brand" ? (
                       <BrandSearchableSelect value={field.value || ""} action={field.onChange} />
-                    ) : form.watch("targetUrl") === "/categories" ? (
+                    ) : form.watch("type") === "category" ? (
                       <CategorySearchableSelect value={field.value || ""} action={field.onChange} />
-                    ) : form.watch("targetUrl") === "/products" ? (
+                    ) : form.watch("type") === "product" ? (
                       <ProductSearchableSelect value={field.value || ""} action={field.onChange} />
                     ) : null}
                     <FormMessage />
                   </FormItem>
                 )}
-              />
-            </>)}
+              />)
+            }
             <FormField
               control={form.control}
               name="order"

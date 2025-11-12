@@ -165,7 +165,8 @@ export default function BrandDetailPage() {
                     <TableHead>SKU</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Price</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Updated</TableHead>
                     <TableHead className="w-16">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -174,7 +175,7 @@ export default function BrandDetailPage() {
                     .slice((productsPage - 1) * itemsPerPage, productsPage * itemsPerPage)
                     .map((product) => (
                       <TableRow key={product._id}>
-                        <TableCell className="w-40">
+                        <TableCell className="w-16">
                           {product.thumbnail ? (
                             <img
                               src={product.thumbnail}
@@ -183,7 +184,7 @@ export default function BrandDetailPage() {
                             />
                           ):<ImageIcon/>}
                         </TableCell>
-                        <TableCell className="font-medium w-32">
+                        <TableCell className="font-medium w-16">
                           {product.sku}
                         </TableCell>
                         <TableCell className="font-medium">
@@ -192,13 +193,11 @@ export default function BrandDetailPage() {
                         <TableCell className="font-medium">
                           ₹{product.originalPrice}
                         </TableCell>
-                        <TableCell>
-                          <Badge variant={
-                            product.isDeleted ? "destructive" :
-                              "secondary"
-                          }>
-                            {product.isDeleted ? "inactive" : "active"}
-                          </Badge>
+                        <TableCell className="font-medium">
+                          ₹{product.createdAt}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          ₹{product.updatedAt}
                         </TableCell>
                         <TableCell>
                           <Link href={`/products/${product._id}`}>

@@ -217,8 +217,9 @@ export function BrandsTable() {
               <TableRow>
                 <TableHead>Image</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Category Count</TableHead>
-                <TableHead>Product Count</TableHead>
+                <TableHead>Categories</TableHead>
+                <TableHead>Products</TableHead>
+                <TableHead>Created</TableHead>
                 <TableHead>Updated</TableHead>
                 <TableHead className="w-16">Actions</TableHead>
               </TableRow>
@@ -273,6 +274,9 @@ export function BrandsTable() {
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {brand.productCount}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {brand.createdAt}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {brand.updatedAt}

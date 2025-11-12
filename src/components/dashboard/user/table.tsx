@@ -230,6 +230,7 @@ export function UsersTable() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
+                <TableHead>Phone</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Created</TableHead>
@@ -250,7 +251,7 @@ export function UsersTable() {
                 />
               ) : users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="p-6">
+                  <TableCell colSpan={6} className="p-6">
                     <EmptyState
                       title="No users found"
                       description="Try a different search."
@@ -263,6 +264,9 @@ export function UsersTable() {
                     <TableRow key={user._id}>
                       <TableCell className="font-medium">
                         {user.name}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {user.phone}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {user.email || "N/A"}

@@ -275,7 +275,7 @@ export function ProductFormDialog({
                     name="categoryId"
                     render={({ field }) => (
                       <FormItem className="space-y-2">
-                        <FormLabel>Category</FormLabel>
+                        <FormLabel>Category *</FormLabel>
                         <CategoryTreeSingleSelect
                           value={field.value || null}
                           action={(val) => field.onChange(val)}
