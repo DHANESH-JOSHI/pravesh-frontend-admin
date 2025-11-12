@@ -31,7 +31,7 @@ import { brandService } from "@/services/brand.service";
 import { Brand, CreateBrand, UpdateBrand, BrandQueryOptions } from "@/types/brand";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "next-view-transitions";
-import { Category } from "@/types";
+
 export function BrandsTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -187,7 +187,7 @@ export function BrandsTable() {
           </div>
 
           {isFilterOpen && (
-            <div className="mt-3 p-4 bg-white dark:bg-slate-800 border rounded-lg shadow-sm">
+            <div className="mt-3 p-4  border rounded-lg shadow-sm">
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground">Deleted Status</label>
@@ -217,7 +217,7 @@ export function BrandsTable() {
               <TableRow>
                 <TableHead>Image</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
+                <TableHead>Category Count</TableHead>
                 <TableHead>Product Count</TableHead>
                 <TableHead>Updated</TableHead>
                 <TableHead className="w-16">Actions</TableHead>
@@ -268,7 +268,7 @@ export function BrandsTable() {
                       </TableCell>
                       <TableCell className="font-medium max-w-xs">
                         <div className="truncate" title={brand.name}>
-                          {(brand.category as Category)?.title}
+                          {brand.categories.length}
                         </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground">

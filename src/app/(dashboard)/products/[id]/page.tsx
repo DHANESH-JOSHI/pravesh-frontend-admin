@@ -104,17 +104,14 @@ export default function ProductDetailPage() {
           <CardHeader>
             <CardTitle>Product Thumbnail</CardTitle>
           </CardHeader>
-          <CardContent className="flex items-center justify-center min-h-full">
+          <CardContent className="flex items-center justify-center">
             {product.thumbnail ? (
-              <div>
-                <p className="text-sm font-medium mb-2">Thumbnail</p>
-                <img
-                  src={product.thumbnail}
-                  alt={product.name}
-                  className="w-full h-48 object-cover rounded-lg border"
-                />
-              </div>
-            ) : <Images className="w-20 h-20"/>}
+              <img
+                src={product.thumbnail}
+                alt={product.name}
+                className="w-full object-cover rounded-lg border"
+              />
+            ) : <Images className="w-20 h-20" />}
             {/*{product.images && product.images.length > 0 && (
                 <div>
                   <p className="text-sm font-medium mb-2">Gallery ({product.images.length} images)</p>

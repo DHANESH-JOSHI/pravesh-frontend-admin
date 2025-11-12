@@ -34,23 +34,16 @@ import { Link } from "next-view-transitions";
 
 export function CategoriesTable() {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<Partial<CategoryQueryOptions>>({});
-  const [appliedFilters, setAppliedFilters] = useState<Partial<CategoryQueryOptions>>({});
+  const [filterDraft, setFilterDraft] = useState<CategoryQueryOptions>({parentCategoryId: "null"});
+  const [appliedFilters, setAppliedFilters] = useState<CategoryQueryOptions>({parentCategoryId:"null"});
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["categories", { page, limit, filters: appliedFilters, searchTerm }],
+    queryKey: ["categories", { ...appliedFilters }],
     queryFn: async () =>
       await categoryService.getAll({
-        page,
-        limit,
-        search: searchTerm || undefined,
-        isParent: true,
         ...appliedFilters,
       }),
   });
@@ -59,7 +52,7 @@ export function CategoriesTable() {
   const totalPages = data?.data?.totalPages ?? 1;
 
   function applyFilters() {
-    const sanitized: Partial<CategoryQueryOptions> = Object.entries(filterDraft).reduce((acc, [k, v]) => {
+    const sanitized: CategoryQueryOptions = Object.entries(filterDraft).reduce((acc, [k, v]) => {
       if (typeof v === "string") {
         const trimmed = v.trim();
         if (trimmed !== "" && trimmed !== "all") (acc as Record<string, unknown>)[k] = trimmed;
@@ -68,19 +61,16 @@ export function CategoriesTable() {
       }
       return acc;
     }, {} as Record<string, unknown>);
-    setAppliedFilters(sanitized);
-    setPage(1);
+    setAppliedFilters({ ...sanitized, page: 1 });
   }
 
   function resetFilters() {
     setFilterDraft({});
-    setAppliedFilters({});
-    setPage(1);
-    setSearchTerm("");
+    setAppliedFilters({ page: 1, search: "", parentCategoryId: "null" });
   }
 
-  const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
-    if (v === undefined || v === null) return false;
+  const hasFiltersSelected = Object.entries(filterDraft).some(([k, v]) => {
+    if (v === undefined || v === null || k == "parentCategoryId") return false;
     if (typeof v === "string") return v.trim() !== "";
     return true;
   });
@@ -142,13 +132,12 @@ export function CategoriesTable() {
             isFetching={isFetching}
             onRefreshAction={refetch}
             onCreateAction={() => setIsCreateDialogOpen(true)}
-            searchTerm={searchTerm}
-            onSearchAction={setSearchTerm}
+            searchTerm={appliedFilters.search || ""}
+            onSearchAction={(s) => setAppliedFilters({ ...appliedFilters, search: s })}
             searchPlaceholder="Search categories..."
-            pageSize={limit}
+            pageSize={appliedFilters.limit}
             onChangePageSizeAction={(v) => {
-              setPage(1);
-              setLimit(Number(v));
+              setAppliedFilters({ ...appliedFilters, page: 1, limit: Number(v) });
             }}
           />
 
@@ -191,7 +180,7 @@ export function CategoriesTable() {
           </div>
 
           {isFilterOpen && (
-            <div className="mt-3 p-4 bg-white dark:bg-slate-800 border rounded-lg shadow-sm">
+            <div className="mt-3 p-4 border rounded-lg shadow-sm">
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground">Deleted Status</label>
@@ -221,9 +210,10 @@ export function CategoriesTable() {
               <TableRow>
                 {/*<TableHead>Image</TableHead>*/}
                 <TableHead>Name</TableHead>
-                <TableHead>Child Count</TableHead>
-                <TableHead>Brand Count</TableHead>
-                <TableHead>Product Count</TableHead>
+                <TableHead>Subcategories</TableHead>
+                <TableHead>Brands</TableHead>
+                <TableHead>Products</TableHead>
+                <TableHead>Created</TableHead>
                 <TableHead>Updated</TableHead>
                 {!filterDraft?.isDeleted && <TableHead className="w-16">Actions</TableHead>}
               </TableRow>
@@ -276,10 +266,13 @@ export function CategoriesTable() {
                         {category.childCount}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {category.brandCount}
+                        {category.brands.length}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {category.productCount}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {category.createdAt}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {category.updatedAt}
@@ -333,12 +326,12 @@ export function CategoriesTable() {
           </Table>
         </div>
         <PaginationControls
-          page={page}
+          page={appliedFilters.page || 1}
           totalPages={totalPages}
           isFetching={isFetching}
-          onPrev={() => setPage((p) => Math.max(1, p - 1))}
-          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
-          onPageChange={(p) => setPage(p)}
+          onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
+          onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
+          onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
         />
       </CardContent>
 

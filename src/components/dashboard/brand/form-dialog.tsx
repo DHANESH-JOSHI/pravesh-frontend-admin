@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronsUpDown, ImageIcon, Loader2, Trash, Upload } from "lucide-react";
+import { ImageIcon, Loader2, Trash, Upload } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -29,20 +29,8 @@ import {
   type UpdateBrand,
   updateBrandSchema,
 } from "@/types/brand";
-import { Category, FormDialogProps } from "@/types";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import { categoryService } from "@/services/category.service";
-import { useQuery } from "@tanstack/react-query";
-import { useDebouncedCallback } from "use-debounce";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import { FormDialogProps } from "@/types";
+import { CategoryTreeSelect } from "@/components/category-tree-select";
 
 export function BrandFormDialog({
   open,
@@ -61,16 +49,16 @@ export function BrandFormDialog({
     ),
     defaultValues: {
       name: initialData?.name || "",
-      categoryId: typeof initialData?.category === "string" ? initialData?.category : ((initialData?.category as Category)?._id ?? ""),
+      categoryIds: initialData?.categories as string[],
       image: undefined,
     },
   });
-  useEffect(()=>{
-    if(open){
+  useEffect(() => {
+    if (open) {
       form.reset()
     }
 
-  },[open,form])
+  }, [open, form])
 
   useEffect(() => {
     return () => {
@@ -120,11 +108,11 @@ export function BrandFormDialog({
             />
             <FormField
               control={form.control}
-              name="categoryId"
+              name="categoryIds"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel>Category *</FormLabel>
-                  <CategorySearchableSelect value={field.value || ""} action={field.onChange} />
+                  <FormLabel>Categories</FormLabel>
+                  <CategoryTreeSelect action={field.onChange} value={field.value || []} />
                   <FormMessage />
                 </FormItem>
               )}
@@ -231,63 +219,3 @@ export function BrandFormDialog({
   );
 }
 
-export function CategorySearchableSelect({ value, action }: { value: string; action: (value: string) => void }) {
-  const [open, setOpen] = useState(false);
-  const [inputValue, setInputValue] = useState("");
-  const [search, setSearch] = useState("");
-
-  const debouncedSetSearch = useDebouncedCallback((value: string) => {
-    setSearch(value);
-  }, 300);
-
-  useEffect(() => {
-    debouncedSetSearch(inputValue);
-  }, [inputValue, debouncedSetSearch]);
-
-  const { data: categoriesData, isLoading: isLoadingCategories } = useQuery({
-    queryKey: ["categories", "search", search],
-    queryFn: () => categoryService.getAll({
-      page: 1,
-      limit: 20,
-      search,
-      isParent: true
-    }),
-    enabled: open,
-  });
-
-  const { data: selectedCategoryData } = useQuery({
-    queryKey: ["categories", value],
-    queryFn: () => categoryService.getById(value),
-    enabled: !!value && !open,
-  });
-
-  const categories: Category[] = categoriesData?.data?.categories ?? [];
-  const selectedCategory = categories.find((p) => p._id === value) ?? selectedCategoryData?.data;
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between text-left" >
-          {value ? selectedCategory?.title ?? "Select category..." : "Select category..."}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 min-w-sm">
-        <Command shouldFilter={false}>
-          <CommandInput placeholder="Search category..." value={inputValue} onValueChange={setInputValue} />
-          <CommandEmpty>{isLoadingCategories ? "Searching..." : "No category found."}</CommandEmpty>
-          <CommandGroup>
-            <ScrollArea className="h-48">
-              {categories.map((category) => (
-                <CommandItem key={category._id} value={category._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
-                  <Check className={cn("mr-2 h-4 w-4", value === category._id ? "opacity-100" : "opacity-0")} />
-                  {category.title}
-                </CommandItem>
-              ))}
-            </ScrollArea>
-          </CommandGroup>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  );
-}

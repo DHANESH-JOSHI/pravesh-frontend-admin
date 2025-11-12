@@ -3,7 +3,7 @@ import { Category, PaginatedData, Product } from ".";
 
 export const createBrandSchema = z.object({
   name: z.string(),
-  categoryId: z.string(),
+  categoryIds: z.array(z.string()).optional(),
   image: z.instanceof(File).optional(),
 });
 
@@ -13,7 +13,7 @@ export type Brand = {
   _id: string;
   name: string;
   image: string;
-  category: string | Partial<Category>;
+  categories: (string | Partial<Category>)[];
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
@@ -34,6 +34,9 @@ interface BrandQueryOptions {
   limit?: number;
   search?: string;
   isDeleted?: string;
+  categoryId?: string;
+  sort?: string;
+  order?: string,
 }
 
 export type { PaginatedBrands, BrandQueryOptions };

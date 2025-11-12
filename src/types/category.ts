@@ -16,14 +16,13 @@ export type Category = {
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
+  brands: (string | Partial<Brand>)[];
   parentCategory?: string | Partial<Category>;
   // relations
   childCount?: number;
-  brandCount?: number;
   productCount?: number;
   children?: Partial<Category>[];
   products?: Partial<Product>[];
-  brands?: Partial<Brand>[];
 };
 export type CreateCategory = z.infer<typeof createCategorySchema>;
 export type UpdateCategory = z.infer<typeof updateCategorySchema>;
@@ -38,6 +37,9 @@ interface CategoryQueryOptions {
   limit?: number;
   search?: string;
   isDeleted?: string;
-  isParent?: boolean;
+  parentCategoryId?: string;
+  brandId?: string;
+  sort?: string;
+  order?: string,
 }
 export type { PaginatedCategories, CategoryQueryOptions };

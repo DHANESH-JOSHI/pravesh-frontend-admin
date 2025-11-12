@@ -29,7 +29,9 @@ import { toast } from "sonner";
 import { CategoryFormDialog } from "@/components/dashboard/category/form-dialog";
 import { CustomAlertDialog } from "@/components/dashboard/common/custom-alert-dialog";
 import Loader from "@/components/ui/loader";
-import { ApiResponse } from "@/types";
+import { ApiResponse, Brand, Product } from "@/types";
+import { productService } from "@/services/product.service";
+import Image from "next/image";
 
 export default function CategoryDetailPage() {
   const queryClient = useQueryClient();
@@ -47,6 +49,14 @@ export default function CategoryDetailPage() {
     queryFn: async () => await categoryService.getById(categoryId),
     enabled: !!categoryId,
   });
+
+  const { data: productsData, isLoading: isProductsLoading } = useQuery({
+    queryKey: ["products", categoryId],
+    queryFn: async () => await productService.getAll({ categoryId }),
+    enabled: !!categoryId,
+  });
+
+  const products = productsData?.data?.products as Product[] ?? [];
 
   const category = data?.data as Category;
   const deleteMutation = useMutation({
@@ -111,7 +121,7 @@ export default function CategoryDetailPage() {
       toast.error("Failed to create category. Please try again.");
     },
   });
-  if (isLoading) {
+  if (isLoading || isProductsLoading) {
     return <Loader />;
   }
 
@@ -240,7 +250,7 @@ export default function CategoryDetailPage() {
                 <div>
                   <label className="text-sm font-medium">Total Products</label>
                   <p className="text-2xl font-bold text-blue-600">
-                    {category.products?.length || 0}
+                    {products.length}
                   </p>
                 </div>
                 <div>
@@ -370,15 +380,14 @@ export default function CategoryDetailPage() {
           }
         </CardContent>
       </Card>
-      {/* Products in Category */}
       {
-        category.products && category.products.length > 0 && (
+        products.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle>
                 <div className="flex items-center gap-2">
                   <Package className="h-5 w-5" />
-                  Products by {category.title} ({category.products.length})
+                  Products by {category.title} ({products?.length})
                 </div>
               </CardTitle>
             </CardHeader>
@@ -387,45 +396,42 @@ export default function CategoryDetailPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Thumbnail</TableHead>
+                      <TableHead className="w-24">Thumbnail</TableHead>
                       <TableHead>SKU</TableHead>
                       <TableHead>Name</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>Brand</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead className="text-right">Price</TableHead>
+                      <TableHead>New Arrival</TableHead>
+                      <TableHead>Featured</TableHead>
                       <TableHead className="w-16">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {(category.products || [])
+                    {products
                       .slice((productsPage - 1) * itemsPerPage, productsPage * itemsPerPage)
                       .map((product) => (
                         <TableRow key={product._id}>
-                          <TableCell className="w-40">
-                            {product.thumbnail ? (
-                              <img
-                                src={product.thumbnail}
-                                alt={product.name}
-                                className="h-10 w-10 rounded object-cover"
-                              />
-                            ) : <ImageIcon />}
-                          </TableCell>
-                          <TableCell className="font-medium w-32">
-                            {product.sku}
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {product.name}
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            ₹{product.originalPrice}
-                          </TableCell>
                           <TableCell>
-                            <Badge variant={
-                              product.isDeleted ? "destructive" :
-                                "secondary"
-                            }>
-                              {product.isDeleted ? "inactive" : "active"}
-                            </Badge>
+                            {product.thumbnail ? <Image
+                              src={product.thumbnail || "/placeholder.svg"}
+                              width={56}
+                              height={56}
+                              alt={product.name}
+                              className="h-12 w-12 rounded-md object-cover"
+                            /> : <ImageIcon />}
                           </TableCell>
+                          <TableCell className="text-left">{product.sku}</TableCell>
+                          <TableCell className="font-medium max-w-[256px] text-left">
+                            <div className="truncate" title={product.name}>
+                              {product.name}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground truncate w-20">{(product.brand as Brand).name}</TableCell>
+                          <TableCell className="text-muted-foreground truncate w-20">{(product.category as Category).title}</TableCell>
+                          <TableCell className="text-center font-semibold">₹{product.originalPrice}</TableCell>
+                          <TableCell className="text-center font-semibold"><Badge variant="outline">{product.isNewArrival ? 'Yes' : 'No'}</Badge></TableCell>
+                          <TableCell className="text-center font-semibold"><Badge variant="outline">{product.isFeatured ? 'Yes' : 'No'}</Badge></TableCell>
                           <TableCell>
                             <Link href={`/products/${product._id}`}>
                               <Button variant="ghost" size="sm">

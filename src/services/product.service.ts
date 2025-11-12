@@ -4,17 +4,6 @@ import { CreateProduct, QueryOptions, Product, PaginatedProducts, ProductFilters
 
 
 class ProductService {
-  async search(query: string, page = 1, limit = 10) {
-    const response = await instance.get<ApiResponse<PaginatedProducts>>(`/products/search`, {
-      params: {
-        q: query,
-        page,
-        limit
-      }
-    });
-    return response.data;
-  }
-
   async getAll(options: QueryOptions) {
     const response = await instance.get<ApiResponse<PaginatedProducts>>("/products", {
       params: options

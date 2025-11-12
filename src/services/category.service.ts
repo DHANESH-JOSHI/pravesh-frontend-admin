@@ -10,13 +10,8 @@ class CategoryService {
     return response.data;
   }
 
-  async getChilds(id: string | null) {
-    const response = await instance.get<ApiResponse<Category[]>>(`/categories/children/${id}`);
-    return response.data;
-  }
-
-  async getByBrand(brandId:string){
-    const response = await instance.get<ApiResponse<Category[]>>(`/categories/brand/${brandId}`);
+  async getTree() {
+    const response = await instance.get<ApiResponse<Category[]>>("/categories/tree");
     return response.data;
   }
 

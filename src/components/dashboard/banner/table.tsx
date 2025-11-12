@@ -187,7 +187,7 @@ export function BannersTable() {
           </div>
 
           {isFilterOpen && (
-            <div className="mt-3 p-4 bg-white dark:bg-slate-800 border rounded-lg shadow-sm">
+            <div className="mt-3 p-4  border rounded-lg shadow-sm">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground">Type</label>

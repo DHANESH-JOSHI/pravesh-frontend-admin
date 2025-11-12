@@ -50,8 +50,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 // import { unitSchema } from "@/types/product";
 import Image from "next/image";
 import z from "zod";
-import { CategorySelectorField } from "@/components/category-selector-field";
-
+import { CategoryTreeSingleSelect } from "@/components/category-tree-single-select";
+import { BrandSingleSelect } from "@/components/brand-select";
 
 export function ProductFormDialog({
   open,
@@ -226,7 +226,7 @@ export function ProductFormDialog({
 
               <div className="flex flex-col gap-6 md:flex-row md:gap-8 w-full">
                 {/* Left: Fields */}
-                <div className="space-y-6 md:w-2/5">
+                <div className="space-y-6 md:w-1/2">
                   <FormField
                     control={form.control}
                     name="name"
@@ -272,17 +272,32 @@ export function ProductFormDialog({
                   />*/}
                   <FormField
                     control={form.control}
-                    name="brandId"
+                    name="categoryId"
                     render={({ field }) => (
                       <FormItem className="space-y-2">
-                        <FormLabel>Brand</FormLabel>
-                        <BrandSearchableSelect value={field.value || ""} action={field.onChange} />
+                        <FormLabel>Category</FormLabel>
+                        <CategoryTreeSingleSelect
+                          value={field.value || null}
+                          action={(val) => field.onChange(val)}
+                        />
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <CategorySelectorField
-                    form={form}
+                  <FormField
+                    control={form.control}
+                    name="brandId"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Brand</FormLabel>
+                        <BrandSingleSelect
+                          control={form.control}
+                          value={field.value || null}
+                          action={(val) => field.onChange(val)}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                   <FormField
                     control={form.control}
@@ -388,7 +403,7 @@ export function ProductFormDialog({
                   </Card>
                 </div>
                 {/* Right: Description */}
-                <div className="space-y-6 md:w-3/5">
+                <div className="space-y-6 md:w-1/2">
                   {/*<FormField
                     control={form.control}
                     name="description"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check, Tag, Box, Palette, DollarSign, ImageIcon } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check, Tag, Box, DollarSign, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -39,6 +39,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Category } from "@/types";
+import { Badge } from "@/components/ui/badge";
 
 export function ProductsTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -60,8 +61,8 @@ export function ProductsTable() {
   const filters = filtersResp?.data ?? { categories: [], brands: [], sizes: [], colors: [], priceRange: { minPrice: 0, maxPrice: 0 } };
   const categories = filters?.categories ?? [];
   const brands = filters.brands ?? [];
-  const sizesOptions = filters.sizes ?? [];
-  const colorsOptions = filters.colors ?? [];
+  // const sizesOptions = filters.sizes ?? [];
+  // const colorsOptions = filters.colors ?? [];
   const minPrice = filters.priceRange?.minPrice ?? 0;
   const maxPrice = filters.priceRange?.maxPrice ?? 0;
   const { data, isLoading, isFetching, refetch } = useQuery({
@@ -192,7 +193,7 @@ export function ProductsTable() {
                 <span className="hidden sm:inline">Filters</span>
               </Button>
               <span className="text-sm text-muted-foreground hidden sm:inline">
-                {filtersLoading ? "Loading filters…" : `${categories.length} categories • ${brands.length} brands • ${colorsOptions.length} colors • ${sizesOptions.length} sizes`}
+                {filtersLoading ? "Loading filters…" : `${categories.length} categories • ${brands.length} brands`}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -221,7 +222,7 @@ export function ProductsTable() {
           </div>
 
           {isFilterOpen && (
-            <div className="mt-3 p-4 bg-white dark:bg-slate-800 border rounded-lg shadow-sm">
+            <div className="mt-3 p-4  border rounded-lg shadow-sm">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground flex items-center gap-2">
@@ -283,7 +284,7 @@ export function ProductsTable() {
                     </div>
                   </div>
 
-                  <div>
+                  {/*<div>
                     <label className="text-xs font-medium text-muted-foreground">Colors</label>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {colorsOptions.slice(0, 20).map((col) => {
@@ -308,11 +309,11 @@ export function ProductsTable() {
                         );
                       })}
                     </div>
-                  </div>
+                  </div>*/}
                 </div>
               </div>
 
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/*<div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-medium text-muted-foreground">Sizes</label>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -336,8 +337,7 @@ export function ProductsTable() {
                     })}
                   </div>
                 </div>
-
-              </div>
+              </div>*/}
             </div>
           )}
         </div>
@@ -349,11 +349,13 @@ export function ProductsTable() {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-24">Thumbnail</TableHead>
-                <TableHead className="w-24">SKU</TableHead>
+                <TableHead>SKU</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Brand</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead className="text-right">Price</TableHead>
+                <TableHead>New Arrival</TableHead>
+                <TableHead>Featured</TableHead>
                 <TableHead className="w-16">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -368,12 +370,14 @@ export function ProductsTable() {
                     "h-4 w-24",
                     "h-4 w-24",
                     "h-4 w-24",
+                    "h-4 w-24",
+                    "h-4 w-24",
                     "h-4 w-20",
                   ]}
                 />
               ) : products.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="p-6">
+                  <TableCell colSpan={9} className="p-6">
                     <EmptyState
                       title="No products found"
                       description="Try a different search."
@@ -395,8 +399,8 @@ export function ProductsTable() {
                           className="h-12 w-12 rounded-md object-cover"
                         /> : <ImageIcon />}
                       </TableCell>
-                      <TableCell className="text-center">{product.sku}</TableCell>
-                      <TableCell className="font-medium max-w-3xs">
+                      <TableCell className="text-left">{product.sku}</TableCell>
+                      <TableCell className="font-medium max-w-[256px] text-left">
                         <div className="truncate" title={product.name}>
                           {product.name}
                         </div>
@@ -404,6 +408,8 @@ export function ProductsTable() {
                       <TableCell className="text-muted-foreground truncate w-20">{brandName}</TableCell>
                       <TableCell className="text-muted-foreground truncate w-20">{categoryName}</TableCell>
                       <TableCell className="text-center font-semibold">₹{product.originalPrice}</TableCell>
+                      <TableCell className="text-center font-semibold"><Badge variant="outline">{product.isNewArrival ? 'Yes' : 'No'}</Badge></TableCell>
+                      <TableCell className="text-center font-semibold"><Badge variant="outline">{product.isFeatured ? 'Yes' : 'No'}</Badge></TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
