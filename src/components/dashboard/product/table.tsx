@@ -130,7 +130,7 @@ export function ProductsTable() {
       }
       return acc;
     }, {} as Record<string, unknown>);
-    setAppliedFilters({ ...sanitized, page: 1 });
+    setAppliedFilters((prev) => ({ ...sanitized, page: 1, limit: prev.limit }));
   }
   function resetFilters() {
     setFilterDraft({});
