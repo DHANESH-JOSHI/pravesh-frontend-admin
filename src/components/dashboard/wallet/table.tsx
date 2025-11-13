@@ -38,7 +38,7 @@ export function WalletsTable() {
   const [editingWallet, setEditingWallet] = useState<Wallet | null>(null);
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["wallets", { page, limit, searchTerm }],
+    queryKey: ["wallets", { page, limit, search: searchTerm }],
     queryFn: async () =>
       await walletService.getAll({
         page,

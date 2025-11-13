@@ -51,6 +51,7 @@ export function OrderFormDialog({
   initialData,
   isLoading,
 }: FormDialogProps<AdminUpdateOrder, Order>) {
+  const [tempItems, setTempItems] = useState(initialData?.items || []);
   const form = useForm<AdminUpdateOrder>({
     resolver: zodResolver(adminUpdateOrderSchema),
     defaultValues: {
@@ -66,15 +67,14 @@ export function OrderFormDialog({
   useEffect(() => {
     if (open) {
       form.reset()
+      setTempItems(initialData?.items || []);
     }
-
   }, [open, form])
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "items",
   });
-
   const [imagePreview, setImagePreview] = useState<string | null>(initialData?.image || null);
 
   useEffect(() => {
@@ -126,25 +126,6 @@ export function OrderFormDialog({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="feedback"
-              render={({ field }) => (
-                <FormItem className="space-y-2">
-                  <FormLabel>Feedback (optional)</FormLabel>
-                  <FormControl>
-                    <textarea
-                      {...field}
-                      className="w-full rounded-md border px-3 py-2 text-sm"
-                      rows={4}
-                      placeholder="Add feedback for this order (optional)"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             {initialData?.isCustomOrder && <FormItem className="space-y-2">
               <FormLabel>Image</FormLabel>
               <div className="flex items-center gap-4">
@@ -182,7 +163,7 @@ export function OrderFormDialog({
                             render={() => (
                               <FormItem className="flex flex-col grow">
                                 <ProductSearchableSelect
-                                  product={initialData?.items?.[index]?.product as Product}
+                                  product={tempItems?.[index]?.product as Product ?? null}
                                   onChange={(v) => {
                                     form.setValue(`items.${index}.product`, v);
                                   }}
@@ -212,7 +193,10 @@ export function OrderFormDialog({
                             type="button"
                             variant="ghost"
                             size="icon"
-                            onClick={() => remove(index)}
+                            onClick={() => {
+                              remove(index)
+                              setTempItems(tempItems?.filter((_, i) => i !== index));
+                            }}
                           >
                             <Trash className="h-4 w-4 text-destructive" />
                           </Button>
@@ -233,6 +217,25 @@ export function OrderFormDialog({
               </Button>
             </FormItem>
 
+            <FormField
+              control={form.control}
+              name="feedback"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel>Feedback (optional)</FormLabel>
+                  <FormControl>
+                    <textarea
+                      {...field}
+                      className="w-full rounded-md border px-3 py-2 text-sm"
+                      rows={4}
+                      placeholder="Add feedback for this order (optional)"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <div className="flex justify-end gap-3 pt-4 border-t">
               <Button
                 type="button"
@@ -252,10 +255,11 @@ export function OrderFormDialog({
   );
 }
 
-function ProductSearchableSelect({ product, onChange }: { product: Partial<Product>; onChange: (value: string) => void }) {
+function ProductSearchableSelect({ product, onChange }: { product: Partial<Product> | null; onChange: (value: string) => void }) {
+  console.log({ product })
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [selectedId, setSelectedId] = useState<string>("");
+  const [selectedId, setSelectedId] = useState<string>(product?._id || "");
   const debouncedSetSearch = useDebouncedCallback((value: string) => {
     setSearch(value);
   }, 300);
@@ -271,6 +275,7 @@ function ProductSearchableSelect({ product, onChange }: { product: Partial<Produ
   });
 
   const products: Product[] = productsData?.data?.products ?? [];
+  if (product && !products.find((p) => p._id === product._id)) products.push(product as Product);
 
   const selectedProduct = products.find((p) => p._id === selectedId);
 
@@ -283,9 +288,7 @@ function ProductSearchableSelect({ product, onChange }: { product: Partial<Produ
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {product
-            ? selectedProduct?.name ?? product.name ?? "Select product..."
-            : "Select product..."}
+          {selectedId ? selectedProduct?.name : "Select product..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -314,7 +317,7 @@ function ProductSearchableSelect({ product, onChange }: { product: Partial<Produ
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      product._id === p._id ? "opacity-100" : "opacity-0"
+                      product?._id === p._id ? "opacity-100" : "opacity-0"
                     )}
                   />
                   <div className="flex flex-col">

@@ -43,14 +43,11 @@ import { Badge } from "@/components/ui/badge";
 
 export function ProductsTable() {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<Partial<QueryOptions>>({});
-  const [appliedFilters, setAppliedFilters] = useState<Partial<QueryOptions>>({});
+  const [filterDraft, setFilterDraft] = useState<QueryOptions>({});
+  const [appliedFilters, setAppliedFilters] = useState<QueryOptions>({});
   const [filterSearch, setFilterSearch] = useState("");
   const queryClient = useQueryClient();
 
@@ -66,15 +63,9 @@ export function ProductsTable() {
   const minPrice = filters.priceRange?.minPrice ?? 0;
   const maxPrice = filters.priceRange?.maxPrice ?? 0;
   const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["products", { page, limit, filters: appliedFilters, searchTerm }],
+    queryKey: ["products", appliedFilters],
     queryFn: async () =>
-      await productService.getAll({
-        page,
-        limit,
-        search: searchTerm,
-        ...appliedFilters,
-
-      } as QueryOptions),
+      await productService.getAll(appliedFilters),
   });
 
   const products = data?.data?.products ?? [];
@@ -130,7 +121,7 @@ export function ProductsTable() {
   });
 
   function applyFilters() {
-    const sanitized: Partial<QueryOptions> = Object.entries(filterDraft).reduce((acc, [k, v]) => {
+    const sanitized: QueryOptions = Object.entries(filterDraft).reduce((acc, [k, v]) => {
       if (typeof v === "string") {
         const trimmed = v.trim();
         if (trimmed !== "") (acc as Record<string, unknown>)[k] = trimmed;
@@ -139,14 +130,11 @@ export function ProductsTable() {
       }
       return acc;
     }, {} as Record<string, unknown>);
-    setAppliedFilters(sanitized);
-    setPage(1);
+    setAppliedFilters({ ...sanitized, page: 1 });
   }
   function resetFilters() {
     setFilterDraft({});
-    setAppliedFilters({});
-    setPage(1);
-    setSearchTerm("");
+    setAppliedFilters({ page: 1,search: "" });
     setFilterSearch("");
   }
 
@@ -168,15 +156,11 @@ export function ProductsTable() {
             isFetching={isFetching}
             onRefreshAction={refetch}
             onCreateAction={() => setIsCreateDialogOpen(true)}
-            searchTerm={searchTerm}
-            onSearchAction={setSearchTerm}
+            searchTerm={appliedFilters.search || ""}
+            onSearchAction={(v) => setAppliedFilters((f) => ({ ...f, search: v, page: 1 }))}
             searchPlaceholder="Search products..."
-            pageSize={limit}
-            onChangePageSizeAction={(v) => {
-              const n = Number(v);
-              setLimit(n);
-              setPage(1);
-            }}
+            pageSize={appliedFilters.limit}
+            onChangePageSizeAction={(v) => setAppliedFilters((f) => ({ ...f, limit: Number(v), page: 1 }))}
           />
 
           {/* modern filter controls */}
@@ -456,12 +440,12 @@ export function ProductsTable() {
           </Table>
         </div>
         <PaginationControls
-          page={page}
+          page={appliedFilters.page || 1}
           totalPages={totalPages}
           isFetching={isFetching}
-          onPrev={() => setPage((p) => Math.max(1, p - 1))}
-          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
-          onPageChange={(p) => setPage(p)}
+          onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
+          onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
+          onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
         />
       </CardContent>
 

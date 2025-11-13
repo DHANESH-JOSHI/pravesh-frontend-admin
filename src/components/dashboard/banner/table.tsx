@@ -34,24 +34,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Link } from "next-view-transitions";
 export function BannersTable() {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<Partial<BannerQueryOptions>>({});
-  const [appliedFilters, setAppliedFilters] = useState<Partial<BannerQueryOptions>>({});
+  const [filterDraft, setFilterDraft] = useState<BannerQueryOptions>({});
+  const [appliedFilters, setAppliedFilters] = useState<BannerQueryOptions>({});
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["banners", { page, limit, filters: appliedFilters, searchTerm }],
+    queryKey: ["banners", appliedFilters],
     queryFn: async () =>
-      await bannerService.getAllBanners({
-        page,
-        limit,
-        search: searchTerm || undefined,
-        ...appliedFilters,
-      }),
+      await bannerService.getAllBanners(appliedFilters),
   });
 
   const banners = data?.data?.banners ?? [];
@@ -101,7 +93,7 @@ export function BannersTable() {
   });
 
   function applyFilters() {
-    const sanitized: Partial<BannerQueryOptions> = Object.entries(filterDraft).reduce((acc, [k, v]) => {
+    const sanitized: BannerQueryOptions = Object.entries(filterDraft).reduce((acc, [k, v]) => {
       if (typeof v === "string") {
         const trimmed = v.trim();
         if (trimmed !== "" && trimmed !== "all") (acc as Record<string, unknown>)[k] = trimmed;
@@ -110,15 +102,12 @@ export function BannersTable() {
       }
       return acc;
     }, {} as Record<string, unknown>);
-    setAppliedFilters(sanitized);
-    setPage(1);
+    setAppliedFilters({ ...sanitized, page: 1 });
   }
 
   function resetFilters() {
     setFilterDraft({});
-    setAppliedFilters({});
-    setPage(1);
-    setSearchTerm("");
+    setAppliedFilters({ page: 1, search: "" });
   }
 
   const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
@@ -138,15 +127,11 @@ export function BannersTable() {
             isFetching={isFetching}
             onRefreshAction={refetch}
             onCreateAction={() => setIsCreateDialogOpen(true)}
-            searchTerm={searchTerm}
-            onSearchAction={setSearchTerm}
+            searchTerm={appliedFilters.search || ""}
+            onSearchAction={(v) => setAppliedFilters((f) => ({ ...f, search: v, page: 1 }))}
             searchPlaceholder="Search banners..."
-            pageSize={limit}
-            onChangePageSizeAction={(v) => {
-              const n = Number(v);
-              setLimit(n);
-              setPage(1);
-            }}
+            pageSize={appliedFilters.limit}
+            onChangePageSizeAction={(v) => setAppliedFilters((f) => ({ ...f, limit: Number(v), page: 1 }))}
           />
 
           <div className="flex items-center justify-between gap-3">
@@ -343,12 +328,12 @@ export function BannersTable() {
           </Table>
         </div>
         <PaginationControls
-          page={page}
+          page={appliedFilters.page || 1}
           totalPages={totalPages}
           isFetching={isFetching}
-          onPrev={() => setPage((p) => Math.max(1, p - 1))}
-          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
-          onPageChange={(p) => setPage(p)}
+          onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
+          onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
+          onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
         />
       </CardContent>
 

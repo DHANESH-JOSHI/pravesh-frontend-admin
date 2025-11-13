@@ -33,23 +33,15 @@ import { Link } from "next-view-transitions";
 import { UserFormDialog } from "./form-dialog";
 export function UsersTable() {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<Partial<UserQueryOptions>>({});
-  const [appliedFilters, setAppliedFilters] = useState<Partial<UserQueryOptions>>({});
+  const [filterDraft, setFilterDraft] = useState<UserQueryOptions>({});
+  const [appliedFilters, setAppliedFilters] = useState<UserQueryOptions>({});
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["users", { page, limit, filters: appliedFilters, searchTerm }],
+    queryKey: ["users", appliedFilters],
     queryFn: async () =>
-      await userService.getAll({
-        page,
-        limit,
-        search: searchTerm || undefined,
-        ...appliedFilters,
-      }),
+      await userService.getAll(appliedFilters),
   });
 
   const users = data?.data?.users ?? [];
@@ -80,7 +72,7 @@ export function UsersTable() {
   });
 
   function applyFilters() {
-    const sanitized: Partial<UserQueryOptions> = Object.entries(filterDraft).reduce((acc, [k, v]) => {
+    const sanitized: UserQueryOptions = Object.entries(filterDraft).reduce((acc, [k, v]) => {
       if (typeof v === "string") {
         const trimmed = v.trim();
         if (trimmed !== "" && trimmed !== "all") (acc as Record<string, unknown>)[k] = trimmed;
@@ -89,15 +81,12 @@ export function UsersTable() {
       }
       return acc;
     }, {} as Record<string, unknown>);
-    setAppliedFilters(sanitized);
-    setPage(1);
+    setAppliedFilters({ ...sanitized, page: 1 });
   }
 
   function resetFilters() {
     setFilterDraft({});
-    setAppliedFilters({});
-    setPage(1);
-    setSearchTerm("");
+    setAppliedFilters({ page: 1, search: "" });
   }
 
   const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
@@ -115,17 +104,13 @@ export function UsersTable() {
             count={users?.length ?? 0}
             countNoun="user"
             isFetching={isFetching}
-            onRefreshAction={refetch}
-            searchTerm={searchTerm}
-            onSearchAction={setSearchTerm}
-            searchPlaceholder="Search users..."
-            pageSize={limit}
-            onChangePageSizeAction={(v) => {
-              const n = Number(v);
-              setLimit(n);
-              setPage(1);
-            }}
             onCreateAction={() => setCreateDialogOpen(true)}
+            onRefreshAction={refetch}
+            searchTerm={appliedFilters.search || ""}
+            onSearchAction={(v) => setAppliedFilters((f) => ({ ...f, search: v, page: 1 }))}
+            searchPlaceholder="Search users..."
+            pageSize={appliedFilters.limit}
+            onChangePageSizeAction={(v) => setAppliedFilters((f) => ({ ...f, limit: Number(v), page: 1 }))}
           />
 
           <div className="flex items-center justify-between gap-3">
@@ -317,12 +302,12 @@ export function UsersTable() {
           </Table>
         </div>
         <PaginationControls
-          page={page}
+          page={appliedFilters.page || 1}
           totalPages={totalPages}
           isFetching={isFetching}
-          onPrev={() => setPage((p) => Math.max(1, p - 1))}
-          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
-          onPageChange={(p) => setPage(p)}
+          onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
+          onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
+          onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
         />
       </CardContent>
       <UserFormDialog
@@ -330,13 +315,14 @@ export function UsersTable() {
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
         onSubmit={(data) => {
-          if(data.email==""){
+          if (data.email == "") {
             delete data.email;
           }
-          if(data.img==""){
+          if (data.img == "") {
             delete data.img;
           }
-          createMutation.mutate(data as Register)}}
+          createMutation.mutate(data as Register)
+        }}
       />
 
       <CustomAlertDialog

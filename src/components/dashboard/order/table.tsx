@@ -25,28 +25,20 @@ import { Order, OrderQueryOptions } from "@/types/order";
 import { User } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 export function OrdersTable() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<Partial<OrderQueryOptions>>({});
-  const [appliedFilters, setAppliedFilters] = useState<Partial<OrderQueryOptions>>({});
+  const [filterDraft, setFilterDraft] = useState<OrderQueryOptions>({});
+  const [appliedFilters, setAppliedFilters] = useState<OrderQueryOptions>({});
   const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["orders", { page, limit, filters: appliedFilters, searchTerm }],
+    queryKey: ["orders", appliedFilters],
     queryFn: async () =>
-      await orderService.getAllOrders({
-        page,
-        limit,
-        user: searchTerm,
-        ...appliedFilters,
-      }),
+      await orderService.getAllOrders(appliedFilters),
   });
 
   const orders = data?.data?.orders ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
 
   function applyFilters() {
-    const sanitized: Partial<OrderQueryOptions> = Object.entries(filterDraft).reduce((acc, [k, v]) => {
+    const sanitized: OrderQueryOptions = Object.entries(filterDraft).reduce((acc, [k, v]) => {
       if (typeof v === "string") {
         const trimmed = v.trim();
         if (trimmed !== "" && trimmed !== "all") (acc as Record<string, unknown>)[k] = trimmed;
@@ -55,15 +47,12 @@ export function OrdersTable() {
       }
       return acc;
     }, {} as Record<string, unknown>);
-    setAppliedFilters(sanitized);
-    setPage(1);
+    setAppliedFilters({ ...sanitized, page: 1 });
   }
 
   function resetFilters() {
     setFilterDraft({});
-    setAppliedFilters({});
-    setPage(1);
-    setSearchTerm("");
+    setAppliedFilters({ page: 1, user: "" });
   }
 
   const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
@@ -82,15 +71,11 @@ export function OrdersTable() {
             countNoun="order"
             isFetching={isFetching}
             onRefreshAction={refetch}
-            searchTerm={searchTerm}
-            onSearchAction={setSearchTerm}
+            searchTerm={appliedFilters.user || ""}
+            onSearchAction={(v) => setAppliedFilters((f) => ({ ...f, user: v, page: 1 }))}
             searchPlaceholder="Search orders by user..."
-            pageSize={limit}
-            onChangePageSizeAction={(v) => {
-              const n = Number(v);
-              setLimit(n);
-              setPage(1);
-            }}
+            pageSize={appliedFilters.limit}
+            onChangePageSizeAction={(v) => setAppliedFilters((f) => ({ ...f, limit: Number(v), page: 1 }))}
           />
 
           <div className="flex items-center justify-between gap-3">
@@ -252,12 +237,12 @@ export function OrdersTable() {
           </Table>
         </div>
         <PaginationControls
-          page={page}
+          page={appliedFilters.page || 1}
           totalPages={totalPages}
           isFetching={isFetching}
-          onPrev={() => setPage((p) => Math.max(1, p - 1))}
-          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
-          onPageChange={(p) => setPage(p)}
+          onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
+          onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
+          onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
         />
       </CardContent>
     </Card>

@@ -24,29 +24,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Product, User } from "@/types";
 import { Link } from "next-view-transitions";
 export function ReviewsTable() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<Partial<ReviewQueryOptions>>({});
-  const [appliedFilters, setAppliedFilters] = useState<Partial<ReviewQueryOptions>>({});
+  const [filterDraft, setFilterDraft] = useState<ReviewQueryOptions>({});
+  const [appliedFilters, setAppliedFilters] = useState<ReviewQueryOptions>({});
   const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["reviews", { page, limit, filters: appliedFilters, searchTerm }],
+    queryKey: ["reviews", appliedFilters],
     queryFn: async () =>
-      await reviewService.getAllReviews({
-        page,
-        limit,
-        search: searchTerm || undefined,
-        ...appliedFilters,
-      }),
+      await reviewService.getAllReviews(appliedFilters),
   });
 
   const reviews = data?.data?.reviews ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
 
   function applyFilters() {
-    const sanitized: Partial<ReviewQueryOptions> = Object.entries(filterDraft).reduce((acc, [k, v]) => {
+    const sanitized: ReviewQueryOptions = Object.entries(filterDraft).reduce((acc, [k, v]) => {
       if (typeof v === "string") {
         const trimmed = v.trim();
         if (trimmed !== "" && trimmed !== "all") (acc as Record<string, unknown>)[k] = trimmed;
@@ -55,15 +46,12 @@ export function ReviewsTable() {
       }
       return acc;
     }, {} as Record<string, unknown>);
-    setAppliedFilters(sanitized);
-    setPage(1);
+    setAppliedFilters({ ...sanitized, page: 1 });
   }
 
   function resetFilters() {
     setFilterDraft({});
-    setAppliedFilters({});
-    setPage(1);
-    setSearchTerm("");
+    setAppliedFilters({ page: 1, search: "" });
   }
 
   const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
@@ -82,15 +70,11 @@ export function ReviewsTable() {
             countNoun="review"
             isFetching={isFetching}
             onRefreshAction={refetch}
-            searchTerm={searchTerm}
-            onSearchAction={setSearchTerm}
+            searchTerm={appliedFilters.search || ""}
+            onSearchAction={(v) => setAppliedFilters((f) => ({ ...f, search: v, page: 1 }))}
             searchPlaceholder="Search reviews..."
-            pageSize={limit}
-            onChangePageSizeAction={(v) => {
-              const n = Number(v);
-              setLimit(n);
-              setPage(1);
-            }}
+            pageSize={appliedFilters.limit}
+            onChangePageSizeAction={(v) => setAppliedFilters((f) => ({ ...f, limit: Number(v), page: 1 }))}
           />
 
           <div className="flex items-center justify-between gap-3">
@@ -251,12 +235,12 @@ export function ReviewsTable() {
           </Table>
         </div>
         <PaginationControls
-          page={page}
+          page={appliedFilters.page || 1}
           totalPages={totalPages}
           isFetching={isFetching}
-          onPrev={() => setPage((p) => Math.max(1, p - 1))}
-          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
-          onPageChange={(p) => setPage(p)}
+          onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
+          onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
+          onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
         />
       </CardContent>
     </Card>

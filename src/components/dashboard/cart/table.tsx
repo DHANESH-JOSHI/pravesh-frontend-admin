@@ -54,11 +54,11 @@ export function CartsTable() {
           title="Shopping Carts"
           count={carts?.length ?? 0}
           countNoun="cart"
+          searchPlaceholder="Search carts by user..."
           isFetching={isFetching}
           onRefreshAction={refetch}
           searchTerm={searchTerm}
           onSearchAction={setSearchTerm}
-          searchPlaceholder="Search carts by user..."
           pageSize={limit}
           onChangePageSizeAction={(v) => {
             const n = Number(v);

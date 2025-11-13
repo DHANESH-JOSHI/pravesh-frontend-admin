@@ -41,11 +41,9 @@ export function CategoriesTable() {
   const [appliedFilters, setAppliedFilters] = useState<CategoryQueryOptions>({parentCategoryId:"null"});
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["categories", { ...appliedFilters }],
+    queryKey: ["categories", appliedFilters],
     queryFn: async () =>
-      await categoryService.getAll({
-        ...appliedFilters,
-      }),
+      await categoryService.getAll(appliedFilters),
   });
 
   const categories = data?.data?.categories ?? [];
@@ -133,11 +131,11 @@ export function CategoriesTable() {
             onRefreshAction={refetch}
             onCreateAction={() => setIsCreateDialogOpen(true)}
             searchTerm={appliedFilters.search || ""}
-            onSearchAction={(s) => setAppliedFilters({ ...appliedFilters, search: s })}
+            onSearchAction={(s) => setAppliedFilters((v) => ({ ...v, search: s }))}
             searchPlaceholder="Search categories..."
             pageSize={appliedFilters.limit}
             onChangePageSizeAction={(v) => {
-              setAppliedFilters({ ...appliedFilters, page: 1, limit: Number(v) });
+              setAppliedFilters((v) => ({ ...v, page: 1, limit: Number(v) }));
             }}
           />
 
