@@ -52,7 +52,7 @@ export function ReviewsTable() {
 
   function resetFilters() {
     setFilterDraft({});
-    setAppliedFilters({ page: 1, search: "", limit: 10 });
+    setAppliedFilters((prev) => ({ page: 1, search: "", limit: prev.limit }));
   }
 
   const hasFiltersSelected = isFiltersSelected(filterDraft);

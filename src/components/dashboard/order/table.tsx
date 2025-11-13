@@ -53,7 +53,7 @@ export function OrdersTable() {
 
   function resetFilters() {
     setFilterDraft({});
-    setAppliedFilters({ page: 1, user: "", limit: 10 });
+    setAppliedFilters((prev) => ({ page: 1, user: "", limit: prev.limit }));
   }
 
   const hasFiltersSelected = isFiltersSelected(filterDraft);
