@@ -35,8 +35,8 @@ export function UsersTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<UserQueryOptions>({});
-  const [appliedFilters, setAppliedFilters] = useState<UserQueryOptions>({});
+  const [filterDraft, setFilterDraft] = useState<UserQueryOptions>({ page: 1, limit: 10 });
+  const [appliedFilters, setAppliedFilters] = useState<UserQueryOptions>({ page: 1, limit: 10 });
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["users", appliedFilters],

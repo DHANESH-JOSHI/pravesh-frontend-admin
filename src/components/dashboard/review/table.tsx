@@ -25,8 +25,8 @@ import { Product, User } from "@/types";
 import { Link } from "next-view-transitions";
 export function ReviewsTable() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<ReviewQueryOptions>({});
-  const [appliedFilters, setAppliedFilters] = useState<ReviewQueryOptions>({});
+  const [filterDraft, setFilterDraft] = useState<ReviewQueryOptions>({ page: 1, limit: 10 });
+  const [appliedFilters, setAppliedFilters] = useState<ReviewQueryOptions>({ page: 1, limit: 10 });
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["reviews", appliedFilters],
     queryFn: async () =>

@@ -38,8 +38,8 @@ export function BlogsTable() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<BlogQueryOptions>({});
-  const [appliedFilters, setAppliedFilters] = useState<BlogQueryOptions>({});
+  const [filterDraft, setFilterDraft] = useState<BlogQueryOptions>({ page: 1, limit: 10 });
+  const [appliedFilters, setAppliedFilters] = useState<BlogQueryOptions>({ page: 1, limit: 10 });
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["blogs", appliedFilters],
@@ -103,7 +103,7 @@ export function BlogsTable() {
       }
       return acc;
     }, {} as Record<string, unknown>);
-    setAppliedFilters({...sanitized, page: 1 });
+    setAppliedFilters({ ...sanitized, page: 1 });
   }
 
   function resetFilters() {
@@ -292,7 +292,7 @@ export function BlogsTable() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                             <DropdownMenuItem asChild className="gap-2">
+                            <DropdownMenuItem asChild className="gap-2">
                               <Link href={`/blogs/${blog._id}`}>
                                 <Eye className="h-4 w-4" />
                                 View

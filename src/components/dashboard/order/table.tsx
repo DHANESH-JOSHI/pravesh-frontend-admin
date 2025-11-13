@@ -26,8 +26,8 @@ import { User } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 export function OrdersTable() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<OrderQueryOptions>({});
-  const [appliedFilters, setAppliedFilters] = useState<OrderQueryOptions>({});
+  const [filterDraft, setFilterDraft] = useState<OrderQueryOptions>({ page: 1, limit: 10 });
+  const [appliedFilters, setAppliedFilters] = useState<OrderQueryOptions>({ page: 1, limit: 10 });
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["orders", appliedFilters],
     queryFn: async () =>

@@ -25,8 +25,8 @@ import { Link } from "next-view-transitions";
 
 export function AddressesTable() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<AddressQueryOptions>({});
-  const [appliedFilters, setAppliedFilters] = useState<AddressQueryOptions>({});
+  const [filterDraft, setFilterDraft] = useState<AddressQueryOptions>({ page: 1, limit: 10 });
+  const [appliedFilters, setAppliedFilters] = useState<AddressQueryOptions>({ page: 1, limit: 10 });
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["addresses", appliedFilters],
@@ -47,12 +47,12 @@ export function AddressesTable() {
       }
       return acc;
     }, {} as Record<string, unknown>);
-    setAppliedFilters({...sanitized, page: 1 });
+    setAppliedFilters({ ...sanitized, page: 1 });
   }
 
   function resetFilters() {
     setFilterDraft({});
-    setAppliedFilters({page:1,search:""});
+    setAppliedFilters({ page: 1, search: "" });
   }
 
   const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
@@ -134,7 +134,7 @@ export function AddressesTable() {
                   <label className="text-xs font-medium text-muted-foreground">Deleted Status</label>
                   <Select
                     value={filterDraft.isDeleted?.toString() || ""}
-                    onValueChange={(v) => setFilterDraft((d) => ({ ...d, isDeleted:v === "true" }))}
+                    onValueChange={(v) => setFilterDraft((d) => ({ ...d, isDeleted: v === "true" }))}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Active" />

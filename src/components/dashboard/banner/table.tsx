@@ -37,8 +37,8 @@ export function BannersTable() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<BannerQueryOptions>({});
-  const [appliedFilters, setAppliedFilters] = useState<BannerQueryOptions>({});
+  const [filterDraft, setFilterDraft] = useState<BannerQueryOptions>({ page: 1, limit: 10 });
+  const [appliedFilters, setAppliedFilters] = useState<BannerQueryOptions>({ page: 1, limit: 10 });
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["banners", appliedFilters],

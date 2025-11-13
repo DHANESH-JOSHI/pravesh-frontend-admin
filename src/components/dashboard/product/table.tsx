@@ -46,8 +46,8 @@ export function ProductsTable() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<QueryOptions>({});
-  const [appliedFilters, setAppliedFilters] = useState<QueryOptions>({});
+  const [filterDraft, setFilterDraft] = useState<QueryOptions>({ page: 1, limit: 10 });
+  const [appliedFilters, setAppliedFilters] = useState<QueryOptions>({ page: 1, limit: 10 });
   const [filterSearch, setFilterSearch] = useState("");
   const queryClient = useQueryClient();
 
@@ -134,7 +134,7 @@ export function ProductsTable() {
   }
   function resetFilters() {
     setFilterDraft({});
-    setAppliedFilters({ page: 1,search: "" });
+    setAppliedFilters({ page: 1, search: "" });
     setFilterSearch("");
   }
 
