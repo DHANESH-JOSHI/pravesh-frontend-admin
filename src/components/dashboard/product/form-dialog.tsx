@@ -699,65 +699,65 @@ export function BrandSearchableSelect({ value, action }: { value: string; action
   );
 }
 
-export function CategorySearchableSelect({ value, action }: { value: string; action: (value: string) => void }) {
-  const [open, setOpen] = useState(false);
-  const [inputValue, setInputValue] = useState("");
-  const [search, setSearch] = useState("");
+// export function CategorySearchableSelect({ value, action }: { value: string; action: (value: string) => void }) {
+//   const [open, setOpen] = useState(false);
+//   const [inputValue, setInputValue] = useState("");
+//   const [search, setSearch] = useState("");
 
-  const debouncedSetSearch = useDebouncedCallback((value: string) => {
-    setSearch(value);
-  }, 300);
+//   const debouncedSetSearch = useDebouncedCallback((value: string) => {
+//     setSearch(value);
+//   }, 300);
 
-  useEffect(() => {
-    debouncedSetSearch(inputValue);
-  }, [inputValue, debouncedSetSearch]);
+//   useEffect(() => {
+//     debouncedSetSearch(inputValue);
+//   }, [inputValue, debouncedSetSearch]);
 
-  const { data: categoriesData, isLoading: isLoadingCategories } = useQuery({
-    queryKey: ["categories", "search", search],
-    queryFn: () => categoryService.getAll({
-      page: 1,
-      limit: 20,
-      search,
-    }),
-    enabled: open,
-  });
+//   const { data: categoriesData, isLoading: isLoadingCategories } = useQuery({
+//     queryKey: ["categories", "search", search],
+//     queryFn: () => categoryService.getAll({
+//       page: 1,
+//       limit: 20,
+//       search,
+//     }),
+//     enabled: open,
+//   });
 
-  const { data: selectedCategoryData } = useQuery({
-    queryKey: ["categories", value],
-    queryFn: () => categoryService.getById(value),
-    enabled: !!value && !open,
-  });
+//   const { data: selectedCategoryData } = useQuery({
+//     queryKey: ["categories", value],
+//     queryFn: () => categoryService.getById(value),
+//     enabled: !!value && !open,
+//   });
 
-  const categories: Category[] = categoriesData?.data?.categories ?? [];
-  const selectedCategory = categories.find((p) => p._id === value) ?? selectedCategoryData?.data;
+//   const categories: Category[] = categoriesData?.data?.categories ?? [];
+//   const selectedCategory = categories.find((p) => p._id === value) ?? selectedCategoryData?.data;
 
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between text-left" >
-          {value ? selectedCategory?.title ?? "Select category..." : "Select category..."}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 min-w-sm">
-        <Command shouldFilter={false}>
-          <CommandInput placeholder="Search category..." value={inputValue} onValueChange={setInputValue} />
-          <CommandEmpty>{isLoadingCategories ? "Searching..." : "No category found."}</CommandEmpty>
-          <CommandGroup>
-            <ScrollArea className="h-48">
-              {categories.map((category) => (
-                <CommandItem key={category._id} value={category._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
-                  <Check className={cn("mr-2 h-4 w-4", value === category._id ? "opacity-100" : "opacity-0")} />
-                  {category.title}
-                </CommandItem>
-              ))}
-            </ScrollArea>
-          </CommandGroup>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  );
-}
+//   return (
+//     <Popover open={open} onOpenChange={setOpen}>
+//       <PopoverTrigger asChild>
+//         <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between text-left" >
+//           {value ? selectedCategory?.title ?? "Select category..." : "Select category..."}
+//           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+//         </Button>
+//       </PopoverTrigger>
+//       <PopoverContent className="w-[--radix-popover-trigger-width] p-0 min-w-sm">
+//         <Command shouldFilter={false}>
+//           <CommandInput placeholder="Search category..." value={inputValue} onValueChange={setInputValue} />
+//           <CommandEmpty>{isLoadingCategories ? "Searching..." : "No category found."}</CommandEmpty>
+//           <CommandGroup>
+//             <ScrollArea className="h-48">
+//               {categories.map((category) => (
+//                 <CommandItem key={category._id} value={category._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
+//                   <Check className={cn("mr-2 h-4 w-4", value === category._id ? "opacity-100" : "opacity-0")} />
+//                   {category.title}
+//                 </CommandItem>
+//               ))}
+//             </ScrollArea>
+//           </CommandGroup>
+//         </Command>
+//       </PopoverContent>
+//     </Popover>
+//   );
+// }
 
 function KeyValueFormArray({ name, title, form, fields, append, remove }: { name: "specifications", title: string, form: any, fields: any[], append: any, remove: any }) {
   return (

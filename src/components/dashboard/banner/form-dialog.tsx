@@ -32,7 +32,7 @@ import {
   bannerTypeSchema,
 } from "@/types/banner";
 import { FormDialogProps, Product } from "@/types";
-import { BrandSearchableSelect, CategorySearchableSelect } from "../product/form-dialog";
+import { BrandSearchableSelect } from "../product/form-dialog";
 import { useDebouncedCallback } from "use-debounce";
 import { useQuery } from "@tanstack/react-query";
 import { productService } from "@/services/product.service";
@@ -40,6 +40,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { CategoryTreeSingleSelect } from "@/components/category-tree-single-select";
 
 export function BannerFormDialog({
   open,
@@ -178,7 +179,7 @@ export function BannerFormDialog({
                     {form.watch("type") === "brand" ? (
                       <BrandSearchableSelect value={field.value || ""} action={field.onChange} />
                     ) : form.watch("type") === "category" ? (
-                      <CategorySearchableSelect value={field.value || ""} action={field.onChange} />
+                      <CategoryTreeSingleSelect value={field.value || ""} action={field.onChange} />
                     ) : form.watch("type") === "product" ? (
                       <ProductSearchableSelect value={field.value || ""} action={field.onChange} />
                     ) : null}
