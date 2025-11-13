@@ -63,12 +63,12 @@ export function OrderFormDialog({
       })),
     },
   });
-  useEffect(()=>{
-    if(open){
+  useEffect(() => {
+    if (open) {
       form.reset()
     }
 
-  },[open,form])
+  }, [open, form])
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -265,8 +265,8 @@ function ProductSearchableSelect({ product, onChange }: { product: Partial<Produ
   }, [search, debouncedSetSearch]);
 
   const { data: productsData, isLoading: isLoadingProducts } = useQuery({
-    queryKey: ["products", search],
-    queryFn: () => productService.search(search, 1, 20),
+    queryKey: ["products", { search }],
+    queryFn: () => productService.getAll({ search, limit: 20 }),
     enabled: open,
   });
 
