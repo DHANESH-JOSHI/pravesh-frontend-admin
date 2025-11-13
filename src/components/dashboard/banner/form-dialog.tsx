@@ -143,33 +143,25 @@ export function BannerFormDialog({
                 </FormItem>
               )}
             />
-            {form.watch("type") == "external" && (<>
+            {["offer", "external"].includes(form.watch("type") ?? "") && (<>
               <FormField
                 control={form.control}
                 name="targetUrl"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
                     <FormLabel>Redirect Url</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Redirect Url" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {["brands", "categories", "products"]?.map((type) => (
-                          <SelectItem key={type} value={`/${type}`}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter Redirect Url..."
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </>)}
-            {["brand","category","product"].includes(form.watch("type") ?? "") &&
+            {["brand", "category", "product"].includes(form.watch("type") ?? "") &&
               (<FormField
                 control={form.control}
                 name="targetId"
