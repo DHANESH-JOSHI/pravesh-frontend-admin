@@ -20,6 +20,7 @@ import { PaginationControls } from "@/components/dashboard/common/pagination-con
 import { brandService } from "@/services/brand.service";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import Loader from "@/components/ui/loader";
+import { Category } from "@/types";
 
 export default function BrandDetailPage() {
   const router = useTransitionRouter()
@@ -116,15 +117,15 @@ export default function BrandDetailPage() {
               {/* Statistics */}
               <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                 <div>
-                  <label className="text-sm font-medium">Total Products</label>
-                  <p className="text-2xl font-bold text-blue-600">
-                    {brand.products?.length || 0}
+                  <label className="text-sm font-medium">Total Categories</label>
+                  <p className="text-2xl font-bold text-green-600">
+                    {brand.categories.length || 0}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Active Products</label>
-                  <p className="text-2xl font-bold text-green-600">
-                    {brand.products?.filter(p => !p.isDeleted).length || 0}
+                  <label className="text-sm font-medium">Total Products</label>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {brand.products?.length || 0}
                   </p>
                 </div>
               </div>
@@ -144,6 +145,60 @@ export default function BrandDetailPage() {
           </CardContent>
         </Card>
       </div>
+      {/* Categories by Brand */}
+      {brand.categories && brand.categories.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Package className="h-5 w-5" />
+                Categories ({brand.categories.length})
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Slug</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Updated</TableHead>
+                    <TableHead className="w-16">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(brand.categories || [])
+                    .map((category:any) => (
+                      <TableRow key={category._id}>
+                        <TableCell className="font-medium">
+                          {category.slug}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {category.title}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {category.createdAt}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {category.updatedAt}
+                        </TableCell>
+                        <TableCell>
+                          <Link href={`/categories/${category._id}`}>
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Products by Brand */}
       {brand.products && brand.products.length > 0 && (
@@ -152,7 +207,7 @@ export default function BrandDetailPage() {
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Package className="h-5 w-5" />
-                Products by {brand.name} ({brand.products.length})
+                Products ({brand.products.length})
               </div>
             </CardTitle>
           </CardHeader>

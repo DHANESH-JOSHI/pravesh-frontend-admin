@@ -298,81 +298,38 @@ export default function CategoryDetailPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {/*<TableHead>Image</TableHead>*/}
-                    <TableHead>Name</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Slug</TableHead>
+                    <TableHead>Title</TableHead>
                     <TableHead>Created</TableHead>
+                    <TableHead>Updated</TableHead>
                     <TableHead className="w-16">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {category.children?.map((child) => (
-                    <TableRow key={child._id}>
-                      {/*<TableCell>
-                        {child.image ? (
-                          <img
-                            src={child.image}
-                            alt={child.title}
-                            className="h-8 w-8 rounded object-cover"
-                          />
-                        ) : (
-                          <div className="h-8 w-8 rounded bg-muted flex items-center justify-center">
-                            <Folder className="h-4 w-4 text-muted-foreground" />
-                          </div>
-                        )}
-                      </TableCell>*/}
-                      <TableCell>{child.title}</TableCell>
-                      <TableCell>
-                        <Badge variant={child.isDeleted ? "destructive" : "secondary"}>
-                          {child.isDeleted ? "Deleted" : "Active"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {child.createdAt}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
+                  {(category.children || [])
+                    .map((c: any) => (
+                      <TableRow key={c._id}>
+                        <TableCell className="font-medium">
+                          {c.slug}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {c.title}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {c.createdAt}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {c.updatedAt}
+                        </TableCell>
+                        <TableCell>
+                          <Link href={`/categories/${c._id}`}>
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild className="gap-2">
-                              <Link href={`/categories/${child._id}`}>
-                                <Eye className="h-4 w-4" />
-                                View
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="gap-2"
-                              onClick={() =>
-                                setEditingCategory(child as Category)
-                              }
-                            >
-                              <Edit className="h-4 w-4" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="gap-2 text-destructive"
-                              onClick={() => {
-                                setIsOpen(true);
-                                pendingDeleteSlug =
-                                  child._id || null;
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </div>
@@ -380,6 +337,76 @@ export default function CategoryDetailPage() {
           }
         </CardContent>
       </Card>
+
+      {category.brands.length > 0 && <Card>
+        <CardHeader>
+          <CardTitle className="flex items-start justify-between">
+            <div className="flex items-center gap-2">
+              <Folder className="h-5 w-5" />
+              Brands ({category.brands?.length ?? 0})
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {
+            category.brands && category.brands.length > 0 && (<div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Thumbnail</TableHead>
+                    <TableHead>Slug</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Updated</TableHead>
+                    <TableHead className="w-16">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(category.brands || [])
+                    .map((b: any) => (
+                      <TableRow key={b._id}>
+                        <TableCell>
+                          {b.image ? (
+                            <img
+                              src={b.image}
+                              alt={b.name}
+                              className="h-8 w-8 rounded object-cover"
+                            />
+                          ) : (
+                            <div className="h-8 w-8 rounded bg-muted flex items-center justify-center">
+                              <Folder className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {b.slug}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {b.name}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {b.createdAt}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {b.updatedAt}
+                        </TableCell>
+                        <TableCell>
+                          <Link href={`/brands/${b._id}`}>
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </div>
+            )
+          }
+        </CardContent>
+      </Card>}
+
       {
         products.length > 0 && (
           <Card>
@@ -387,7 +414,7 @@ export default function CategoryDetailPage() {
               <CardTitle>
                 <div className="flex items-center gap-2">
                   <Package className="h-5 w-5" />
-                  Products by {category.title} ({products?.length})
+                  Products ({products?.length})
                 </div>
               </CardTitle>
             </CardHeader>
