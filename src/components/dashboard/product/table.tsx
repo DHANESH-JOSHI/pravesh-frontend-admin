@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/select";
 import { Category } from "@/types";
 import { Badge } from "@/components/ui/badge";
+import { isFiltersSelected } from "@/lib/utils";
 
 export function ProductsTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -138,12 +139,7 @@ export function ProductsTable() {
     setFilterSearch("");
   }
 
-  const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
-    if (v === undefined || v === null) return false;
-    if (Array.isArray(v)) return v.length > 0;
-    if (typeof v === "string") return v.trim() !== "";
-    return true;
-  });
+  const hasFiltersSelected = isFiltersSelected(filterDraft);
 
   return (
     <Card>

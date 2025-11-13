@@ -23,6 +23,7 @@ import { Review, ReviewQueryOptions } from "@/types/review";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Product, User } from "@/types";
 import { Link } from "next-view-transitions";
+import { isFiltersSelected } from "@/lib/utils";
 export function ReviewsTable() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterDraft, setFilterDraft] = useState<ReviewQueryOptions>({ page: 1, limit: 10 });
@@ -54,11 +55,7 @@ export function ReviewsTable() {
     setAppliedFilters({ page: 1, search: "", limit: 10 });
   }
 
-  const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
-    if (v === undefined || v === null) return false;
-    if (typeof v === "string") return v.trim() !== "";
-    return true;
-  });
+  const hasFiltersSelected = isFiltersSelected(filterDraft);
 
   return (
     <Card>

@@ -33,6 +33,7 @@ import { Blog, CreateBlog, UpdateBlog, BlogQueryOptions } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "next-view-transitions";
 import { Badge } from "@/components/ui/badge";
+import { isFiltersSelected } from "@/lib/utils";
 export function BlogsTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -111,11 +112,8 @@ export function BlogsTable() {
     setAppliedFilters({ page: 1, search: "", limit: 10 });
   }
 
-  const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
-    if (v === undefined || v === null) return false;
-    if (typeof v === "string") return v.trim() !== "";
-    return true;
-  });
+  const hasFiltersSelected = isFiltersSelected(filterDraft);
+
 
   return (
     <Card>

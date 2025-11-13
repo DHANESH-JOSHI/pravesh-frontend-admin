@@ -31,6 +31,7 @@ import { Category, CreateCategory, UpdateCategory, CategoryQueryOptions } from "
 import { categoryService } from "@/services/category.service";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "next-view-transitions";
+import { isFiltersSelected } from "@/lib/utils";
 
 export function CategoriesTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -67,11 +68,7 @@ export function CategoriesTable() {
     setAppliedFilters({ page: 1, search: "", limit: 10, parentCategoryId: "null" });
   }
 
-  const hasFiltersSelected = Object.entries(filterDraft).some(([k, v]) => {
-    if (v === undefined || v === null || k == "parentCategoryId") return false;
-    if (typeof v === "string") return v.trim() !== "";
-    return true;
-  });
+  const hasFiltersSelected = isFiltersSelected(filterDraft);
 
   const deleteMutation = useMutation({
     mutationFn: categoryService.delete,

@@ -24,6 +24,7 @@ import { orderService } from "@/services/order.service";
 import { Order, OrderQueryOptions } from "@/types/order";
 import { User } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { isFiltersSelected } from "@/lib/utils";
 export function OrdersTable() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterDraft, setFilterDraft] = useState<OrderQueryOptions>({ page: 1, limit: 10 });
@@ -55,11 +56,7 @@ export function OrdersTable() {
     setAppliedFilters({ page: 1, user: "", limit: 10 });
   }
 
-  const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
-    if (v === undefined || v === null) return false;
-    if (typeof v === "string") return v.trim() !== "";
-    return true;
-  });
+  const hasFiltersSelected = isFiltersSelected(filterDraft);
 
   return (
     <Card>

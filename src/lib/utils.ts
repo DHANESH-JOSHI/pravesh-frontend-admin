@@ -41,3 +41,11 @@ export function toLabel(seg: string): string {
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 }
+
+
+export const isFiltersSelected = (filterDraft: any) => Object.entries(filterDraft).some(([k, v]) => {
+    if (["page", "limit", "parentCategoryId"].includes(k)) return false;
+    if (v === undefined || v === null) return false;
+    if (typeof v === "string") return v.trim() !== "";
+    return true;
+  });

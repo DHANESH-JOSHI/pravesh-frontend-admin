@@ -32,6 +32,7 @@ import { bannerService } from "@/services/banner.service";
 import { Banner, CreateBanner, UpdateBanner, BannerQueryOptions } from "@/types/banner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "next-view-transitions";
+import { isFiltersSelected } from "@/lib/utils";
 export function BannersTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -110,11 +111,8 @@ export function BannersTable() {
     setAppliedFilters({ page: 1, search: "", limit: 10 });
   }
 
-  const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
-    if (v === undefined || v === null) return false;
-    if (typeof v === "string") return v.trim() !== "";
-    return true;
-  });
+  const hasFiltersSelected = isFiltersSelected(filterDraft);
+
 
   return (
     <Card>

@@ -22,6 +22,7 @@ import { addressService } from "@/services/address.service";
 import { Address, AddressQueryOptions } from "@/types/address";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "next-view-transitions";
+import { isFiltersSelected } from "@/lib/utils";
 
 export function AddressesTable() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -55,11 +56,7 @@ export function AddressesTable() {
     setAppliedFilters({ page: 1, search: "", limit: 10 });
   }
 
-  const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {
-    if (v === undefined || v === null) return false;
-    if (typeof v === "string") return v.trim() !== "";
-    return true;
-  });
+  const hasFiltersSelected = isFiltersSelected(filterDraft);
 
   return (
     <Card>
