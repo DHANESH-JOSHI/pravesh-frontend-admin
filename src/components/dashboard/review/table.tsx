@@ -51,7 +51,7 @@ export function ReviewsTable() {
 
   function resetFilters() {
     setFilterDraft({});
-    setAppliedFilters({ page: 1, search: "" });
+    setAppliedFilters({ page: 1, search: "", limit: 10 });
   }
 
   const hasFiltersSelected = Object.entries(filterDraft).some(([, v]) => {

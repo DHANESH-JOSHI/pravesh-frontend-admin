@@ -64,7 +64,7 @@ export function CategoriesTable() {
 
   function resetFilters() {
     setFilterDraft({});
-    setAppliedFilters({ page: 1, search: "", parentCategoryId: "null" });
+    setAppliedFilters({ page: 1, search: "", limit: 10, parentCategoryId: "null" });
   }
 
   const hasFiltersSelected = Object.entries(filterDraft).some(([k, v]) => {

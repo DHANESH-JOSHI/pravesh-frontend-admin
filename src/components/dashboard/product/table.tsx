@@ -134,7 +134,7 @@ export function ProductsTable() {
   }
   function resetFilters() {
     setFilterDraft({});
-    setAppliedFilters({ page: 1, search: "" });
+    setAppliedFilters({ page: 1, search: "", limit: 10 });
     setFilterSearch("");
   }
 
