@@ -9,6 +9,11 @@ class BannerService {
     return response.data;
   }
 
+  async getById(id:string){
+    const response = await instance.get<ApiResponse<Banner>>(`/banners/${id}`)
+    return response.data;
+  }
+
   async create(data: CreateBanner) {
     const formData = new FormData();
     formData.append('title', data.title);

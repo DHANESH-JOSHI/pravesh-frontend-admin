@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2, Funnel, X, Check } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Funnel, X, Check, Eye } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ import { BannerFormDialog } from "./form-dialog";
 import { bannerService } from "@/services/banner.service";
 import { Banner, CreateBanner, UpdateBanner, BannerQueryOptions } from "@/types/banner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Link } from "next-view-transitions";
 export function BannersTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -305,6 +306,12 @@ export function BannersTable() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild className="gap-2">
+                              <Link href={`/banners/${banner._id}`}>
+                                <Eye className="h-4 w-4" />
+                                View
+                              </Link>
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-2"
                               onClick={() =>

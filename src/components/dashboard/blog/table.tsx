@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2, Funnel, X, Check } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Funnel, X, Check, Eye } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -31,6 +31,8 @@ import { BlogFormDialog } from "./form-dialog";
 import { blogService } from "@/services/blog.service";
 import { Blog, CreateBlog, UpdateBlog, BlogQueryOptions } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Link } from "next-view-transitions";
+import { Badge } from "@/components/ui/badge";
 export function BlogsTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -235,6 +237,8 @@ export function BlogsTable() {
                 <TableHead>Thumbnail</TableHead>
                 <TableHead>Title</TableHead>
                 <TableHead>Slug</TableHead>
+                <TableHead>Published</TableHead>
+                <TableHead>Created</TableHead>
                 <TableHead>Updated</TableHead>
                 {!appliedFilters?.isDeleted && <TableHead className="w-16">Actions</TableHead>}
               </TableRow>
@@ -284,6 +288,10 @@ export function BlogsTable() {
                       <TableCell className="text-muted-foreground font-mono text-sm">
                         {blog.slug}
                       </TableCell>
+                      <TableCell className="text-center font-semibold"><Badge variant="outline">{blog.isPublished ? 'Yes' : 'No'}</Badge></TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {blog.createdAt}
+                      </TableCell>
                       <TableCell className="text-muted-foreground">
                         {blog.updatedAt}
                       </TableCell>
@@ -299,6 +307,12 @@ export function BlogsTable() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                             <DropdownMenuItem asChild className="gap-2">
+                              <Link href={`/blogs/${blog._id}`}>
+                                <Eye className="h-4 w-4" />
+                                View
+                              </Link>
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-2"
                               onClick={() =>
