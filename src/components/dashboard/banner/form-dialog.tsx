@@ -192,11 +192,11 @@ export function BannerFormDialog({
               name="order"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel>Order</FormLabel>
+                  <FormLabel>Priority</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
-                      placeholder="Enter order..."
+                      placeholder="Enter priority level..."
                       {...field}
                       onChange={(e) => field.onChange(Number(e.target.value))}
                     />

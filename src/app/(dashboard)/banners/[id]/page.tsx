@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
-import {Link} from "next-view-transitions";
+import { Link, useTransitionRouter } from "next-view-transitions";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,9 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { bannerService } from "@/services/banner.service";
 import { Banner } from "@/types/banner";
+import { Badge } from "@/components/ui/badge";
 
 export default function BannerDetailPage() {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
   const params = useParams();
+  const router = useTransitionRouter()
   const id = params?.id as string;
 
   const { data, isLoading, isError, refetch } = useQuery({
@@ -53,23 +56,34 @@ export default function BannerDetailPage() {
     );
   }
 
+  const makeUrl = (type: string, { id, url }: { id?: string, url?: string }) => {
+    switch (type) {
+      case "product":
+        return `${baseUrl}/products${id ? `/${id}` : ""}`;
+      case "category":
+        return `${baseUrl}/categories${id ? `/${id}` : ""}`;
+      case "brand":
+        return `${baseUrl}/brands${id ? `/${id}` : ""}`;
+      default:
+        return url || "_";
+    }
+  }
+
+  const redirectUrl = makeUrl(banner.type, { id: banner.targetId, url: banner.targetUrl });
+
   return (
     <div className="p-4 max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/banners">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold">Banner details</h1>
+          <Button variant="outline" size="sm" onClick={() => router.back()} >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <h1 className="text-xl font-bold">{banner._id}</h1>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => refetch()}>Refresh</Button>
-          <Link href={`/banners/${banner._id}/edit`}>
-            <Button>Edit</Button>
-          </Link>
-        </div>
+        <Badge variant={banner.isDeleted ? "destructive" : "secondary"}>
+          {banner.isDeleted ? "Deleted" : "Active"}
+        </Badge>
       </div>
 
       <Card>
@@ -95,19 +109,15 @@ export default function BannerDetailPage() {
               <div className="font-medium">{banner.type ?? "—"}</div>
             </div>
             <div className="space-y-1">
-              <div className="text-sm text-muted-foreground">Order</div>
+              <div className="text-sm text-muted-foreground">Priority</div>
               <div className="font-medium">{banner.order ?? "—"}</div>
             </div>
             <div className="space-y-1">
               <div className="text-sm text-muted-foreground">Link</div>
               <div className="font-medium flex items-center gap-2">
-                {banner.targetUrl ? (
-                  <a href={banner.targetUrl} target="_blank" rel="noreferrer" className="underline">
-                    <LinkIcon className="h-4 w-4" /> {banner.targetUrl}
-                  </a>
-                ) : (
-                  "—"
-                )}
+                <a href={redirectUrl} target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-2">
+                  <LinkIcon className="h-4 w-4" /> <p className="text-sm">{redirectUrl}</p>
+                </a>
               </div>
             </div>
             <div className="space-y-1">
