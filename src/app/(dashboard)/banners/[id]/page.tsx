@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
-import Link from "next/link";
+import {Link} from "next-view-transitions";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
