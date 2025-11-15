@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check, Folder } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check, Image } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
@@ -239,11 +239,11 @@ export function BrandsTable() {
                           <img
                             src={brand.image}
                             alt={brand.name}
-                            className="h-8 w-8 rounded object-cover"
+                            className="h-12 w-12 rounded object-cover"
                           />
                         ) : (
-                          <div className="h-8 w-8 rounded bg-muted flex items-center justify-center">
-                            <Folder className="h-4 w-4 text-muted-foreground" />
+                          <div className="h-12 w-12 rounded bg-muted flex items-center justify-center">
+                            <Image className="text-muted-foreground" />
                           </div>
                         )}
                       </TableCell>

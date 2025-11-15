@@ -49,7 +49,7 @@ export function BrandFormDialog({
     ),
     defaultValues: {
       name: initialData?.name || "",
-      categoryIds: initialData?.categories as string[],
+      categoryIds: initialData?.categories as string[] || [],
       image: undefined,
     },
   });

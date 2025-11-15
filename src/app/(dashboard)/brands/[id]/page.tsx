@@ -20,7 +20,7 @@ import { PaginationControls } from "@/components/dashboard/common/pagination-con
 import { brandService } from "@/services/brand.service";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import Loader from "@/components/ui/loader";
-import { Category } from "@/types";
+import Image from "next/image";
 
 export default function BrandDetailPage() {
   const router = useTransitionRouter()
@@ -161,7 +161,7 @@ export default function BrandDetailPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Slug</TableHead>
+                    <TableHead>Path</TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead>Updated</TableHead>
@@ -170,10 +170,10 @@ export default function BrandDetailPage() {
                 </TableHeader>
                 <TableBody>
                   {(brand.categories || [])
-                    .map((category:any) => (
+                    .map((category: any) => (
                       <TableRow key={category._id}>
                         <TableCell className="font-medium">
-                          {category.slug}
+                          {category.path.join(" > ")}
                         </TableCell>
                         <TableCell className="font-medium">
                           {category.title}
@@ -231,13 +231,13 @@ export default function BrandDetailPage() {
                     .map((product) => (
                       <TableRow key={product._id}>
                         <TableCell className="w-16">
-                          {product.thumbnail ? (
-                            <img
-                              src={product.thumbnail}
-                              alt={product.name}
-                              className="h-10 w-10 rounded object-cover"
-                            />
-                          ):<ImageIcon/>}
+                          {product.thumbnail ? <Image
+                            src={product.thumbnail || "/placeholder.svg"}
+                            width={56}
+                            height={56}
+                            alt={product.name || "Product"}
+                            className="h-12 w-12 rounded-md object-cover"
+                          /> : <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center"><ImageIcon className="text-muted-foreground" /></div>}
                         </TableCell>
                         <TableCell className="font-medium w-16">
                           {product.sku}

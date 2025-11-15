@@ -14,6 +14,7 @@ export type Category = {
   title: string;
   // image?: string;
   isDeleted: boolean;
+  path:string[];
   createdAt: string;
   updatedAt: string;
   brands: (string | Partial<Brand>)[];
@@ -21,6 +22,7 @@ export type Category = {
   // relations
   childCount?: number;
   productCount?: number;
+  brandCount?: number;
   children?: Partial<Category>[];
   products?: Partial<Product>[];
 };

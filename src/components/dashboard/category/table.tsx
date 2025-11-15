@@ -260,7 +260,7 @@ export function CategoriesTable() {
                         {category.childCount}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {category.brands.length}
+                        {category.brandCount}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {category.productCount}

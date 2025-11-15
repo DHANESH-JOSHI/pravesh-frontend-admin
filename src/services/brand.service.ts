@@ -17,11 +17,14 @@ class BrandService {
 
   async create(data: CreateBrand) {
     const formData = new FormData();
+    console.log("Creating brand with data:", data);
     formData.append('name', data.name);
     if (data.image && data.image instanceof File) {
       formData.append('image', data.image);
     }
-    formData.append('categoryIds', JSON.stringify(data.categoryIds));
+    if (data.categoryIds) {
+      formData.append('categoryIds', JSON.stringify(data.categoryIds));
+    }
     const response = await instance.post<ApiResponse<Brand>>("/brands", formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -38,7 +41,9 @@ class BrandService {
     if (data.image && data.image instanceof File) {
       formData.append('image', data.image);
     }
-    formData.append('categoryIds', JSON.stringify(data.categoryIds));
+    if (data.categoryIds) {
+      formData.append('categoryIds', JSON.stringify(data.categoryIds));
+    }
 
     const response = await instance.patch<ApiResponse<Brand>>(`/brands/${id}`, formData, {
       headers: {

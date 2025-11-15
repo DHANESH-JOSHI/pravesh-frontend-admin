@@ -239,9 +239,15 @@ export default function CategoryDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Category Title</label>
-                <p className="text-lg font-semibold">{category.title}</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Category Title</label>
+                  <p className="text-lg font-semibold">{category.title}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Path</label>
+                  <p className="text-lg font-semibold">{category.path.join(" > ")}</p>
+                </div>
               </div>
 
               {/* Statistics */}
@@ -445,7 +451,7 @@ export default function CategoryDetailPage() {
                               height={56}
                               alt={product.name}
                               className="h-12 w-12 rounded-md object-cover"
-                            /> : <ImageIcon />}
+                            /> : <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center"><ImageIcon className="text-muted-foreground" /></div>}
                           </TableCell>
                           <TableCell className="text-left">{product.sku}</TableCell>
                           <TableCell className="font-medium max-w-[256px] text-left">

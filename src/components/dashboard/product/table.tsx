@@ -376,7 +376,7 @@ export function ProductsTable() {
                           height={56}
                           alt={product.name}
                           className="h-12 w-12 rounded-md object-cover"
-                        /> : <ImageIcon />}
+                        /> : <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center"><ImageIcon className="text-muted-foreground" /></div>}
                       </TableCell>
                       <TableCell className="text-left">{product.sku}</TableCell>
                       <TableCell className="font-medium max-w-[256px] text-left">
