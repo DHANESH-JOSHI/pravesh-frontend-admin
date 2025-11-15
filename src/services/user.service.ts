@@ -12,7 +12,7 @@ class UserService {
     const response = await instance.get<ApiResponse<PaginatedUsers>>("/users", {
       params: {
         ...options,
-        role: "user"
+        role: options?.role || "user"
       }
     });
     return response.data;
