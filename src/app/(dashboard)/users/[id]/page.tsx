@@ -183,7 +183,7 @@ export default function UserDetailPage() {
       )}
 
       {/* Cart Information */}
-      {user.cart && (
+      {/* {user.cart && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -204,7 +204,7 @@ export default function UserDetailPage() {
             </div>
           </CardContent>
         </Card>
-      )}
+      )} */}
 
       {/* Addresses Table */}
       {user.addresses && user.addresses.length > 0 && (
@@ -287,7 +287,7 @@ export default function UserDetailPage() {
       )}
 
       {/* Wishlist */}
-      {user.wishlist && (
+      {/* {user.wishlist && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -308,7 +308,7 @@ export default function UserDetailPage() {
             </div>
           </CardContent>
         </Card>
-      )}
+      )} */}
 
       {/* Orders Table */}
       {user.orders && user.orders.length > 0 && (
