@@ -60,7 +60,7 @@ export default function OrderDetailPage() {
       const data = await orderService.updateOrder(order?._id!, values);
       return data;
     },
-    onSuccess: ({message}) => {
+    onSuccess: ({ message }) => {
       toast.success(message ?? "Order updated.");
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       setOpen(false);
@@ -122,7 +122,7 @@ export default function OrderDetailPage() {
           </Button>
           <h1 className="text-xl font-bold">{order._id}</h1>
         </div>
-        <Button size="sm" onClick={() => setOpen(true)}>
+        <Button size="sm" onClick={() => setOpen(true)} disabled={order.status !== 'received'}>
           <Edit className="h-4 w-4 mr-2" />
           Edit
         </Button>
