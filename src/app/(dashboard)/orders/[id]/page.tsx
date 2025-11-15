@@ -33,11 +33,11 @@ export default function OrderDetailPage() {
 
 
   const order = data?.data;
-  console.log({order})
+  console.log({ order })
 
   const { mutate: updateStatus } = useMutation({
     mutationFn: (status: OrderStatus) => orderService.updateOrderStatus(orderId, status),
-    onSuccess: (_, status) => {
+    onSuccess: ({ message }, status) => {
       queryClient.cancelQueries({ queryKey: ["order", orderId] });
       queryClient.setQueryData(["order", orderId], (oldData: ApiResponse<Order>) => {
         return {
@@ -48,26 +48,25 @@ export default function OrderDetailPage() {
           },
         };
       })
-      toast.success("Order status updated successfully");
+      toast.success(message ?? "Order status updated successfully");
     },
-    onError: () => {
-      toast.error("Failed to update order status");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to update order status");
     }
   })
 
   const updatemutation = useMutation({
     mutationFn: async (values: AdminUpdateOrder) => {
-      if (!order) return;
-      const data = await orderService.updateOrder(order._id, values);
-      return data.data;
+      const data = await orderService.updateOrder(order?._id!, values);
+      return data;
     },
-    onSuccess: () => {
-      toast.success("Order updated successfully!");
+    onSuccess: ({message}) => {
+      toast.success(message ?? "Order updated.");
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       setOpen(false);
     },
-    onError: () => {
-      toast.error("Failed to update order. Please try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to update order.");
     },
   });
 
@@ -97,17 +96,21 @@ export default function OrderDetailPage() {
   const totalAmount = order.items.reduce((acc, item) => {
     return acc + (item.price || 0) * item.quantity;
   }, 0);
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "processing": return "bg-yellow-100 text-yellow-800";
-      case "shipped": return "bg-blue-100 text-blue-800";
-      case "delivered": return "bg-green-100 text-green-800";
-      case "cancelled": return "bg-red-100 text-red-800";
-      case "awaiting_confirmation": return "bg-orange-100 text-orange-800";
-      case "awaiting_payment": return "bg-purple-100 text-purple-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
+
+  const STATUS_COLORS: Record<string, string> = {
+    received: "bg-orange-100 text-orange-800",
+    approved: "bg-purple-100 text-purple-800",
+    confirmed: "bg-yellow-100 text-yellow-800",
+    shipped: "bg-blue-100 text-blue-800",
+    out_for_delivery: "bg-indigo-100 text-indigo-800",
+    delivered: "bg-green-100 text-green-800",
+    cancelled: "bg-red-100 text-red-800",
+    refunded: "bg-pink-100 text-pink-800",
   };
+
+  const getStatusColor = (status: string) =>
+    STATUS_COLORS[status.toLowerCase()] ?? "bg-gray-100 text-gray-800";
+
 
   return (
     <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
@@ -173,12 +176,14 @@ export default function OrderDetailPage() {
                 <SelectValue className={getStatusColor(order.status)} placeholder={`${order.status}`} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="processing"><Badge className={getStatusColor("processing")}>Processing</Badge></SelectItem>
-                <SelectItem value="shipped"><Badge className={getStatusColor("shipped")}>Shipped</Badge></SelectItem>
-                <SelectItem value="delivered"><Badge className={getStatusColor("delivered")}>Delivered</Badge></SelectItem>
+                <SelectItem value="received"><Badge className={getStatusColor("received")}>Received</Badge></SelectItem>
+                <SelectItem value="approved"><Badge className={getStatusColor("approved")}>Approved</Badge></SelectItem>
+                <SelectItem value="confirmed"><Badge className={getStatusColor("confirmed")}>Confirmed</Badge></SelectItem>
                 <SelectItem value="cancelled"><Badge className={getStatusColor("cancelled")}>Cancelled</Badge></SelectItem>
-                <SelectItem value="awaiting_confirmation"><Badge className={getStatusColor("awaiting_confirmation")}>Awaiting Confirmation</Badge></SelectItem>
-                <SelectItem value="awaiting_payment"><Badge className={getStatusColor("awaiting_payment")}>Awaiting Payment</Badge></SelectItem>
+                <SelectItem value="shipped"><Badge className={getStatusColor("shipped")}>Shipped</Badge></SelectItem>
+                <SelectItem value="out_for_delivery"><Badge className={getStatusColor("out_for_delivery")}>Out for Delivery</Badge></SelectItem>
+                <SelectItem value="delivered"><Badge className={getStatusColor("delivered")}>Delivered</Badge></SelectItem>
+                <SelectItem value="refunded"><Badge className={getStatusColor("refunded")}>Refunded</Badge></SelectItem>
               </SelectContent>
             </Select>
           </CardContent>

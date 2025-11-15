@@ -53,44 +53,43 @@ export function BlogsTable() {
 
   const deleteMutation = useMutation({
     mutationFn: blogService.delete,
-    onSuccess: () => {
+    onSuccess: ({ message }) => {
       setIsOpen(false);
-      toast.success("Blog deleted successfully");
+      toast.success(message ?? "Blog deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["blogs"], exact: false });
     },
-    onError: () => {
+    onError: (error: any) => {
       setIsOpen(false);
-      toast.error("Failed to delete blog. Please try again.");
+      toast.error(error.response.data.message ?? "Failed to delete blog. Please try again.");
     },
   });
 
   const updatemutation = useMutation({
     mutationFn: async (values: UpdateBlog) => {
-      if (!editingBlog) return;
-      const data = await blogService.update(editingBlog._id, values);
-      return data.data;
+      const data = await blogService.update(editingBlog?._id!, values);
+      return data;
     },
-    onSuccess: () => {
-      toast.success("Blog updated successfully!");
+    onSuccess: ({ message }) => {
+      toast.success(message ?? "Blog updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
       setEditingBlog(null);
     },
-    onError: () => {
-      toast.error("Failed to update blog. Please try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to update blog. Please try again.");
     },
   });
   const createMutation = useMutation({
     mutationFn: async (values: CreateBlog) => {
       const data = await blogService.create(values);
-      return data.data;
+      return data;
     },
-    onSuccess: () => {
-      toast.success("Blog created successfully!");
+    onSuccess: ({message}) => {
+      toast.success(message ?? "Blog created successfully!");
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
       setIsCreateDialogOpen(false);
     },
-    onError: () => {
-      toast.error("Failed to create blog. Please try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to create blog. Please try again.");
     },
   });
 

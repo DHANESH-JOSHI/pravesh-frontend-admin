@@ -50,25 +50,25 @@ export function UsersTable() {
 
   const deleteMutation = useMutation({
     mutationFn: userService.deleteById,
-    onSuccess: () => {
+    onSuccess: ({ message }) => {
       setIsOpen(false);
-      toast.success("User deleted successfully");
+      toast.success(message ?? "User deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["users"], exact: false });
     },
-    onError: () => {
+    onError: (error: any) => {
       setIsOpen(false);
-      toast.error("Failed to delete user. Please try again.");
+      toast.error(error.response.data.message ?? "Failed to delete user. Please try again.");
     },
   });
 
   const createMutation = useMutation({
     mutationFn: userService.createVerifiedUser,
-    onSuccess: () => {
-      toast.success("User created successfully");
+    onSuccess: ({ message }) => {
+      toast.success(message ?? "User created successfully");
       queryClient.invalidateQueries({ queryKey: ["users"], exact: false });
     },
-    onError: () => {
-      toast.error("Failed to create user. Please try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to create user. Please try again.");
     },
   });
 

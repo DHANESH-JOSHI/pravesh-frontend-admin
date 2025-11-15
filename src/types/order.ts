@@ -4,12 +4,14 @@ import { Product } from "./product";
 import { PaginatedData, User } from ".";
 
 export const orderStatusSchema = z.enum([
-  "processing",
-  "shipped",
-  "delivered",
+  "received",
+  "approved",
   "cancelled",
-  "awaiting_confirmation",
-  "awaiting_payment",
+  "confirmed",
+  "shipped",
+  "out_for_delivery",
+  "delivered",
+  "refunded",
 ]);
 export type OrderStatus = z.infer<typeof orderStatusSchema>;
 
@@ -25,6 +27,11 @@ type OrderItem = {
   price: number;
 }
 
+type OrderHistoryItem = {
+  status: OrderStatus;
+  timestamp: Date;
+}
+
 export type Order = {
   _id: string;
   user: string | Partial<User>;
@@ -32,6 +39,7 @@ export type Order = {
   totalAmount: number;
   shippingAddress: string | Partial<Address>;
   status: OrderStatus;
+  history: OrderHistoryItem[];
   isCustomOrder: boolean;
   image?: string;
   feedback?: string;
@@ -53,7 +61,6 @@ export const adminUpdateOrderSchema = z.object({
       orderUpdateItemSchema
     )
     .optional(),
-  status: orderStatusSchema.optional(),
   feedback: z.string().optional(),
 });
 

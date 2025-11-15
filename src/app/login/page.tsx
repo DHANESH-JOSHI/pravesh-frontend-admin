@@ -47,28 +47,28 @@ export default function LoginPage() {
 
   const { mutate: sendOtp, isPending: isSendingOtp } = useMutation({
     mutationFn: (phoneOrEmail: string) => authService.requestForOtp(phoneOrEmail),
-    onSuccess: () => {
-      toast.success("OTP sent to your email");
+    onSuccess: ({ message }) => {
+      toast.success(message ?? "OTP sent to your email");
       setShowOTP(true);
     },
-    onError: () => {
-      toast.error("Failed to send OTP. Please try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to send OTP.");
     },
   });
 
   const { mutate: loginWithPassword, isPending: isLoggingIn } = useMutation({
     mutationFn: async (data: Login) => {
       const response = await authService.login(data);
-      return response.data;
+      return response;
     },
-    onSuccess: (data) => {
+    onSuccess: ({ data, message }) => {
       if (!data) return;
       login(data);
-      toast.success("Logged in");
+      toast.success(message ?? "Logged in");  
       router.push("/");
     },
-    onError: () => {
-      toast.error("Failed to login. Check credentials and try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to login. Check credentials and try again.");
     },
   });
 

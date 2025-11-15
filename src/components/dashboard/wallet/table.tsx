@@ -53,16 +53,16 @@ export function WalletsTable() {
   const addFundsMutation = useMutation({
     mutationFn: async (data: { userId: string; amount: number; description?: string }) => {
       const result = await walletService.addFunds(data);
-      return result.data;
+      return result;
     },
-    onSuccess: () => {
-      toast.success("Funds added successfully!");
+    onSuccess: ({ message }) => {
+      toast.success(message ?? "Funds added successfully!");
       queryClient.invalidateQueries({ queryKey: ["wallets"] });
       setEditingWallet(null);
       setViewOpen(false);
     },
-    onError: () => {
-      toast.error("Failed to add funds. Please try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to add funds. Please try again.");
     },
   });
 

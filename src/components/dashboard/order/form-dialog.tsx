@@ -56,7 +56,6 @@ export function OrderFormDialog({
     resolver: zodResolver(adminUpdateOrderSchema),
     defaultValues: {
       feedback: initialData?.feedback || "",
-      status: initialData?.status,
       items: initialData?.items?.map((item) => ({
         product: (item.product as Product)._id,
         quantity: item.quantity,
@@ -101,7 +100,7 @@ export function OrderFormDialog({
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-6 w-full"
           >
-            <FormField
+            {/* <FormField
               control={form.control}
               name="status"
               render={({ field }) => (
@@ -124,7 +123,7 @@ export function OrderFormDialog({
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             {initialData?.isCustomOrder && <FormItem className="space-y-2">
               <FormLabel>Image</FormLabel>

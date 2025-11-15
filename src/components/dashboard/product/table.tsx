@@ -74,50 +74,49 @@ export function ProductsTable() {
 
   const deleteMutation = useMutation({
     mutationFn: productService.delete,
-    onSuccess: () => {
+    onSuccess: ({message}) => {
       setIsOpen(false);
-      toast.success("Product deleted successfully");
+      toast.success(message ?? "Product deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["category"] });
       queryClient.invalidateQueries({ queryKey: ["brand"] });
     },
-    onError: () => {
+    onError: (error: any) => {
       setIsOpen(false);
-      toast.error("Failed to delete product. Please try again.");
+      toast.error(error.response.data.message ?? "Failed to delete product. Please try again.");
     },
   });
 
   const updatemutation = useMutation({
     mutationFn: async (values: UpdateProduct) => {
-      if (!editingProduct) return;
-      const data = await productService.update(editingProduct._id, values);
-      return data.data;
+      const data = await productService.update(editingProduct?._id!, values);
+      return data;
     },
-    onSuccess: () => {
-      toast.success("Product updated successfully!");
+    onSuccess: ({message}) => {
+      toast.success(message ?? "Product updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["category"] });
       queryClient.invalidateQueries({ queryKey: ["brand"] });
       setEditingProduct(null);
     },
-    onError: () => {
-      toast.error("Failed to update product. Please try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to update product. Please try again.");
     },
   });
   const createMutation = useMutation({
     mutationFn: async (values: CreateProduct) => {
       const data = await productService.create(values);
-      return data.data;
+      return data;
     },
-    onSuccess: () => {
-      toast.success("Product created successfully!");
+    onSuccess: ({message}) => {
+      toast.success(message ?? "Product created successfully!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["category"] });
       queryClient.invalidateQueries({ queryKey: ["brand"] });
       setIsCreateDialogOpen(false);
     },
-    onError: () => {
-      toast.error("Failed to create product. Please try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to create product. Please try again.");
     },
   });
 

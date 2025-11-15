@@ -39,16 +39,16 @@ export function InputOTPForm({ phoneOrEmail }: { phoneOrEmail: string }) {
   const { mutate, isPending } = useMutation({
     mutationFn: async (values: VerifyOtp) => {
       const data = await authService.loginViaOtp(values.phoneOrEmail, values.otp)
-      return data.data;
+      return data;
     },
-    onSuccess: (data) => {
+    onSuccess: ({ data }) => {
       if (!data) return;
       login(data);
       toast.success("Login successful!")
       router.push("/");
     },
-    onError: () => {
-      toast.error("Invalid OTP. Please try again.")
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Invalid OTP. Please try again.")
     },
   })
 

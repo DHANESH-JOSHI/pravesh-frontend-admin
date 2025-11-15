@@ -72,47 +72,46 @@ export function BrandsTable() {
 
   const deleteMutation = useMutation({
     mutationFn: brandService.delete,
-    onSuccess: () => {
+    onSuccess: ({message}) => {
       setIsOpen(false);
-      toast.success("Brand deleted successfully");
+      toast.success(message ?? "Brand deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["brands"] });
       queryClient.invalidateQueries({ queryKey: ["category"] });
     },
-    onError: () => {
+    onError: (error: any) => {
       setIsOpen(false);
-      toast.error("Failed to delete brand. Please try again.");
+      toast.error(error.response.data.message ?? "Failed to delete brand. Please try again.");
     },
   });
 
   const updatemutation = useMutation({
     mutationFn: async (values: UpdateBrand) => {
-      if (!editingBrand) return;
-      const data = await brandService.update(editingBrand._id, values);
-      return data.data;
+      const data = await brandService.update(editingBrand?._id!, values);
+      return data;
     },
-    onSuccess: () => {
-      toast.success("Brand updated successfully!");
+    onSuccess: ({message}) => {
+      toast.success(message ?? "Brand updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["brands"] });
       queryClient.invalidateQueries({ queryKey: ["category"] });
       setEditingBrand(null);
     },
-    onError: () => {
-      toast.error("Failed to update brand. Please try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to update brand. Please try again.");
     },
   });
   const createMutation = useMutation({
     mutationFn: async (values: CreateBrand) => {
       const data = await brandService.create(values);
-      return data.data;
+      return data;
     },
-    onSuccess: () => {
-      toast.success("Brand created successfully!");
+    onSuccess: ({message}) => {
+      toast.success(message ?? "Brand created successfully!");
       queryClient.invalidateQueries({ queryKey: ["brands"] });
       queryClient.invalidateQueries({ queryKey: ["category"] });
       setIsCreateDialogOpen(false);
     },
-    onError: () => {
-      toast.error("Failed to create brand. Please try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to create brand. Please try again.");
     },
   });
 

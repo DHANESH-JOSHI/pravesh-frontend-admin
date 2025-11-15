@@ -61,25 +61,24 @@ export default function CategoryDetailPage() {
   const category = data?.data as Category;
   const deleteMutation = useMutation({
     mutationFn: categoryService.delete,
-    onSuccess: () => {
+    onSuccess: ({ message }) => {
       setIsOpen(false);
-      toast.success("Category deleted successfully");
+      toast.success(message ?? "Category deleted.");
       queryClient.invalidateQueries({ queryKey: ["categories"] })
     },
-    onError: () => {
+    onError: (error: any) => {
       setIsOpen(false);
-      toast.error("Failed to delete category. Please try again.");
+      toast.error(error.response.data.message ?? "Failed to delete category.");
     },
   });
 
   const updatemutation = useMutation({
     mutationFn: async (values: UpdateCategory) => {
-      if (!editingCategory) return;
-      const data = await categoryService.update(editingCategory._id, values);
-      return data.data;
+      const data = await categoryService.update(editingCategory?._id!, values);
+      return data;
     },
-    onSuccess: (updatedCategory) => {
-      toast.success("Category updated successfully!");
+    onSuccess: ({ data: updatedCategory, message }) => {
+      toast.success(message ?? "Category updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       queryClient.setQueryData(["category", categoryId], (oldData: ApiResponse<Category>) => ({
         ...oldData,
@@ -93,17 +92,17 @@ export default function CategoryDetailPage() {
       }));
       setEditingCategory(null);
     },
-    onError: () => {
-      toast.error("Failed to update category. Please try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to update category.");
     },
   });
   const createMutation = useMutation({
     mutationFn: async (values: CreateCategory) => {
       const data = await categoryService.create({ ...values, parentCategoryId: categoryId });
-      return data.data;
+      return data;
     },
-    onSuccess: (createdCategory) => {
-      toast.success("Category created successfully!");
+    onSuccess: ({ data: createdCategory, message }) => {
+      toast.success(message ?? "Category created successfully!");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       queryClient.setQueryData(["category", categoryId], (oldData: ApiResponse<Category>) => ({
         ...oldData,
@@ -117,8 +116,8 @@ export default function CategoryDetailPage() {
       }));
       setIsCreateDialogOpen(false);
     },
-    onError: () => {
-      toast.error("Failed to create category. Please try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to create category.");
     },
   });
   if (isLoading || isProductsLoading) {

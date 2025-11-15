@@ -52,44 +52,43 @@ export function BannersTable() {
 
   const deleteMutation = useMutation({
     mutationFn: bannerService.delete,
-    onSuccess: () => {
+    onSuccess: ({ message }) => {
       setIsOpen(false);
-      toast.success("Banner deleted successfully");
+      toast.success(message ?? "Banner deleted.");
       queryClient.invalidateQueries({ queryKey: ["banners"], exact: false });
     },
-    onError: () => {
+    onError: (error: any) => {
       setIsOpen(false);
-      toast.error("Failed to delete banner. Please try again.");
+      toast.error(error.response.data.message ?? "Failed to delete banner.");
     },
   });
 
   const updatemutation = useMutation({
     mutationFn: async (values: UpdateBanner) => {
-      if (!editingBanner) return;
-      const data = await bannerService.update(editingBanner._id, values);
-      return data.data;
+      const data = await bannerService.update(editingBanner?._id!, values);
+      return data;
     },
-    onSuccess: () => {
-      toast.success("Banner updated successfully!");
+    onSuccess: ({ message }) => {
+      toast.success(message ?? "Banner updated.");
       queryClient.invalidateQueries({ queryKey: ["banners"] });
       setEditingBanner(null);
     },
-    onError: () => {
-      toast.error("Failed to update banner. Please try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to update banner.");
     },
   });
   const createMutation = useMutation({
     mutationFn: async (values: CreateBanner) => {
       const data = await bannerService.create(values);
-      return data.data;
+      return data;
     },
-    onSuccess: () => {
-      toast.success("Banner created successfully!");
+    onSuccess: ({ message }) => {
+      toast.success(message ?? "Banner created.");
       queryClient.invalidateQueries({ queryKey: ["banners"] });
       setIsCreateDialogOpen(false);
     },
-    onError: () => {
-      toast.error("Failed to create banner. Please try again.");
+    onError: (error: any) => {
+      toast.error(error.response.data.message ?? "Failed to create banner.");
     },
   });
 
