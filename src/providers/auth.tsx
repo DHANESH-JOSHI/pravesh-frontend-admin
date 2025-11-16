@@ -23,8 +23,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       try {
         const res = await userService.getMe();
+        if (res.data?.role === "user") {
+          logout()
+        }
         setUser(res?.data || null);
-      } catch (e:any) {
+      } catch (e: any) {
         setUser(null);
       } finally {
         setLoading(false);

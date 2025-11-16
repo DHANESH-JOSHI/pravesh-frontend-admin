@@ -14,14 +14,14 @@ import { Link } from "next-view-transitions"
 import { User } from "@/types"
 const items = [
   {
-    title: "Brands",
-    url: "/brands",
-    icon: Building2,
-  },
-  {
     title: "Categories",
     url: "/categories",
     icon: FolderOpen,
+  },
+  {
+    title: "Brands",
+    url: "/brands",
+    icon: Building2,
   },
   {
     title: "Products",
