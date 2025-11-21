@@ -69,6 +69,7 @@ export function BannerFormDialog({
   useEffect(() => {
     if (open) {
       form.reset()
+      setImagePreview(null)
     }
 
   }, [open, form])

@@ -42,7 +42,6 @@ import { FormDialogProps } from "@/types";
 // import { Textarea } from "@/components/ui/textarea";
 import { useQuery } from "@tanstack/react-query";
 import { brandService } from "@/services/brand.service";
-import { categoryService } from "@/services/category.service";
 import { Brand } from "@/types/brand";
 import { Category } from "@/types/category";
 import { Switch } from "@/components/ui/switch";
@@ -110,6 +109,7 @@ export function ProductFormDialog({
   useEffect(()=>{
     if(open){
       form.reset()
+      setThumbnailPreview(null)
     }
 
   },[open,form])

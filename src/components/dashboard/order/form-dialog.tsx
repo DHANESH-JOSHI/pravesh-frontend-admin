@@ -21,7 +21,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Command,
@@ -35,7 +34,6 @@ import {
   AdminUpdateOrder,
   type Order,
   adminUpdateOrderSchema,
-  orderStatusSchema,
 } from "@/types/order";
 import { FormDialogProps } from "@/types";
 import { useQuery } from "@tanstack/react-query";

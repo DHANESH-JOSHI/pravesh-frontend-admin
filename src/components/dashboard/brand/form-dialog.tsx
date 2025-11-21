@@ -56,6 +56,7 @@ export function BrandFormDialog({
   useEffect(() => {
     if (open) {
       form.reset()
+      setImagePreview(null)
     }
 
   }, [open, form])

@@ -55,6 +55,7 @@ export function BlogFormDialog({
   useEffect(() => {
     if (open) {
       form.reset()
+      setFeaturedImagePreview(null)
     }
 
   }, [open, form])
