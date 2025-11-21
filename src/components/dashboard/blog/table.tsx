@@ -271,7 +271,7 @@ export function BlogsTable() {
                     <TableCell className="text-muted-foreground font-mono text-sm">
                       {blog.slug}
                     </TableCell>
-                    <TableCell className="text-center font-semibold"><Badge variant="outline">{blog.isPublished ? 'Yes' : 'No'}</Badge></TableCell>
+                    <TableCell className="font-semibold"><Badge variant="outline">{blog.isPublished ? 'Yes' : 'No'}</Badge></TableCell>
                     <TableCell className="text-muted-foreground">
                       {new Date(blog.createdAt).toLocaleDateString("en-GB", {
                         day: "2-digit",
