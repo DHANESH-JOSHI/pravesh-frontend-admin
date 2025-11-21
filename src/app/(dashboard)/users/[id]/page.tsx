@@ -216,7 +216,7 @@ export default function UserDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border">
+            <div className="rounded border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -324,25 +324,25 @@ export default function UserDetailPage() {
           <CardContent>
             {/* Order Statistics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="text-center p-4 bg-green-50 rounded">
                 <p className="text-2xl font-bold text-green-600">
                   {user.orders.filter(order => order.status === "delivered").length}
                 </p>
                 <p className="text-sm text-muted-foreground">Completed</p>
               </div>
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-center p-4 bg-blue-50 rounded">
                 <p className="text-2xl font-bold text-blue-600">
                   {user.orders.filter(order => ["pending", "processing", "shipped"].includes(order.status || "")).length}
                 </p>
                 <p className="text-sm text-muted-foreground">In Progress</p>
               </div>
-              <div className="text-center p-4 bg-yellow-50 rounded-lg">
+              <div className="text-center p-4 bg-yellow-50 rounded">
                 <p className="text-2xl font-bold text-yellow-600">
                   {user.orders.filter(order => order.status === "cancelled").length}
                 </p>
                 <p className="text-sm text-muted-foreground">Cancelled</p>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
+              <div className="text-center p-4 bg-gray-50 rounded">
                 <p className="text-2xl font-bold text-gray-600">
                   {user.orders.length}
                 </p>
@@ -350,7 +350,7 @@ export default function UserDetailPage() {
               </div>
             </div>
 
-            <div className="rounded-md border">
+            <div className="rounded border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -426,19 +426,19 @@ export default function UserDetailPage() {
           <CardContent>
             {/* Review Statistics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="text-center p-4 bg-yellow-50 rounded-lg">
+              <div className="text-center p-4 bg-yellow-50 rounded">
                 <p className="text-2xl font-bold text-yellow-600">
                   {(user.reviews.reduce((acc, review) => acc + (review.rating || 0), 0) / user.reviews.length).toFixed(1)}
                 </p>
                 <p className="text-sm text-muted-foreground">Average Rating</p>
               </div>
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-center p-4 bg-blue-50 rounded">
                 <p className="text-2xl font-bold text-blue-600">
                   {user.reviews.length}
                 </p>
                 <p className="text-sm text-muted-foreground">Total Reviews</p>
               </div>
-              <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="text-center p-4 bg-green-50 rounded">
                 <p className="text-2xl font-bold text-green-600">
                   {user.reviews.filter(review => review.rating && review.rating >= 4).length}
                 </p>
@@ -446,7 +446,7 @@ export default function UserDetailPage() {
               </div>
             </div>
 
-            <div className="rounded-md border">
+            <div className="rounded border">
               <Table>
                 <TableHeader>
                   <TableRow>

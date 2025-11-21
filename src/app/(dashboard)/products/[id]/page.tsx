@@ -109,7 +109,7 @@ export default function ProductDetailPage() {
               <img
                 src={product.thumbnail}
                 alt={product.name}
-                className="w-full object-cover rounded-lg border"
+                className="w-full object-cover rounded border"
               />
             ) : <Images className="w-20 h-20" />}
             {/*{product.images && product.images.length > 0 && (
@@ -371,7 +371,7 @@ export default function ProductDetailPage() {
                 {Object.entries(product.specifications).map(([key, value], index) => (
                   <div
                     key={key}
-                    className={`flex justify-between items-center py-3 px-4 rounded-lg ${index % 2 === 0 ? 'bg-muted/30' : 'bg-background'
+                    className={`flex justify-between items-center py-3 px-4 rounded ${index % 2 === 0 ? 'bg-muted/30' : 'bg-background'
                       }`}
                   >
                     <span className="font-medium text-sm">{key}</span>
@@ -432,7 +432,7 @@ export default function ProductDetailPage() {
         <CardContent>
           {reviews.length > 0 ? (
             <>
-              <div className="rounded-md border">
+              <div className="rounded border">
                 <Table>
                   <TableHeader>
                     <TableRow>

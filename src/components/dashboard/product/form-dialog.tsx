@@ -373,7 +373,7 @@ export function ProductFormDialog({
                         control={form.control}
                         name="isFeatured"
                         render={({ field }) => (
-                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                          <FormItem className="flex flex-row items-center justify-between rounded border p-3 shadow-sm">
                             <FormLabel className="mr-4">Featured</FormLabel>
                             <FormControl>
                               <Switch
@@ -388,7 +388,7 @@ export function ProductFormDialog({
                         control={form.control}
                         name="isNewArrival"
                         render={({ field }) => (
-                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                          <FormItem className="flex flex-row items-center justify-between rounded border p-3 shadow-sm">
                             <FormLabel className="mr-4">New Arrival</FormLabel>
                             <FormControl>
                               <Switch

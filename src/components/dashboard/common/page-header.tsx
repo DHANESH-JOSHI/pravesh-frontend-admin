@@ -14,7 +14,7 @@ export function PageHeader({ title, subtitle, icon: Icon }: Props) {
         {Icon ? (
           <div
             className={cn(
-              "inline-flex items-center justify-center rounded-xl shadow-sm",
+              "inline-flex items-center justify-center rounded shadow-sm",
               "size-10 md:size-12 bg-linear-to-br from-primary/75 to-primary/15 text-secondary ring-1 ring-primary/20",
             )}
           >

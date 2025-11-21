@@ -174,10 +174,10 @@ export default function CategoryDetailPage() {
                     <img
                       src={category.parentCategory.image}
                       alt={category.parentCategory.title}
-                      className="h-12 w-12 rounded-lg object-cover border"
+                      className="h-12 w-12 rounded object-cover border"
                     />
                   ) : (
-                    <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
+                    <div className="h-12 w-12 rounded bg-muted flex items-center justify-center">
                       <Folder className="h-6 w-6 text-muted-foreground" />
                     </div>
                   )}*/}
@@ -219,10 +219,10 @@ export default function CategoryDetailPage() {
               <img
                 src={category.image}
                 alt={category.title}
-                className="w-full h-48 object-cover rounded-lg border"
+                className="w-full h-48 object-cover rounded border"
               />
             ) : (
-              <div className="w-full h-48 bg-muted rounded-lg flex items-center justify-center">
+              <div className="w-full h-48 bg-muted rounded flex items-center justify-center">
                 <ImageIcon className="h-12 w-12 text-muted-foreground" />
               </div>
             )}
@@ -299,7 +299,7 @@ export default function CategoryDetailPage() {
         </CardHeader>
         <CardContent>
           {
-            category.children && category.children.length > 0 && (<div className="rounded-md border">
+            category.children && category.children.length > 0 && (<div className="rounded border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -354,7 +354,7 @@ export default function CategoryDetailPage() {
         </CardHeader>
         <CardContent>
           {
-            category.brands && category.brands.length > 0 && (<div className="rounded-md border">
+            category.brands && category.brands.length > 0 && (<div className="rounded border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -424,7 +424,7 @@ export default function CategoryDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border">
+              <div className="rounded border">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -450,8 +450,8 @@ export default function CategoryDetailPage() {
                               width={56}
                               height={56}
                               alt={product.name}
-                              className="h-12 w-12 rounded-md object-cover"
-                            /> : <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center"><ImageIcon className="text-muted-foreground" /></div>}
+                              className="h-12 w-12 rounded object-cover"
+                            /> : <div className="h-12 w-12 rounded bg-muted flex items-center justify-center"><ImageIcon className="text-muted-foreground" /></div>}
                           </TableCell>
                           <TableCell className="text-left">{product.sku}</TableCell>
                           <TableCell className="font-medium max-w-[256px] text-left">

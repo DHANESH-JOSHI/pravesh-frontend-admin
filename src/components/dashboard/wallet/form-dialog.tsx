@@ -94,7 +94,7 @@ export function WalletFormDialog({
                   {wallet.transactions && wallet.transactions.length > 0 ? (
                     <div className="space-y-3">
                       {wallet.transactions.map((transaction, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div key={index} className="flex items-center justify-between p-3 border rounded">
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
                               <Badge variant={transaction.amount > 0 ? "default" : "destructive"}>

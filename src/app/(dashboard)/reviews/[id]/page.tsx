@@ -120,7 +120,7 @@ export default function ReviewDetailPage() {
                   <MessageSquare className="h-4 w-4" />
                   Comment
                 </label>
-                <div className="mt-2 p-4 bg-muted/50 rounded-lg">
+                <div className="mt-2 p-4 bg-muted/50 rounded">
                   <p className="whitespace-pre-wrap text-sm leading-relaxed">
                     {review.comment}
                   </p>

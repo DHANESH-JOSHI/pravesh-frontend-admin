@@ -55,7 +55,7 @@ export function ReviewViewDialog({
             <h3 className="text-sm font-medium text-muted-foreground mb-2">
               User Information
             </h3>
-            <div className="bg-muted/50 rounded-lg p-3">
+            <div className="bg-muted/50 rounded p-3">
               <p className="font-medium">
                 {userName || "Unknown User"}
               </p>
@@ -72,7 +72,7 @@ export function ReviewViewDialog({
             <h3 className="text-sm font-medium text-muted-foreground mb-2">
               Product Information
             </h3>
-            <div className="bg-muted/50 rounded-lg p-3">
+            <div className="bg-muted/50 rounded p-3">
               <p className="font-medium">
                 {productName || "Unknown Product"}
               </p>
@@ -105,7 +105,7 @@ export function ReviewViewDialog({
               <h3 className="text-sm font-medium text-muted-foreground mb-2">
                 Comment
               </h3>
-              <div className="bg-muted/50 rounded-lg p-3">
+              <div className="bg-muted/50 rounded p-3">
                 <p className="text-sm whitespace-pre-wrap">
                   {review.comment}
                 </p>

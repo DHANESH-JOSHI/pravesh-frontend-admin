@@ -40,7 +40,7 @@ export function AddressViewDialog({
               <h3 className="text-sm font-medium text-muted-foreground mb-2">
                 User Information
               </h3>
-              <div className="bg-muted/50 rounded-lg p-3">
+              <div className="bg-muted/50 rounded p-3">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-muted-foreground" />
                   <p className="font-medium">{user.name || "Unknown User"}</p>
@@ -59,7 +59,7 @@ export function AddressViewDialog({
             <h3 className="text-sm font-medium text-muted-foreground mb-2">
               Contact Information
             </h3>
-            <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+            <div className="bg-muted/50 rounded p-3 space-y-2">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">{address.fullname}</span>
@@ -76,7 +76,7 @@ export function AddressViewDialog({
             <h3 className="text-sm font-medium text-muted-foreground mb-2">
               Address Details
             </h3>
-            <div className="bg-muted/50 rounded-lg p-3">
+            <div className="bg-muted/50 rounded p-3">
               <div className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
                 <div className="space-y-1">

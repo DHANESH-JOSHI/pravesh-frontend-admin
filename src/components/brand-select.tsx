@@ -68,7 +68,7 @@ export function BrandSingleSelect({
           </Button>
         </PopoverTrigger>
 
-        <PopoverContent className="w-[--radix-popover-trigger-width] p-1.5 h-[330px] shadow-md rounded-lg min-w-md">
+        <PopoverContent className="w-[--radix-popover-trigger-width] p-1.5 h-[330px] shadow-md rounded min-w-md">
           {!categoryId ? (
             <div className="text-center text-muted-foreground text-sm py-6">
               Please select a category first
@@ -87,7 +87,7 @@ export function BrandSingleSelect({
                 <div
                   key={brand._id}
                   className={cn(
-                    "flex items-center justify-between px-3 py-1.5 rounded-md text-sm cursor-pointer hover:bg-accent/60 transition",
+                    "flex items-center justify-between px-3 py-1.5 rounded text-sm cursor-pointer hover:bg-accent/60 transition",
                     value === brand._id && "bg-accent/40 font-medium"
                   )}
                   onClick={() => {

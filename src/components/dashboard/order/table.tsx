@@ -59,8 +59,9 @@ export function OrdersTable() {
   const hasFiltersSelected = isFiltersSelected(filterDraft);
 
   return (
-    <Card>
-      <CardHeader>
+    <div className="space-y-6">
+
+      <div className="flex flex-col gap-4 rounded border bg-background/50 p-4 backdrop-blur-sm">
         <div className="flex flex-col gap-2">
           <TableHeaderControls
             title="Orders"
@@ -114,7 +115,7 @@ export function OrdersTable() {
           </div>
 
           {isFilterOpen && (
-            <div className="mt-3 p-4 border rounded-lg shadow-sm">
+            <div className="mt-3 p-4 border rounded shadow-sm">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground">Status</label>
@@ -156,92 +157,95 @@ export function OrdersTable() {
             </div>
           )}
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="relative rounded-md border">
-          <CommonOverlaySpinner show={isFetching && !isLoading} />
-          <Table>
-            <TableHeader>
+      </div>
+      <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
+
+        <CommonOverlaySpinner show={isFetching && !isLoading} />
+        <Table>
+          <TableHeader className="bg-muted/40">
+            <TableRow className="[&>th]:py-3">
+              <TableHead>ID</TableHead>
+              <TableHead>User</TableHead>
+              <TableHead>Total</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Updated</TableHead>
+              <TableHead className="w-16">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableLoadingRows
+                rows={6}
+                columns={[
+                  "h-12 w-40 rounded",
+                  "h-4 w-40",
+                  "h-4 w-40",
+                  "h-4 w-40",
+                  "h-8 w-12 rounded",
+                ]}
+              />
+            ) : orders.length === 0 ? (
               <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Updated</TableHead>
-                <TableHead className="w-16">Actions</TableHead>
+                <TableCell colSpan={6} className="p-6">
+                  <EmptyState
+                    title="No orders found"
+                    description="Try a different search."
+                  />
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableLoadingRows
-                  rows={6}
-                  columns={[
-                    "h-12 w-40 rounded-md",
-                    "h-4 w-40",
-                    "h-4 w-40",
-                    "h-4 w-40",
-                    "h-8 w-12 rounded",
-                  ]}
-                />
-              ) : orders.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="p-6">
-                    <EmptyState
-                      title="No orders found"
-                      description="Try a different search."
-                    />
-                  </TableCell>
-                </TableRow>
-              ) : (
-                <>
-                  {orders.map((order: Order) => (
-                    <TableRow key={order._id}>
-                      <TableCell className="font-mono text-sm">
-                        <div className="flex items-center gap-2">
-                          {order._id}
-                          {order.isCustomOrder && (
-                            <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-                              <Palette className="h-3 w-3 mr-1" />
-                              Custom
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {(order.user as User).name}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        ₹{order.totalAmount}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {order.status}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {order.updatedAt}
-                      </TableCell>
-                      <TableCell>
-                        <Link href={`/orders/${order._id}`}>
-                          <Button variant="ghost">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </Link>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <PaginationControls
-          page={appliedFilters.page || 1}
-          totalPages={totalPages}
-          isFetching={isFetching}
-          onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
-          onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
-          onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
-        />
-      </CardContent>
-    </Card>
+            ) : (
+              <>
+                {orders.map((order: Order) => (
+                  <TableRow key={order._id}>
+                    <TableCell className="font-mono text-sm">
+                      <div className="flex items-center gap-2">
+                        {order._id}
+                        {order.isCustomOrder && (
+                          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+                            <Palette className="h-3 w-3 mr-1" />
+                            Custom
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {(order.user as User).name}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      ₹{order.totalAmount}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {order.status}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(order.updatedAt).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </TableCell>
+                    <TableCell>
+                      <Link href={`/orders/${order._id}`}>
+                        <Button variant="ghost">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <PaginationControls
+        page={appliedFilters.page || 1}
+        totalPages={totalPages}
+        isFetching={isFetching}
+        onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
+        onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
+        onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
+      />
+    </div >
   );
 }

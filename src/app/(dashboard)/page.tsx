@@ -144,7 +144,7 @@ export default function DashboardPage() {
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="bg-accent/50 p-6 rounded-lg shadow">
+          <div className="bg-accent/50 p-6 rounded shadow">
             <h2 className="text-xl font-semibold mb-4">Monthly Revenue</h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={stats.monthlyRevenue}>
@@ -156,7 +156,7 @@ export default function DashboardPage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="bg-accent/50 p-6 rounded-lg shadow">
+          <div className="bg-accent/50 p-6 rounded shadow">
             <h2 className="text-xl font-semibold mb-4">Order Status Distribution</h2>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -182,7 +182,7 @@ export default function DashboardPage() {
 
         {/* Tables */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="bg-accent/50 p-6 rounded-lg shadow">
+          <div className="bg-accent/50 p-6 rounded shadow">
             <h2 className="text-xl font-semibold mb-4">Recent Orders</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -207,7 +207,7 @@ export default function DashboardPage() {
               </table>
             </div>
           </div>
-          <div className="bg-accent/50 p-6 rounded-lg shadow">
+          <div className="bg-accent/50 p-6 rounded shadow">
             <h2 className="text-xl font-semibold mb-4">Top Products</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -234,7 +234,7 @@ export default function DashboardPage() {
 
         {/* Alerts */}
         {/*<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="bg-accent/50 p-6 rounded-lg shadow">
+          <div className="bg-accent/50 p-6 rounded shadow">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
               <AlertTriangle className="h-5 w-5 mr-2 text-yellow-500" />
               Low Stock Products
@@ -248,7 +248,7 @@ export default function DashboardPage() {
               ))}
             </ul>
           </div>
-          <div className="bg-accent/50 p-6 rounded-lg shadow">
+          <div className="bg-accent/50 p-6 rounded shadow">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
               <AlertTriangle className="h-5 w-5 mr-2 text-red-500" />
               Out of Stock Products
@@ -278,7 +278,7 @@ export default function DashboardPage() {
 
 function Card({ icon, title, value, change }: { icon?: React.ReactNode; title: string; value: string; change?: number }) {
   return (
-    <div className="bg-accent/50 p-6 rounded-lg shadow flex items-center">
+    <div className="bg-accent/50 p-6 rounded shadow flex items-center">
       {icon && <div className="mr-4 text-primary">{icon}</div>}
       <div>
         <h3 className="text-sm font-medium">{title}</h3>

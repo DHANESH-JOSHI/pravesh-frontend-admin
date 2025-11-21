@@ -126,7 +126,7 @@ export function OrderFormDialog({
             {initialData?.isCustomOrder && <FormItem className="space-y-2">
               <FormLabel>Image</FormLabel>
               <div className="flex items-center gap-4">
-                <div className="w-28 h-28 rounded-md border flex items-center justify-center overflow-hidden bg-muted">
+                <div className="w-28 h-28 rounded border flex items-center justify-center overflow-hidden bg-muted">
                   {imagePreview ? (
                     <img
                       src={imagePreview}
@@ -223,7 +223,7 @@ export function OrderFormDialog({
                   <FormControl>
                     <textarea
                       {...field}
-                      className="w-full rounded-md border px-3 py-2 text-sm"
+                      className="w-full rounded border px-3 py-2 text-sm"
                       rows={4}
                       placeholder="Add feedback for this order (optional)"
                     />

@@ -225,9 +225,9 @@ export default function OrderDetailPage() {
                     <TableRow key={idx}>
                       <TableCell>
                         {product.thumbnail ? (
-                          <Image src={product.thumbnail} alt={product.name || "thumb"} width={40} height={40} className="rounded-md object-cover" />
+                          <Image src={product.thumbnail} alt={product.name || "thumb"} width={40} height={40} className="rounded object-cover" />
                         ) : (
-                          <div className="w-14 h-14 rounded-md flex items-center justify-center">
+                          <div className="w-14 h-14 rounded flex items-center justify-center">
                             <Package className="h-6 w-6" />
                           </div>
                         )}
@@ -276,7 +276,7 @@ export default function OrderDetailPage() {
             <CardContent>
               {order.image && (
                 <div className="mb-4">
-                  <img src={order.image} alt="Custom order image" className="max-w-full h-auto rounded-md" />
+                  <img src={order.image} alt="Custom order image" className="max-w-full h-auto rounded" />
                 </div>
               )}
               {order.feedback && (

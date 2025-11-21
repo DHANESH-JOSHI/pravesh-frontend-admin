@@ -116,8 +116,9 @@ export function CategoriesTable() {
   });
 
   return (
-    <Card>
-      <CardHeader>
+     <div className="space-y-6">
+
+      <div className="flex flex-col gap-4 rounded border bg-background/50 p-4 backdrop-blur-sm">
         <div className="flex flex-col gap-2">
           <TableHeaderControls
             title="Categories"
@@ -174,7 +175,7 @@ export function CategoriesTable() {
           </div>
 
           {isFilterOpen && (
-            <div className="mt-3 p-4 border rounded-lg shadow-sm">
+            <div className="mt-3 p-4 border rounded shadow-sm">
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground">Deleted Status</label>
@@ -195,13 +196,13 @@ export function CategoriesTable() {
             </div>
           )}
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="relative rounded-md border">
+      </div>
+            <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
+
           <CommonOverlaySpinner show={isFetching && !isLoading} />
           <Table>
-            <TableHeader>
-              <TableRow>
+            <TableHeader className="bg-muted/40">
+            <TableRow className="[&>th]:py-3">
                 <TableHead>Image</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Subcategories</TableHead>
@@ -217,7 +218,7 @@ export function CategoriesTable() {
                 <TableLoadingRows
                   rows={6}
                   columns={[
-                    "h-12 w-40 rounded-md",
+                    "h-12 w-40 rounded",
                     "h-4 w-40",
                     "h-4 w-40",
                     "h-4 w-40",
@@ -266,10 +267,18 @@ export function CategoriesTable() {
                         {category.productCount}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {category.createdAt}
+                        {new Date(category.createdAt).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {category.updatedAt}
+                        {new Date(category.updatedAt).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
                       </TableCell>
                       {!category.isDeleted && <TableCell>
                         <DropdownMenu>
@@ -327,7 +336,6 @@ export function CategoriesTable() {
           onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
           onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
         />
-      </CardContent>
 
       <CategoryFormDialog
         open={isCreateDialogOpen}
@@ -355,7 +363,7 @@ export function CategoriesTable() {
             deleteMutation.mutate(pendingDeleteSlug);
         }}
       />
-    </Card>
+    </div>
   );
 }
 

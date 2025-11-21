@@ -137,9 +137,9 @@ export default function CartDetailPage() {
                     <TableRow key={idx}>
                       <TableCell>
                         {product.thumbnail ? (
-                          <Image src={product.thumbnail} alt={product.name || "thumb"} width={24} height={24} className="rounded-md object-cover" />
+                          <Image src={product.thumbnail} alt={product.name || "thumb"} width={24} height={24} className="rounded object-cover" />
                         ) : (
-                          <div className="w-14 h-14 rounded-md flex items-center justify-center">
+                          <div className="w-14 h-14 rounded flex items-center justify-center">
                             <Package className="h-6 w-6" />
                           </div>
                         )}

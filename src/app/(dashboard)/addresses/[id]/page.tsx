@@ -130,7 +130,7 @@ export default function AddressDetailPage() {
           {/* Address Information */}
           <div>
             <label className="text-sm font-medium">Address</label>
-            <div className="mt-2 p-4 bg-muted/50 rounded-lg">
+            <div className="mt-2 p-4 bg-muted/50 rounded">
               <div className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div className="space-y-1">
@@ -218,7 +218,7 @@ export default function AddressDetailPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
+          <div className="rounded border">
             <Table>
               <TableHeader>
                 <TableRow>

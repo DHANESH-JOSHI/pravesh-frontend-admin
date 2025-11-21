@@ -89,10 +89,10 @@ export default function BrandDetailPage() {
               <img
                 src={brand.image}
                 alt={brand.name}
-                className="w-full h-48 object-contain rounded-lg border"
+                className="w-full h-48 object-contain rounded border"
               />
             ) : (
-              <div className="w-full h-48 bg-muted rounded-lg flex items-center justify-center">
+              <div className="w-full h-48 bg-muted rounded flex items-center justify-center">
                 <Tag className="h-12 w-12 text-muted-foreground" />
               </div>
             )}
@@ -157,7 +157,7 @@ export default function BrandDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border">
+            <div className="rounded border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -212,7 +212,7 @@ export default function BrandDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border">
+            <div className="rounded border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -236,8 +236,8 @@ export default function BrandDetailPage() {
                             width={56}
                             height={56}
                             alt={product.name || "Product"}
-                            className="h-12 w-12 rounded-md object-cover"
-                          /> : <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center"><ImageIcon className="text-muted-foreground" /></div>}
+                            className="h-12 w-12 rounded object-cover"
+                          /> : <div className="h-12 w-12 rounded bg-muted flex items-center justify-center"><ImageIcon className="text-muted-foreground" /></div>}
                         </TableCell>
                         <TableCell className="font-medium w-16">
                           {product.sku}

@@ -125,7 +125,7 @@ export function BlogFormDialog({
                   control={form.control}
                   name="isPublished"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <FormItem className="flex flex-row items-center justify-between rounded border p-3 shadow-sm">
                       <div className="space-y-0.5">
                         <FormLabel>Published</FormLabel>
                       </div>
@@ -234,7 +234,7 @@ export function BlogFormDialog({
                     <FormItem className="w-full">
                       <FormLabel>Content *</FormLabel>
                       <FormControl className="w-full">
-                        <div className="w-full border rounded-lg bg-background p-1 shadow-sm h-[95%] mx-auto">
+                        <div className="w-full border rounded bg-background p-1 shadow-sm h-[95%] mx-auto">
                           <BlogEditor
                             value={field.value || ""}
                             onChange={(value) =>

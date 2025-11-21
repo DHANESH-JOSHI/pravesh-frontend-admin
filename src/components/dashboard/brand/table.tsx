@@ -72,7 +72,7 @@ export function BrandsTable() {
 
   const deleteMutation = useMutation({
     mutationFn: brandService.delete,
-    onSuccess: ({message}) => {
+    onSuccess: ({ message }) => {
       setIsOpen(false);
       toast.success(message ?? "Brand deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["brands"] });
@@ -89,7 +89,7 @@ export function BrandsTable() {
       const data = await brandService.update(editingBrand?._id!, values);
       return data;
     },
-    onSuccess: ({message}) => {
+    onSuccess: ({ message }) => {
       toast.success(message ?? "Brand updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["brands"] });
       queryClient.invalidateQueries({ queryKey: ["category"] });
@@ -104,7 +104,7 @@ export function BrandsTable() {
       const data = await brandService.create(values);
       return data;
     },
-    onSuccess: ({message}) => {
+    onSuccess: ({ message }) => {
       toast.success(message ?? "Brand created successfully!");
       queryClient.invalidateQueries({ queryKey: ["brands"] });
       queryClient.invalidateQueries({ queryKey: ["category"] });
@@ -116,8 +116,9 @@ export function BrandsTable() {
   });
 
   return (
-    <Card>
-      <CardHeader>
+    <div className="space-y-6">
+
+      <div className="flex flex-col gap-4 rounded border bg-background/50 p-4 backdrop-blur-sm">
         <div className="flex flex-col gap-2">
           <TableHeaderControls
             title="Brands"
@@ -172,7 +173,7 @@ export function BrandsTable() {
           </div>
 
           {isFilterOpen && (
-            <div className="mt-3 p-4  border rounded-lg shadow-sm">
+            <div className="mt-3 p-4  border rounded shadow-sm">
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground">Deleted Status</label>
@@ -193,136 +194,143 @@ export function BrandsTable() {
             </div>
           )}
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="relative rounded-md border">
-          <CommonOverlaySpinner show={isFetching && !isLoading} />
-          <Table>
-            <TableHeader>
+      </div>
+      <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
+
+        <CommonOverlaySpinner show={isFetching && !isLoading} />
+        <Table>
+          <TableHeader className="bg-muted/40">
+            <TableRow className="[&>th]:py-3">
+              <TableHead>Image</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Categories</TableHead>
+              <TableHead>Products</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead>Updated</TableHead>
+              <TableHead className="w-16">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableLoadingRows
+                rows={6}
+                columns={[
+                  "h-12 w-40 rounded",
+                  "h-4 w-40",
+                  "h-4 w-40",
+                  "h-4 w-40",
+                  "h-8 w-12 rounded",
+                ]}
+              />
+            ) : brands.length === 0 ? (
               <TableRow>
-                <TableHead>Image</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Categories</TableHead>
-                <TableHead>Products</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Updated</TableHead>
-                <TableHead className="w-16">Actions</TableHead>
+                <TableCell colSpan={7} className="p-6">
+                  <EmptyState
+                    title="No brands found"
+                    description="Try a different search."
+                  />
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableLoadingRows
-                  rows={6}
-                  columns={[
-                    "h-12 w-40 rounded-md",
-                    "h-4 w-40",
-                    "h-4 w-40",
-                    "h-4 w-40",
-                    "h-8 w-12 rounded",
-                  ]}
-                />
-              ) : brands.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="p-6">
-                    <EmptyState
-                      title="No brands found"
-                      description="Try a different search."
-                    />
-                  </TableCell>
-                </TableRow>
-              ) : (
-                <>
-                  {brands.map((brand: Brand) => (
-                    <TableRow key={brand._id}>
-                      <TableCell>
-                        {brand.image ? (
-                          <img
-                            src={brand.image}
-                            alt={brand.name}
-                            className="h-12 w-12 rounded object-cover"
-                          />
-                        ) : (
-                          <div className="h-12 w-12 rounded bg-muted flex items-center justify-center">
-                            <Image className="text-muted-foreground" />
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell className="font-medium max-w-xs">
-                        <div className="truncate" title={brand.name}>
-                          {brand.name}
+            ) : (
+              <>
+                {brands.map((brand: Brand) => (
+                  <TableRow key={brand._id}>
+                    <TableCell>
+                      {brand.image ? (
+                        <img
+                          src={brand.image}
+                          alt={brand.name}
+                          className="h-12 w-12 rounded object-cover"
+                        />
+                      ) : (
+                        <div className="h-12 w-12 rounded bg-muted flex items-center justify-center">
+                          <Image className="text-muted-foreground" />
                         </div>
-                      </TableCell>
-                      <TableCell className="font-medium max-w-xs">
-                        <div className="truncate" title={brand.name}>
-                          {brand.categories.length}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {brand.productCount}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {brand.createdAt}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {brand.updatedAt}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild className="gap-2">
-                              <Link href={`/brands/${brand._id}`}>
-                                <Eye className="h-4 w-4" />
-                                View
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="gap-2"
-                              onClick={() =>
-                                setEditingBrand(brand)
-                              }
-                            >
-                              <Edit className="h-4 w-4" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="gap-2 text-destructive"
-                              onClick={() => {
-                                setIsOpen(true);
-                                pendingDeleteId =
-                                  brand._id;
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <PaginationControls
-          page={appliedFilters.page || 1}
-          totalPages={totalPages}
-          isFetching={isFetching}
-          onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
-          onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
-          onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
-        />
-      </CardContent>
+                      )}
+                    </TableCell>
+                    <TableCell className="font-medium max-w-xs">
+                      <div className="truncate" title={brand.name}>
+                        {brand.name}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium max-w-xs">
+                      <div className="truncate" title={brand.name}>
+                        {brand.categories.length}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {brand.productCount}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(brand.createdAt).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(brand.updatedAt).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild className="gap-2">
+                            <Link href={`/brands/${brand._id}`}>
+                              <Eye className="h-4 w-4" />
+                              View
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="gap-2"
+                            onClick={() =>
+                              setEditingBrand(brand)
+                            }
+                          >
+                            <Edit className="h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="gap-2 text-destructive"
+                            onClick={() => {
+                              setIsOpen(true);
+                              pendingDeleteId =
+                                brand._id;
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <PaginationControls
+        page={appliedFilters.page || 1}
+        totalPages={totalPages}
+        isFetching={isFetching}
+        onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
+        onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
+        onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
+      />
 
       <BrandFormDialog
         isLoading={createMutation.isPending}
@@ -348,7 +356,7 @@ export function BrandsTable() {
             deleteMutation.mutate(pendingDeleteId);
         }}
       />
-    </Card>
+    </div>
   );
 }
 

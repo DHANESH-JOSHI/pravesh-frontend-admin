@@ -83,7 +83,7 @@ export function BlogsTable() {
       const data = await blogService.create(values);
       return data;
     },
-    onSuccess: ({message}) => {
+    onSuccess: ({ message }) => {
       toast.success(message ?? "Blog created successfully!");
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
       setIsCreateDialogOpen(false);
@@ -115,8 +115,9 @@ export function BlogsTable() {
 
 
   return (
-    <Card>
-      <CardHeader>
+    <div className="space-y-6">
+
+      <div className="flex flex-col gap-4 rounded border bg-background/50 p-4 backdrop-blur-sm">
         <div className="flex flex-col gap-2">
           <TableHeaderControls
             title="Blogs"
@@ -171,7 +172,7 @@ export function BlogsTable() {
           </div>
 
           {isFilterOpen && (
-            <div className="mt-3 p-4  border rounded-lg shadow-sm">
+            <div className="mt-3 p-4  border rounded shadow-sm">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <label className="text-xs font-medium text-muted-foreground">Published Status</label>
@@ -209,131 +210,138 @@ export function BlogsTable() {
             </div>
           )}
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="relative rounded-md border">
-          <CommonOverlaySpinner show={isFetching && !isLoading} />
-          <Table>
-            <TableHeader>
+      </div>
+      <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
+
+        <CommonOverlaySpinner show={isFetching && !isLoading} />
+        <Table>
+          <TableHeader className="bg-muted/40">
+            <TableRow className="[&>th]:py-3">
+              <TableHead>Thumbnail</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Slug</TableHead>
+              <TableHead>Published</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead>Updated</TableHead>
+              {!appliedFilters?.isDeleted && <TableHead className="w-16">Actions</TableHead>}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableLoadingRows
+                rows={6}
+                columns={[
+                  "h-12 w-40 rounded",
+                  "h-4 w-40",
+                  "h-4 w-40",
+                  "h-4 w-40",
+                  "h-8 w-12 rounded",
+                ]}
+              />
+            ) : blogs.length === 0 ? (
               <TableRow>
-                <TableHead>Thumbnail</TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead>Slug</TableHead>
-                <TableHead>Published</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Updated</TableHead>
-                {!appliedFilters?.isDeleted && <TableHead className="w-16">Actions</TableHead>}
+                <TableCell colSpan={7} className="p-6">
+                  <EmptyState
+                    title="No blogs found"
+                    description="Try a different search."
+                  />
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableLoadingRows
-                  rows={6}
-                  columns={[
-                    "h-12 w-40 rounded-md",
-                    "h-4 w-40",
-                    "h-4 w-40",
-                    "h-4 w-40",
-                    "h-8 w-12 rounded",
-                  ]}
-                />
-              ) : blogs.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="p-6">
-                    <EmptyState
-                      title="No blogs found"
-                      description="Try a different search."
-                    />
-                  </TableCell>
-                </TableRow>
-              ) : (
-                <>
-                  {blogs.map((blog: Blog) => (
-                    <TableRow key={blog._id}>
-                      <TableCell>
-                        <img
-                          src={
-                            blog.featuredImage ||
-                            "/placeholder.svg"
-                          }
-                          width={50}
-                          height={50}
-                          alt={blog.title}
-                          className="h-12 w-12 rounded object-cover"
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium max-w-xs">
-                        <div className="truncate" title={blog.title}>
-                          {blog.title}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground font-mono text-sm">
-                        {blog.slug}
-                      </TableCell>
-                      <TableCell className="text-center font-semibold"><Badge variant="outline">{blog.isPublished ? 'Yes' : 'No'}</Badge></TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {blog.createdAt}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {blog.updatedAt}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild className="gap-2">
-                              <Link href={`/blogs/${blog._id}`}>
-                                <Eye className="h-4 w-4" />
-                                View
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="gap-2"
-                              onClick={() =>
-                                setEditingBlog(blog)
-                              }
-                            >
-                              <Edit className="h-4 w-4" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="gap-2 text-destructive"
-                              onClick={() => {
-                                setIsOpen(true);
-                                pendingDeleteSlug =
-                                  blog._id;
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <PaginationControls
-          page={appliedFilters.page || 1}
-          totalPages={totalPages}
-          isFetching={isFetching}
-          onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
-          onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
-          onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
-        />
-      </CardContent>
+            ) : (
+              <>
+                {blogs.map((blog: Blog) => (
+                  <TableRow key={blog._id}>
+                    <TableCell>
+                      <img
+                        src={
+                          blog.featuredImage ||
+                          "/placeholder.svg"
+                        }
+                        width={50}
+                        height={50}
+                        alt={blog.title}
+                        className="h-12 w-12 rounded object-cover"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium max-w-xs">
+                      <div className="truncate" title={blog.title}>
+                        {blog.title}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground font-mono text-sm">
+                      {blog.slug}
+                    </TableCell>
+                    <TableCell className="text-center font-semibold"><Badge variant="outline">{blog.isPublished ? 'Yes' : 'No'}</Badge></TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(blog.createdAt).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(blog.updatedAt).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild className="gap-2">
+                            <Link href={`/blogs/${blog._id}`}>
+                              <Eye className="h-4 w-4" />
+                              View
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="gap-2"
+                            onClick={() =>
+                              setEditingBlog(blog)
+                            }
+                          >
+                            <Edit className="h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="gap-2 text-destructive"
+                            onClick={() => {
+                              setIsOpen(true);
+                              pendingDeleteSlug =
+                                blog._id;
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <PaginationControls
+        page={appliedFilters.page || 1}
+        totalPages={totalPages}
+        isFetching={isFetching}
+        onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
+        onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
+        onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
+      />
 
       <BlogFormDialog
         isLoading={createMutation.isPending}
@@ -364,7 +372,7 @@ export function BlogsTable() {
             deleteMutation.mutate(pendingDeleteSlug);
         }}
       />
-    </Card>
+    </div>
   );
 }
 
