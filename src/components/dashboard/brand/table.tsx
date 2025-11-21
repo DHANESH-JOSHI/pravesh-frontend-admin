@@ -199,7 +199,7 @@ export function BrandsTable() {
 
         <CommonOverlaySpinner show={isFetching && !isLoading} />
         <Table>
-          <TableHeader className="bg-muted/40">
+          <TableHeader className="bg-secondary">
             <TableRow className="[&>th]:py-3">
               <TableHead>Image</TableHead>
               <TableHead>Name</TableHead>

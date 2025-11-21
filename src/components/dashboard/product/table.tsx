@@ -271,7 +271,7 @@ export function ProductsTable() {
       <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
         <CommonOverlaySpinner show={isFetching && !isLoading} />
         <Table>
-          <TableHeader className="bg-muted/40">
+          <TableHeader className="bg-secondary">
             <TableRow className="[&>th]:py-3">
               <TableHead className="w-24">Thumbnail</TableHead>
               <TableHead>SKU</TableHead>
