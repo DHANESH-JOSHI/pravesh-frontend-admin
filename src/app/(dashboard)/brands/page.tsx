@@ -4,7 +4,7 @@ import { Building2 } from "lucide-react";
 
 export default function BrandsPage() {
   return (
-    <div className="flex flex-1 flex-col gap-4 sm:max-w-6xl mx-auto w-full space-y-8 p-4">
+    <div className="flex flex-1 flex-col gap-4 p-4 sm:px-20 mx-auto w-full space-y-4">
       <PageHeader
         icon={Building2}
         title="Brand Management"

@@ -33,7 +33,7 @@ export default function AddressDetailPage() {
   const addressId = params.id as string;
 
   const [ordersPage, setOrdersPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 8;
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["address", addressId],

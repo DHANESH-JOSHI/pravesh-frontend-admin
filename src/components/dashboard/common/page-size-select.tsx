@@ -10,7 +10,7 @@ type Props = {
   className?: string;
 };
 
-export function PageSizeSelect({ value, action, options = [4,8, 10, 12, 16], className }: Props) {
+export function PageSizeSelect({ value, action, options = [4,6,8], className }: Props) {
   return (
     <Select value={String(value)} onValueChange={action}>
       <SelectTrigger className={cn("h-9 w-32", className)}>

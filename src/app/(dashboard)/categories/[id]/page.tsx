@@ -42,7 +42,7 @@ export default function CategoryDetailPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const itemsPerPage = 10;
+  const itemsPerPage = 8;
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["category", categoryId],

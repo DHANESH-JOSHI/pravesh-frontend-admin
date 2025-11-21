@@ -38,8 +38,8 @@ export function BrandsTable() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<BrandQueryOptions>({ page: 1, limit: 10 });
-  const [appliedFilters, setAppliedFilters] = useState<BrandQueryOptions>({ page: 1, limit: 10 });
+  const [filterDraft, setFilterDraft] = useState<BrandQueryOptions>({ page: 1, limit: 8 });
+  const [appliedFilters, setAppliedFilters] = useState<BrandQueryOptions>({ page: 1, limit: 8 });
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["brands", appliedFilters],

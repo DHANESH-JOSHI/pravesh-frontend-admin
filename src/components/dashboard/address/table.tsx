@@ -26,8 +26,8 @@ import { isFiltersSelected } from "@/lib/utils";
 
 export function AddressesTable() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<AddressQueryOptions>({ page: 1, limit: 10 });
-  const [appliedFilters, setAppliedFilters] = useState<AddressQueryOptions>({ page: 1, limit: 10 });
+  const [filterDraft, setFilterDraft] = useState<AddressQueryOptions>({ page: 1, limit: 8 });
+  const [appliedFilters, setAppliedFilters] = useState<AddressQueryOptions>({ page: 1, limit: 8 });
 
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["addresses", appliedFilters],

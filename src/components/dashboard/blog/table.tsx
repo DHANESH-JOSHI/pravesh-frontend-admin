@@ -39,8 +39,8 @@ export function BlogsTable() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<BlogQueryOptions>({ page: 1, limit: 10 });
-  const [appliedFilters, setAppliedFilters] = useState<BlogQueryOptions>({ page: 1, limit: 10 });
+  const [filterDraft, setFilterDraft] = useState<BlogQueryOptions>({ page: 1, limit: 8 });
+  const [appliedFilters, setAppliedFilters] = useState<BlogQueryOptions>({ page: 1, limit: 8 });
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["blogs", appliedFilters],

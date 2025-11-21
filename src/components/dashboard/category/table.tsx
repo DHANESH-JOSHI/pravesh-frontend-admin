@@ -38,8 +38,8 @@ export function CategoriesTable() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<CategoryQueryOptions>({ parentCategoryId: "null", page: 1, limit: 10 });
-  const [appliedFilters, setAppliedFilters] = useState<CategoryQueryOptions>({ parentCategoryId: "null", page: 1, limit: 10 });
+  const [filterDraft, setFilterDraft] = useState<CategoryQueryOptions>({ parentCategoryId: "null", page: 1, limit: 8 });
+  const [appliedFilters, setAppliedFilters] = useState<CategoryQueryOptions>({ parentCategoryId: "null", page: 1, limit: 8 });
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["categories", appliedFilters],

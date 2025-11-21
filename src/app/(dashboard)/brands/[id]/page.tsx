@@ -27,7 +27,7 @@ export default function BrandDetailPage() {
   const params = useParams();
   const brandId = params.id as string;
   const [productsPage, setProductsPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 8;
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["brand", brandId],

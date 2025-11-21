@@ -218,7 +218,7 @@ export default function OrderDetailPage() {
               ) : (
                 order.items.map((item, idx) => {
                   const product = item.product as Partial<Product>;
-                  const brand = product.brand as Partial<Brand>;
+                  const brand = product.brand as Partial<Brand> | undefined;
                   const category = product.category as Partial<Category>;
                   const lineTotal = (item.price ?? 0) * item.quantity;
                   return (
@@ -236,7 +236,7 @@ export default function OrderDetailPage() {
                         <Link className="hover:underline" href={`/products/${product._id}`}>{product.name || "N/A"}</Link>
                       </TableCell>
                       <TableCell>
-                        <Link className="hover:underline" href={`/brands/${brand._id}`}>{brand.name || "N/A"}
+                        <Link className="hover:underline" href={brand ? `/brands/${brand._id}` : "#"}>{brand?.name || "N/A"}
                         </Link>
                       </TableCell>
                       <TableCell>
