@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check, Image } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Eye, Image } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
@@ -10,7 +10,6 @@ import { OverlaySpinner as CommonOverlaySpinner } from "@/components/dashboard/c
 import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
 import TableHeaderControls from "@/components/dashboard/common/table-header-controls";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,8 +36,6 @@ export function CategoriesTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<CategoryQueryOptions>({ parentCategoryId: "null", page: 1, limit: 8 });
   const [appliedFilters, setAppliedFilters] = useState<CategoryQueryOptions>({ parentCategoryId: "null", page: 1, limit: 8 });
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
@@ -50,25 +47,11 @@ export function CategoriesTable() {
   const categories = data?.data?.categories ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
 
-  function applyFilters() {
-    const sanitized: CategoryQueryOptions = Object.entries(filterDraft).reduce((acc, [k, v]) => {
-      if (typeof v === "string") {
-        const trimmed = v.trim();
-        if (trimmed !== "" && trimmed !== "all") (acc as Record<string, unknown>)[k] = trimmed;
-      } else {
-        (acc as Record<string, unknown>)[k] = v;
-      }
-      return acc;
-    }, {} as Record<string, unknown>);
-    setAppliedFilters((prev) => ({ ...sanitized, page: 1, limit: prev.limit }));
-  }
-
   function resetFilters() {
-    setFilterDraft({});
     setAppliedFilters((prev) => ({ page: 1, search: "", limit: prev.limit, parentCategoryId: "null" }));
   }
 
-  const hasFiltersSelected = isFiltersSelected(filterDraft);
+  const hasFiltersSelected = isFiltersSelected(appliedFilters);
 
   const deleteMutation = useMutation({
     mutationFn: categoryService.delete,
@@ -89,7 +72,7 @@ export function CategoriesTable() {
       const data = await categoryService.update(editingCategory?._id!, values);
       return data;
     },
-    onSuccess: ({message}, { parentCategoryId }) => {
+    onSuccess: ({ message }, { parentCategoryId }) => {
       toast.success(message ?? "Category updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       queryClient.invalidateQueries({ queryKey: ["category", parentCategoryId], exact: true })
@@ -104,7 +87,7 @@ export function CategoriesTable() {
       const data = await categoryService.create(values);
       return data;
     },
-    onSuccess: ({message}, { parentCategoryId }) => {
+    onSuccess: ({ message }, { parentCategoryId }) => {
       toast.success(message ?? "Category created successfully!");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       queryClient.invalidateQueries({ queryKey: ["category", parentCategoryId], exact: true })
@@ -116,7 +99,7 @@ export function CategoriesTable() {
   });
 
   return (
-     <div className="space-y-6">
+    <div className="space-y-4">
 
       <div className="flex flex-col gap-4 rounded border bg-background/50 p-4 backdrop-blur-sm">
         <div className="flex flex-col gap-2">
@@ -136,73 +119,45 @@ export function CategoriesTable() {
             }}
           />
 
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                aria-label="toggle filters"
-                onClick={() => setIsFilterOpen((s) => !s)}
-                className="flex items-center gap-1"
+
+          <div className="flex gap-6">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground">Status</label>
+              <Select
+                value={appliedFilters.isDeleted}
+                onValueChange={(v) => setAppliedFilters((d) => ({ ...d, isDeleted: v }))}
               >
-                <Funnel className="h-4 w-4" />
-                <span className="hidden sm:inline">Filters</span>
-              </Button>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Active" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="false">Active</SelectItem>
+                  <SelectItem value="true">Deleted</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-end justify-end">
               {hasFiltersSelected && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={resetFilters}
-                  aria-label="reset filters"
-                  className="flex items-center gap-1"
+                  className="h-8 text-xs"
                 >
-                  <X className="h-4 w-4 text-muted-foreground" />
-                  <span className="hidden md:inline text-sm">Reset</span>
+                  Reset
                 </Button>
               )}
-              <Button
-                size="sm"
-                onClick={applyFilters}
-                aria-label="apply filters"
-                className="flex items-center gap-1"
-              >
-                <Check className="h-4 w-4" />
-                <span className="hidden md:inline text-sm">Apply</span>
-              </Button>
             </div>
           </div>
-
-          {isFilterOpen && (
-            <div className="mt-3 p-4 border rounded shadow-sm">
-              <div className="grid grid-cols-1 gap-4">
-                <div className="space-y-3">
-                  <label className="text-xs font-medium text-muted-foreground">Deleted Status</label>
-                  <Select
-                    value={filterDraft.isDeleted}
-                    onValueChange={(v) => setFilterDraft((d) => ({ ...d, isDeleted: v }))}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Active" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="false">Active</SelectItem>
-                      <SelectItem value="true">Deleted</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
-            <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
+      <div>
+        <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
 
           <CommonOverlaySpinner show={isFetching && !isLoading} />
           <Table>
             <TableHeader className="bg-secondary">
-            <TableRow className="[&>th]:py-3">
+              <TableRow className="[&>th]:py-3">
                 <TableHead>Image</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Subcategories</TableHead>
@@ -210,7 +165,7 @@ export function CategoriesTable() {
                 <TableHead>Products</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead>Updated</TableHead>
-                {!filterDraft?.isDeleted && <TableHead className="w-16">Actions</TableHead>}
+                {!appliedFilters?.isDeleted && <TableHead className="w-16">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -268,17 +223,17 @@ export function CategoriesTable() {
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {new Date(category.createdAt).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {new Date(category.updatedAt).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </TableCell>
                       {!category.isDeleted && <TableCell>
                         <DropdownMenu>
@@ -329,6 +284,7 @@ export function CategoriesTable() {
           </Table>
         </div>
         <PaginationControls
+          limit={appliedFilters.limit || 8}
           page={appliedFilters.page || 1}
           totalPages={totalPages}
           isFetching={isFetching}
@@ -336,6 +292,7 @@ export function CategoriesTable() {
           onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
           onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
         />
+      </div>
 
       <CategoryFormDialog
         open={isCreateDialogOpen}

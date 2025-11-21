@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { MoreHorizontal, Trash2, Funnel, X, Check, Eye } from "lucide-react";
+import { MoreHorizontal, Trash2, Eye } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
@@ -10,7 +10,6 @@ import { OverlaySpinner as CommonOverlaySpinner } from "@/components/dashboard/c
 import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
 import TableHeaderControls from "@/components/dashboard/common/table-header-controls";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,8 +34,6 @@ import { isFiltersSelected } from "@/lib/utils";
 export function UsersTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<UserQueryOptions>({ page: 1, limit: 8 });
   const [appliedFilters, setAppliedFilters] = useState<UserQueryOptions>({ page: 1, limit: 8 });
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
@@ -72,28 +69,14 @@ export function UsersTable() {
     },
   });
 
-  function applyFilters() {
-    const sanitized: UserQueryOptions = Object.entries(filterDraft).reduce((acc, [k, v]) => {
-      if (typeof v === "string") {
-        const trimmed = v.trim();
-        if (trimmed !== "" && trimmed !== "all") (acc as Record<string, unknown>)[k] = trimmed;
-      } else {
-        (acc as Record<string, unknown>)[k] = v;
-      }
-      return acc;
-    }, {} as Record<string, unknown>);
-    setAppliedFilters((prev) => ({ ...sanitized, page: 1, limit: prev.limit }));
-  }
-
   function resetFilters() {
-    setFilterDraft({});
     setAppliedFilters((prev) => ({ page: 1, search: "", limit: prev.limit }));
   }
 
-  const hasFiltersSelected = isFiltersSelected(filterDraft);
+  const hasFiltersSelected = isFiltersSelected(appliedFilters);
 
   return (
-     <div className="space-y-6">
+    <div className="space-y-4">
 
       <div className="flex flex-col gap-4 rounded border bg-background/50 p-4 backdrop-blur-sm">
         <div className="flex flex-col gap-2">
@@ -111,107 +94,79 @@ export function UsersTable() {
             onChangePageSizeAction={(v) => setAppliedFilters((f) => ({ ...f, limit: Number(v), page: 1 }))}
           />
 
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
+
+          <div className="flex gap-6">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground">Role</label>
+              <Select
+                value={appliedFilters.role || ""}
+                onValueChange={(v) => setAppliedFilters((d) => ({ ...d, role: v === "all" ? undefined : v }))}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground">Status</label>
+              <Select
+                value={appliedFilters.status || ""}
+                onValueChange={(v) => setAppliedFilters((d) => ({ ...d, status: v === "all" ? undefined : v }))}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground">Status</label>
+              <Select
+                value={appliedFilters.isDeleted}
+                onValueChange={(v) => setAppliedFilters((d) => ({ ...d, isDeleted: v }))}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Active" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="false">Active</SelectItem>
+                  <SelectItem value="true">Deleted</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex items-end justify-end">
+            {hasFiltersSelected && (
               <Button
                 variant="ghost"
                 size="sm"
-                aria-label="toggle filters"
-                onClick={() => setIsFilterOpen((s) => !s)}
-                className="flex items-center gap-1"
+                onClick={resetFilters}
+                className="h-8 text-xs"
               >
-                <Funnel className="h-4 w-4" />
-                <span className="hidden sm:inline">Filters</span>
+                Reset
               </Button>
-            </div>
-            <div className="flex items-center gap-2">
-              {hasFiltersSelected && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={resetFilters}
-                  aria-label="reset filters"
-                  className="flex items-center gap-1"
-                >
-                  <X className="h-4 w-4 text-muted-foreground" />
-                  <span className="hidden md:inline text-sm">Reset</span>
-                </Button>
-              )}
-              <Button
-                size="sm"
-                onClick={applyFilters}
-                aria-label="apply filters"
-                className="flex items-center gap-1"
-              >
-                <Check className="h-4 w-4" />
-                <span className="hidden md:inline text-sm">Apply</span>
-              </Button>
-            </div>
+            )}
           </div>
-
-          {isFilterOpen && (
-            <div className="mt-3 p-4  border rounded shadow-sm">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-3">
-                  <label className="text-xs font-medium text-muted-foreground">Role</label>
-                  <Select
-                    value={filterDraft.role || ""}
-                    onValueChange={(v) => setFilterDraft((d) => ({ ...d, role: v === "all" ? undefined : v }))}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="user">User</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-xs font-medium text-muted-foreground">Status</label>
-                  <Select
-                    value={filterDraft.status || ""}
-                    onValueChange={(v) => setFilterDraft((d) => ({ ...d, status: v === "all" ? undefined : v }))}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-xs font-medium text-muted-foreground">Deleted Status</label>
-                  <Select
-                    value={filterDraft.isDeleted}
-                    onValueChange={(v) => setFilterDraft((d) => ({ ...d, isDeleted: v }))}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Active" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="false">Active</SelectItem>
-                      <SelectItem value="true">Deleted</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
-            <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
+      <div>
+        <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
 
           <CommonOverlaySpinner show={isFetching && !isLoading} />
           <Table>
             <TableHeader className="bg-secondary">
-            <TableRow className="[&>th]:py-3">
+              <TableRow className="[&>th]:py-3">
                 <TableHead>Name</TableHead>
                 <TableHead>Phone</TableHead>
                 <TableHead>Email</TableHead>
@@ -259,10 +214,10 @@ export function UsersTable() {
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {new Date(user.createdAt).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
@@ -304,6 +259,7 @@ export function UsersTable() {
           </Table>
         </div>
         <PaginationControls
+          limit={appliedFilters.limit || 8}
           page={appliedFilters.page || 1}
           totalPages={totalPages}
           isFetching={isFetching}
@@ -311,6 +267,7 @@ export function UsersTable() {
           onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
           onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
         />
+      </div>
       <UserFormDialog
         isLoading={createMutation.isPending}
         open={createDialogOpen}

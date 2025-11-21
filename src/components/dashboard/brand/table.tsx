@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check, Image } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Eye,Image } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
@@ -10,7 +10,6 @@ import { OverlaySpinner as CommonOverlaySpinner } from "@/components/dashboard/c
 import TableHeaderControls from "@/components/dashboard/common/table-header-controls";
 import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,8 +36,6 @@ export function BrandsTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<BrandQueryOptions>({ page: 1, limit: 8 });
   const [appliedFilters, setAppliedFilters] = useState<BrandQueryOptions>({ page: 1, limit: 8 });
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching, refetch } = useQuery({
@@ -50,25 +47,11 @@ export function BrandsTable() {
   const brands = data?.data?.brands ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
 
-  function applyFilters() {
-    const sanitized: BrandQueryOptions = Object.entries(filterDraft).reduce((acc, [k, v]) => {
-      if (typeof v === "string") {
-        const trimmed = v.trim();
-        if (trimmed !== "" && trimmed !== "all") (acc as Record<string, unknown>)[k] = trimmed;
-      } else {
-        (acc as Record<string, unknown>)[k] = v;
-      }
-      return acc;
-    }, {} as Record<string, unknown>);
-    setAppliedFilters((prev) => ({ ...sanitized, page: 1, limit: prev.limit }));
-  }
-
   function resetFilters() {
-    setFilterDraft({});
     setAppliedFilters((prev) => ({ page: 1, search: "", limit: prev.limit }));
   }
 
-  const hasFiltersSelected = isFiltersSelected(filterDraft);
+  const hasFiltersSelected = isFiltersSelected(appliedFilters);
 
   const deleteMutation = useMutation({
     mutationFn: brandService.delete,
@@ -116,7 +99,7 @@ export function BrandsTable() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
 
       <div className="flex flex-col gap-4 rounded border bg-background/50 p-4 backdrop-blur-sm">
         <div className="flex flex-col gap-2">
@@ -134,203 +117,177 @@ export function BrandsTable() {
             onChangePageSizeAction={(v) => { const n = Number(v); setAppliedFilters((f) => ({ ...f, limit: n, page: 1 })); }}
           />
 
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                aria-label="toggle filters"
-                onClick={() => setIsFilterOpen((s) => !s)}
-                className="flex items-center gap-1"
+
+          <div className="flex gap-6">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground">Status</label>
+              <Select
+                value={appliedFilters.isDeleted}
+                onValueChange={(v) => setAppliedFilters((d) => ({ ...d, isDeleted: v }))}
               >
-                <Funnel className="h-4 w-4" />
-                <span className="hidden sm:inline">Filters</span>
-              </Button>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Active" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="false">Active</SelectItem>
+                  <SelectItem value="true">Deleted</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-end justify-end">
               {hasFiltersSelected && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={resetFilters}
-                  aria-label="reset filters"
-                  className="flex items-center gap-1"
+                  className="h-8 text-xs"
                 >
-                  <X className="h-4 w-4 text-muted-foreground" />
-                  <span className="hidden md:inline text-sm">Reset</span>
+                  Reset
                 </Button>
               )}
-              <Button
-                size="sm"
-                onClick={applyFilters}
-                aria-label="apply filters"
-                className="flex items-center gap-1"
-              >
-                <Check className="h-4 w-4" />
-                <span className="hidden md:inline text-sm">Apply</span>
-              </Button>
             </div>
           </div>
-
-          {isFilterOpen && (
-            <div className="mt-3 p-4  border rounded shadow-sm">
-              <div className="grid grid-cols-1 gap-4">
-                <div className="space-y-3">
-                  <label className="text-xs font-medium text-muted-foreground">Deleted Status</label>
-                  <Select
-                    value={filterDraft.isDeleted}
-                    onValueChange={(v) => setFilterDraft((d) => ({ ...d, isDeleted: v }))}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Active" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="false">Active</SelectItem>
-                      <SelectItem value="true">Deleted</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
-      <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
+      <div>
+        <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
 
-        <CommonOverlaySpinner show={isFetching && !isLoading} />
-        <Table>
-          <TableHeader className="bg-secondary">
-            <TableRow className="[&>th]:py-3">
-              <TableHead>Image</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Categories</TableHead>
-              <TableHead>Products</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead>Updated</TableHead>
-              <TableHead className="w-16">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableLoadingRows
-                rows={6}
-                columns={[
-                  "h-12 w-40 rounded",
-                  "h-4 w-40",
-                  "h-4 w-40",
-                  "h-4 w-40",
-                  "h-8 w-12 rounded",
-                ]}
-              />
-            ) : brands.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="p-6">
-                  <EmptyState
-                    title="No brands found"
-                    description="Try a different search."
-                  />
-                </TableCell>
+          <CommonOverlaySpinner show={isFetching && !isLoading} />
+          <Table>
+            <TableHeader className="bg-secondary">
+              <TableRow className="[&>th]:py-3">
+                <TableHead>Image</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Categories</TableHead>
+                <TableHead>Products</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead>Updated</TableHead>
+                <TableHead className="w-16">Actions</TableHead>
               </TableRow>
-            ) : (
-              <>
-                {brands.map((brand: Brand) => (
-                  <TableRow key={brand._id}>
-                    <TableCell>
-                      {brand.image ? (
-                        <img
-                          src={brand.image}
-                          alt={brand.name}
-                          className="h-12 w-12 rounded object-cover"
-                        />
-                      ) : (
-                        <div className="h-12 w-12 rounded bg-muted flex items-center justify-center">
-                          <Image className="text-muted-foreground" />
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableLoadingRows
+                  rows={6}
+                  columns={[
+                    "h-12 w-40 rounded",
+                    "h-4 w-40",
+                    "h-4 w-40",
+                    "h-4 w-40",
+                    "h-8 w-12 rounded",
+                  ]}
+                />
+              ) : brands.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="p-6">
+                    <EmptyState
+                      title="No brands found"
+                      description="Try a different search."
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                <>
+                  {brands.map((brand: Brand) => (
+                    <TableRow key={brand._id}>
+                      <TableCell>
+                        {brand.image ? (
+                          <img
+                            src={brand.image}
+                            alt={brand.name}
+                            className="h-12 w-12 rounded object-cover"
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded bg-muted flex items-center justify-center">
+                            <Image className="text-muted-foreground" />
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="font-medium max-w-xs">
+                        <div className="truncate" title={brand.name}>
+                          {brand.name}
                         </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="font-medium max-w-xs">
-                      <div className="truncate" title={brand.name}>
-                        {brand.name}
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium max-w-xs">
-                      <div className="truncate" title={brand.name}>
-                        {brand.categories.length}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {brand.productCount}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {new Date(brand.createdAt).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {new Date(brand.updatedAt).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild className="gap-2">
-                            <Link href={`/brands/${brand._id}`}>
-                              <Eye className="h-4 w-4" />
-                              View
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="gap-2"
-                            onClick={() =>
-                              setEditingBrand(brand)
-                            }
-                          >
-                            <Edit className="h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="gap-2 text-destructive"
-                            onClick={() => {
-                              setIsOpen(true);
-                              pendingDeleteId =
-                                brand._id;
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </>
-            )}
-          </TableBody>
-        </Table>
+                      </TableCell>
+                      <TableCell className="font-medium max-w-xs">
+                        <div className="truncate" title={brand.name}>
+                          {brand.categories.length}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {brand.productCount}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {new Date(brand.createdAt).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {new Date(brand.updatedAt).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild className="gap-2">
+                              <Link href={`/brands/${brand._id}`}>
+                                <Eye className="h-4 w-4" />
+                                View
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="gap-2"
+                              onClick={() =>
+                                setEditingBrand(brand)
+                              }
+                            >
+                              <Edit className="h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="gap-2 text-destructive"
+                              onClick={() => {
+                                setIsOpen(true);
+                                pendingDeleteId =
+                                  brand._id;
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <PaginationControls
+          limit={appliedFilters.limit || 8}
+          page={appliedFilters.page || 1}
+          totalPages={totalPages}
+          isFetching={isFetching}
+          onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
+          onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
+          onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
+        />
       </div>
-      <PaginationControls
-        page={appliedFilters.page || 1}
-        totalPages={totalPages}
-        isFetching={isFetching}
-        onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
-        onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
-        onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
-      />
 
       <BrandFormDialog
         isLoading={createMutation.isPending}

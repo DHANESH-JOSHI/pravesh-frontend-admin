@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2, Eye, Funnel, X, Check, Tag, Box, DollarSign, ImageIcon } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Eye, ImageIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
@@ -44,13 +44,11 @@ export function ProductsTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterDraft, setFilterDraft] = useState<QueryOptions>({ page: 1, limit: 8 });
   const [appliedFilters, setAppliedFilters] = useState<QueryOptions>({ page: 1, limit: 8 });
   const [filterSearch, setFilterSearch] = useState("");
   const queryClient = useQueryClient();
 
-  const { data: filtersResp, isLoading: filtersLoading } = useQuery({
+  const { data: filtersResp } = useQuery({
     queryKey: ["product-filters"],
     queryFn: () => productService.getFilters()
   });
@@ -72,7 +70,7 @@ export function ProductsTable() {
 
   const deleteMutation = useMutation({
     mutationFn: productService.delete,
-    onSuccess: ({message}) => {
+    onSuccess: ({ message }) => {
       setIsOpen(false);
       toast.success(message ?? "Product deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -90,7 +88,7 @@ export function ProductsTable() {
       const data = await productService.update(editingProduct?._id!, values);
       return data;
     },
-    onSuccess: ({message}) => {
+    onSuccess: ({ message }) => {
       toast.success(message ?? "Product updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["category"] });
@@ -106,7 +104,7 @@ export function ProductsTable() {
       const data = await productService.create(values);
       return data;
     },
-    onSuccess: ({message}) => {
+    onSuccess: ({ message }) => {
       toast.success(message ?? "Product created successfully!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["category"] });
@@ -118,28 +116,15 @@ export function ProductsTable() {
     },
   });
 
-  function applyFilters() {
-    const sanitized: QueryOptions = Object.entries(filterDraft).reduce((acc, [k, v]) => {
-      if (typeof v === "string") {
-        const trimmed = v.trim();
-        if (trimmed !== "") (acc as Record<string, unknown>)[k] = trimmed;
-      } else {
-        (acc as Record<string, unknown>)[k] = v;
-      }
-      return acc;
-    }, {} as Record<string, unknown>);
-    setAppliedFilters((prev) => ({ ...sanitized, page: 1, limit: prev.limit }));
-  }
   function resetFilters() {
-    setFilterDraft({});
     setAppliedFilters((prev) => ({ page: 1, search: "", limit: prev.limit }));
     setFilterSearch("");
   }
 
-  const hasFiltersSelected = isFiltersSelected(filterDraft);
+  const hasFiltersSelected = isFiltersSelected(appliedFilters);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header + Controls */}
       <div className="flex flex-col gap-4 rounded border bg-background/50 p-4 backdrop-blur-sm">
         <div className="flex flex-col gap-2">
@@ -157,255 +142,225 @@ export function ProductsTable() {
             onChangePageSizeAction={(v) => setAppliedFilters((f) => ({ ...f, limit: Number(v), page: 1 }))}
           />
 
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                aria-label="toggle filters"
-                onClick={() => setIsFilterOpen((s) => !s)}
-                className="flex items-center gap-1"
-              >
-                <Funnel className="h-4 w-4" />
-                <span className="hidden sm:inline">Filters</span>
-              </Button>
-              <span className="text-xs sm:text-sm text-muted-foreground hidden sm:inline">
-                {filtersLoading ? "Loading filters…" : `${categories.length} categories • ${brands.length} brands`}
-              </span>
+          <div className="flex gap-6">
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground ">
+                Category
+              </label>
+              <Select value={appliedFilters.categoryId || ""} onValueChange={(v) => setAppliedFilters((d) => ({ ...d, categoryId: v || undefined }))}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories
+                    .filter((c) => (c.title ?? "").toLowerCase().includes(filterSearch.toLowerCase()))
+                    .map((c) => (
+                      <SelectItem key={c._id} value={c._id}>
+                        {c.title}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="space-y-1">
+
+              <label className="text-xs text-muted-foreground">
+                Brand
+              </label>
+              <Select value={appliedFilters.brandId || ""} onValueChange={(v) => setAppliedFilters((d) => ({ ...d, brandId: v || undefined }))}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent>
+                  {brands
+                    .filter((b) => (b.name ?? "").toLowerCase().includes(filterSearch.toLowerCase()))
+                    .map((b) => (
+                      <SelectItem key={b._id} value={b._id}>
+                        {b.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground">
+                Price range
+              </label>
+              <div className="flex items-center space-x-2 justify-between px-2 py-1.5 rounded border bg-muted/30">
+
+                <div>Min: ₹{appliedFilters.minPrice ?? minPrice}</div>
+
+                <div className="py-1 min-w-sm">
+                  <Slider
+                    min={minPrice}
+                    max={maxPrice}
+                    step={100}
+                    value={[appliedFilters.minPrice ?? minPrice, appliedFilters.maxPrice ?? maxPrice]}
+                    onValueChange={(value) => setAppliedFilters((prev) => ({ ...prev, minPrice: value[0], maxPrice: value[1] }))}
+                  />
+                </div>
+                <div>Max: ₹{appliedFilters.maxPrice ?? maxPrice}</div>
+              </div>
+            </div>
+            <div className="flex items-end justify-end">
               {hasFiltersSelected && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={resetFilters}
-                  aria-label="reset filters"
-                  className="flex items-center gap-1"
+                  className="h-8 text-xs"
                 >
-                  <X className="h-4 w-4 text-muted-foreground" />
-                  <span className="hidden md:inline text-sm">Reset</span>
+                  Reset
                 </Button>
               )}
-              <Button
-                size="sm"
-                onClick={applyFilters}
-                aria-label="apply filters"
-                className="flex items-center gap-1"
-              >
-                <Check className="h-4 w-4" />
-                <span className="hidden md:inline text-sm">Apply</span>
-              </Button>
             </div>
           </div>
-
-          {isFilterOpen && (
-            <div className="mt-3 p-4 border rounded bg-background/40 shadow-sm">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <label className="text-xs font-medium text-muted-foreground flex items-center gap-2">
-                    <Tag className="h-4 w-4" /> Category
-                  </label>
-                  <Select value={filterDraft.categoryId || ""} onValueChange={(v) => setFilterDraft((d) => ({ ...d, categoryId: v || undefined }))}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories
-                        .filter((c) => (c.title ?? "").toLowerCase().includes(filterSearch.toLowerCase()))
-                        .map((c) => (
-                          <SelectItem key={c._id} value={c._id}>
-                            {c.title}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-
-                  <label className="text-xs font-medium text-muted-foreground flex items-center gap-2">
-                    <Box className="h-4 w-4" /> Brand
-                  </label>
-                  <Select value={filterDraft.brandId || ""} onValueChange={(v) => setFilterDraft((d) => ({ ...d, brandId: v || undefined }))}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Brand" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {brands
-                        .filter((b) => (b.name ?? "").toLowerCase().includes(filterSearch.toLowerCase()))
-                        .map((b) => (
-                          <SelectItem key={b._id} value={b._id}>
-                            {b.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground flex items-center gap-2">
-                      <DollarSign className="h-4 w-4" /> Price range
-                    </label>
-                    <div className="mt-2 px-3 py-3 rounded border bg-muted/30">
-                      <div className="flex justify-between text-xs sm:text-sm text-muted-foreground mb-2">
-                        <div>Min: ₹{filterDraft.minPrice ?? minPrice}</div>
-                        <div>Max: ₹{filterDraft.maxPrice ?? maxPrice}</div>
-                      </div>
-                      <div className="py-1">
-                        <Slider
-                          min={minPrice}
-                          max={maxPrice}
-                          step={100}
-                          value={[filterDraft.minPrice ?? minPrice, filterDraft.maxPrice ?? maxPrice]}
-                          onValueChange={(value) => setFilterDraft((prev) => ({ ...prev, minPrice: value[0], maxPrice: value[1] }))}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* Table */}
-      <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
-        <CommonOverlaySpinner show={isFetching && !isLoading} />
-        <Table>
-          <TableHeader className="bg-secondary">
-            <TableRow className="[&>th]:py-3">
-              <TableHead className="w-24">Thumbnail</TableHead>
-              <TableHead>SKU</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Brand</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-right">Price</TableHead>
-              <TableHead>New Arrival</TableHead>
-              <TableHead>Featured</TableHead>
-              <TableHead className="w-16">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableLoadingRows
-                rows={6}
-                columns={[
-                  "h-12 w-24 rounded",
-                  "h-4 w-24",
-                  "h-4 w-24",
-                  "h-4 w-24",
-                  "h-4 w-24",
-                  "h-4 w-24",
-                  "h-4 w-24",
-                  "h-4 w-24",
-                  "h-4 w-20",
-                ]}
-              />
-            ) : products.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={9} className="p-6">
-                  <EmptyState
-                    title="No products found"
-                    description="Try a different search."
-                  />
-                </TableCell>
+      <div>
+        <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
+          <CommonOverlaySpinner show={isFetching && !isLoading} />
+          <Table>
+            <TableHeader className="bg-secondary">
+              <TableRow className="[&>th]:py-3">
+                <TableHead className="w-24">Thumbnail</TableHead>
+                <TableHead>SKU</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Brand</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead className="text-right">Price</TableHead>
+                <TableHead>New Arrival</TableHead>
+                <TableHead>Featured</TableHead>
+                <TableHead className="w-16">Actions</TableHead>
               </TableRow>
-            ) : (
-              products.map((product: Product) => {
-                const brandName = typeof product.brand === "string" ? product.brand : product.brand?.name ?? "N/A";
-                const categoryName = typeof product.category === "string" ? product.category : (product.category as Category)?.title ?? "N/A";
-                return (
-                  <TableRow
-                    key={product._id}
-                    className="group transition-colors hover:bg-muted/40"
-                  >
-                    <TableCell>
-                      {product.thumbnail ? (
-                        <img
-                          src={product.thumbnail || "/placeholder.svg"}
-                          width={56}
-                          height={56}
-                          alt={product.name}
-                          className="h-12 w-12 rounded object-cover ring-1 ring-border/50"
-                        />
-                      ) : (
-                        <div className="h-12 w-12 rounded bg-muted flex items-center justify-center ring-1 ring-border/50">
-                          <ImageIcon className="text-muted-foreground" />
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableLoadingRows
+                  rows={6}
+                  columns={[
+                    "h-12 w-24 rounded",
+                    "h-4 w-24",
+                    "h-4 w-24",
+                    "h-4 w-24",
+                    "h-4 w-24",
+                    "h-4 w-24",
+                    "h-4 w-24",
+                    "h-4 w-24",
+                    "h-4 w-20",
+                  ]}
+                />
+              ) : products.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={9} className="p-6">
+                    <EmptyState
+                      title="No products found"
+                      description="Try a different search."
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                products.map((product: Product) => {
+                  const brandName = typeof product.brand === "string" ? product.brand : product.brand?.name ?? "N/A";
+                  const categoryName = typeof product.category === "string" ? product.category : (product.category as Category)?.title ?? "N/A";
+                  return (
+                    <TableRow
+                      key={product._id}
+                      className="group transition-colors hover:bg-muted/40"
+                    >
+                      <TableCell>
+                        {product.thumbnail ? (
+                          <img
+                            src={product.thumbnail || "/placeholder.svg"}
+                            width={56}
+                            height={56}
+                            alt={product.name}
+                            className="h-12 w-12 rounded object-cover ring-1 ring-border/50"
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded bg-muted flex items-center justify-center ring-1 ring-border/50">
+                            <ImageIcon className="text-muted-foreground" />
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-left">{product.sku}</TableCell>
+                      <TableCell className="font-medium max-w-[256px] text-left">
+                        <div className="truncate" title={product.name}>
+                          {product.name}
                         </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-left">{product.sku}</TableCell>
-                    <TableCell className="font-medium max-w-[256px] text-left">
-                      <div className="truncate" title={product.name}>
-                        {product.name}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground truncate w-20">{brandName}</TableCell>
-                    <TableCell className="text-muted-foreground truncate w-20">{categoryName}</TableCell>
-                    <TableCell className="text-center font-semibold">₹{product.originalPrice}</TableCell>
-                    <TableCell className="text-center font-semibold">
-                      <Badge variant="outline" className="bg-background/40">
-                        {product.isNewArrival ? "Yes" : "No"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-center font-semibold">
-                      <Badge variant="outline" className="bg-background/40">
-                        {product.isFeatured ? "Yes" : "No"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild className="gap-2">
-                            <a href={`/products/${product._id}`} className="flex items-center gap-2">
-                              <Eye className="h-4 w-4" />
-                              View
-                            </a>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="gap-2"
-                            onClick={() => setEditingProduct(product)}
-                          >
-                            <Edit className="h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="gap-2 text-destructive"
-                            onClick={() => {
-                              setIsOpen(true);
-                              pendingDeleteId = product._id;
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground truncate w-20">{brandName}</TableCell>
+                      <TableCell className="text-muted-foreground truncate w-20">{categoryName}</TableCell>
+                      <TableCell className="text-center font-semibold">₹{product.originalPrice}</TableCell>
+                      <TableCell className="text-center font-semibold">
+                        <Badge variant="outline" className="bg-background/40">
+                          {product.isNewArrival ? "Yes" : "No"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-center font-semibold">
+                        <Badge variant="outline" className="bg-background/40">
+                          {product.isFeatured ? "Yes" : "No"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild className="gap-2">
+                              <a href={`/products/${product._id}`} className="flex items-center gap-2">
+                                <Eye className="h-4 w-4" />
+                                View
+                              </a>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="gap-2"
+                              onClick={() => setEditingProduct(product)}
+                            >
+                              <Edit className="h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="gap-2 text-destructive"
+                              onClick={() => {
+                                setIsOpen(true);
+                                pendingDeleteId = product._id;
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
-      <PaginationControls
-        page={appliedFilters.page || 1}
-        totalPages={totalPages}
-        isFetching={isFetching}
-        onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
-        onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
-        onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
-      />
+        <PaginationControls
+          limit={appliedFilters.limit || 8}
+
+          page={appliedFilters.page || 1}
+          totalPages={totalPages}
+          isFetching={isFetching}
+          onPrev={() => setAppliedFilters(prev => ({ ...prev, page: Math.max(1, (prev.page ?? 0) - 1) }))}
+          onNext={() => setAppliedFilters(prev => ({ ...prev, page: Math.min(totalPages, (prev.page ?? 0) + 1) }))}
+          onPageChange={(p) => setAppliedFilters(prev => ({ ...prev, page: p }))}
+        />
+      </div>
 
       <ProductFormDialog
         isLoading={createMutation.isPending}
@@ -431,7 +386,7 @@ export function ProductsTable() {
             deleteMutation.mutate(pendingDeleteId);
         }}
       />
-    </div>
+    </div >
   );
 }
 

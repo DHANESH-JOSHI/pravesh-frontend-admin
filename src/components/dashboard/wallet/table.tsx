@@ -67,7 +67,7 @@ export function WalletsTable() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
 
       <div className="flex flex-col gap-4 rounded border bg-background/50 p-4 backdrop-blur-sm">
         <div className="flex flex-col gap-2">
@@ -89,124 +89,127 @@ export function WalletsTable() {
           />
         </div>
       </div>
-      <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
+      <div>
+        <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
 
-        <CommonOverlaySpinner show={isFetching && !isLoading} />
-        <Table>
-          <TableHeader className="bg-secondary">
-            <TableRow className="[&>th]:py-3">
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Balance</TableHead>
-              <TableHead>Transactions</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead>Updated</TableHead>
-              <TableHead className="w-16">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableLoadingRows
-                rows={6}
-                columns={[
-                  "h-4 w-32",
-                  "h-4 w-24",
-                  "h-4 w-24",
-                  "h-4 w-16",
-                  "h-4 w-24",
-                  "h-4 w-24",
-                  "h-8 w-12 rounded",
-                ]}
-              />
-            ) : wallets.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="p-6">
-                  <EmptyState
-                    title="No wallets found"
-                    description="Wallets will appear here when users register."
-                  />
-                </TableCell>
+          <CommonOverlaySpinner show={isFetching && !isLoading} />
+          <Table>
+            <TableHeader className="bg-secondary">
+              <TableRow className="[&>th]:py-3">
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Balance</TableHead>
+                <TableHead>Transactions</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead>Updated</TableHead>
+                <TableHead className="w-16">Actions</TableHead>
               </TableRow>
-            ) : (
-              <>
-                {wallets.map((wallet) => (
-                  <TableRow key={wallet._id}>
-                    <TableCell className="font-medium font-mono text-sm">
-                      {(wallet.user as User).name}
-                    </TableCell>
-                    <TableCell className="font-medium font-mono text-sm">
-                      {(wallet.user as User).email}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground font-semibold">
-                      ₹{wallet.balance.toFixed(2)}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {wallet.transactions?.length || 0}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {new Date(wallet.updatedAt).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {new Date(wallet.updatedAt).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            className="gap-2"
-                            onClick={() => {
-                              setViewOpen(true)
-                              setEditingWallet(wallet)
-                            }}
-                          >
-                            <Eye className="h-4 w-4" />
-                            View
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="gap-2"
-                            onClick={() => {
-                              setViewOpen(false)
-                              setEditingWallet(wallet)
-                            }}
-                          >
-                            <Plus className="h-4 w-4" />
-                            Add Funds
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableLoadingRows
+                  rows={6}
+                  columns={[
+                    "h-4 w-32",
+                    "h-4 w-24",
+                    "h-4 w-24",
+                    "h-4 w-16",
+                    "h-4 w-24",
+                    "h-4 w-24",
+                    "h-8 w-12 rounded",
+                  ]}
+                />
+              ) : wallets.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="p-6">
+                    <EmptyState
+                      title="No wallets found"
+                      description="Wallets will appear here when users register."
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                <>
+                  {wallets.map((wallet) => (
+                    <TableRow key={wallet._id}>
+                      <TableCell className="font-medium font-mono text-sm">
+                        {(wallet.user as User).name}
+                      </TableCell>
+                      <TableCell className="font-medium font-mono text-sm">
+                        {(wallet.user as User).email}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground font-semibold">
+                        ₹{wallet.balance.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {wallet.transactions?.length || 0}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {new Date(wallet.updatedAt).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {new Date(wallet.updatedAt).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              className="gap-2"
+                              onClick={() => {
+                                setViewOpen(true)
+                                setEditingWallet(wallet)
+                              }}
+                            >
+                              <Eye className="h-4 w-4" />
+                              View
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="gap-2"
+                              onClick={() => {
+                                setViewOpen(false)
+                                setEditingWallet(wallet)
+                              }}
+                            >
+                              <Plus className="h-4 w-4" />
+                              Add Funds
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <PaginationControls
+          limit={limit}
+          page={page}
+          totalPages={totalPages}
+          isFetching={isFetching}
+          onPrev={() => setPage((p) => Math.max(1, p - 1))}
+          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+          onPageChange={(p) => setPage(p)}
+        />
       </div>
-      <PaginationControls
-        page={page}
-        totalPages={totalPages}
-        isFetching={isFetching}
-        onPrev={() => setPage((p) => Math.max(1, p - 1))}
-        onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
-        onPageChange={(p) => setPage(p)}
-      />
 
       <WalletFormDialog
         isLoading={addFundsMutation.isPending}
