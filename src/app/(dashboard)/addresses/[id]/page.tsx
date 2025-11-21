@@ -284,6 +284,7 @@ export default function AddressDetailPage() {
         {totalPages > 1 && (
           <div className="px-6 pb-4">
             <PaginationControls
+              limit={itemsPerPage}
               page={ordersPage}
               totalPages={totalPages}
               isFetching={false}

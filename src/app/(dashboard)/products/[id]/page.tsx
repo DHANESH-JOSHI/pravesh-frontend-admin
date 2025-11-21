@@ -489,6 +489,7 @@ export default function ProductDetailPage() {
               {totalReviews > itemsPerPage && (
                 <div className="mt-4">
                   <PaginationControls
+                    limit={itemsPerPage}
                     page={reviewsPage}
                     totalPages={Math.ceil(totalReviews / itemsPerPage)}
                     isFetching={false}

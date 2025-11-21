@@ -269,6 +269,7 @@ export default function BrandDetailPage() {
             {(brand.products || []).length > itemsPerPage && (
               <div className="mt-4">
                 <PaginationControls
+                  limit={itemsPerPage}
                   page={productsPage}
                   totalPages={Math.ceil((brand.products || []).length / itemsPerPage)}
                   isFetching={false}

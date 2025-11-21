@@ -106,7 +106,6 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto">
         <div className='mb-8'>
           <PageHeader
-            icon={LayoutDashboard}
             title="Dashboard Stats"
           />
         </div>
