@@ -370,13 +370,13 @@ export function ProductsTable() {
                   return (
                     <TableRow key={product._id}>
                       <TableCell>
-                        {product.thumbnail ? <Image
+                        {product.thumbnail ? <img
                           src={product.thumbnail || "/placeholder.svg"}
-                          width={56}
-                          height={56}
+                          width={50}
+                          height={50}
                           alt={product.name}
-                          className="h-12 w-12 rounded-md object-cover"
-                        /> : <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center"><ImageIcon className="text-muted-foreground" /></div>}
+                          className="h-12 w-12 rounded object-cover"
+                        /> : <div className="h-12 w-12 rounded bg-muted flex items-center justify-center"><ImageIcon className="text-muted-foreground" /></div>}
                       </TableCell>
                       <TableCell className="text-left">{product.sku}</TableCell>
                       <TableCell className="font-medium max-w-[256px] text-left">

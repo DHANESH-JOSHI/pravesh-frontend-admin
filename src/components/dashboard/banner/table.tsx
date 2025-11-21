@@ -251,15 +251,10 @@ export function BannersTable() {
                   {banners.map((banner: Banner) => (
                     <TableRow key={banner._id}>
                       <TableCell>
-                        <Image
-                          src={
-                            banner.image ||
-                            "/placeholder.svg"
-                          }
-                          width={50}
-                          height={50}
+                        <img
+                          src={banner.image}
                           alt={banner.title}
-                          className="h-12 w-12 rounded-md object-cover"
+                          className="h-12 w-12 rounded object-cover"
                         />
                       </TableCell>
                       <TableCell className="font-medium max-w-xs">

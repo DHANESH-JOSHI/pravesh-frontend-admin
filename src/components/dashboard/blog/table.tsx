@@ -251,7 +251,7 @@ export function BlogsTable() {
                   {blogs.map((blog: Blog) => (
                     <TableRow key={blog._id}>
                       <TableCell>
-                        <Image
+                        <img
                           src={
                             blog.featuredImage ||
                             "/placeholder.svg"
@@ -259,7 +259,7 @@ export function BlogsTable() {
                           width={50}
                           height={50}
                           alt={blog.title}
-                          className="h-12 w-12 rounded-md object-cover"
+                          className="h-12 w-12 rounded object-cover"
                         />
                       </TableCell>
                       <TableCell className="font-medium max-w-xs">
