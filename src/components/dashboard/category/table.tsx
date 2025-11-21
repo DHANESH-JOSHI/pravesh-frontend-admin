@@ -227,7 +227,7 @@ export function CategoriesTable() {
                 />
               ) : categories.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="p-6">
+                  <TableCell colSpan={8} className="p-6">
                     <EmptyState
                       title="No categories found"
                       description="Try a different search."

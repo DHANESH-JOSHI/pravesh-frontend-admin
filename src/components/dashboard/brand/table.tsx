@@ -223,7 +223,7 @@ export function BrandsTable() {
                 />
               ) : brands.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="p-6">
+                  <TableCell colSpan={7} className="p-6">
                     <EmptyState
                       title="No brands found"
                       description="Try a different search."

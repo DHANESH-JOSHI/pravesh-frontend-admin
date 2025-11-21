@@ -239,7 +239,7 @@ export function BlogsTable() {
                 />
               ) : blogs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="p-6">
+                  <TableCell colSpan={7} className="p-6">
                     <EmptyState
                       title="No blogs found"
                       description="Try a different search."

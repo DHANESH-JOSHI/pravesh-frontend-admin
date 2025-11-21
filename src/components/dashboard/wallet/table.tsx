@@ -33,7 +33,7 @@ import { User } from "@/types";
 export function WalletsTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(8);
   const [viewOpen, setViewOpen] = useState(false);
   const [editingWallet, setEditingWallet] = useState<Wallet | null>(null);
   const queryClient = useQueryClient();
