@@ -12,7 +12,7 @@ export const updateCategorySchema = createCategorySchema.partial();
 export type Category = {
   _id: string;
   title: string;
-  // image?: string;
+  image?: string;
   isDeleted: boolean;
   path:string[];
   createdAt: string;
