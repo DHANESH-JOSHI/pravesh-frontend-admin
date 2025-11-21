@@ -19,7 +19,7 @@ export default function AdminLayout({
   return (
     <ViewTransitions>
       <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable} font-mono antialiased`}>
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <AuthProvider>
             <QueryProvider>
               <main className="min-h-screen vt-page">{children}</main>
