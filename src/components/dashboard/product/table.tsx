@@ -43,11 +43,15 @@ export function ProductsTable() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [appliedFilters, setAppliedFilters] = useState<QueryOptions>({ page: 1, limit: 8 });
   const [filterSearch, setFilterSearch] = useState("");
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(0);
+  const [debouncedMaxPrice] = useDebounce(maxPrice, 500);
+  const [debouncedMinPrice] = useDebounce(minPrice, 500);
   const queryClient = useQueryClient();
 
   const { data: filtersResp } = useQuery({
     queryKey: ["product-filters"],
-    queryFn: () => productService.getFilters()
+    queryFn: () => productService.getFilters(),
   });
   const filters = filtersResp?.data ?? { categories: [], brands: [], sizes: [], colors: [], priceRange: { minPrice: 0, maxPrice: 0 } };
   const categories = filters?.categories ?? [];
@@ -60,14 +64,12 @@ export function ProductsTable() {
       await productService.getAll(appliedFilters),
   });
 
-  const mnprice = filters.priceRange.minPrice;
-  const mxprice = filters.priceRange.maxPrice;
-
-  const [minPrice, setMinPrice] = useState(filters.priceRange.minPrice);
-  const [maxPrice, setMaxPrice] = useState(filters.priceRange.maxPrice);
-
-  const [debouncedMinPrice] = useDebounce(minPrice, 500);
-  const [debouncedMaxPrice] = useDebounce(maxPrice, 500);
+  useEffect(() => {
+    if (filters.priceRange) {
+      setMinPrice(filters.priceRange.minPrice);
+      setMaxPrice(filters.priceRange.maxPrice);
+    }
+  }, [filters])
   useEffect(() => {
     setAppliedFilters((prev) => ({
       ...prev,
@@ -134,7 +136,6 @@ export function ProductsTable() {
   }
 
   const hasFiltersSelected = isFiltersSelected(appliedFilters);
-
   return (
     <div className="space-y-4">
       {/* Header + Controls */}
@@ -205,8 +206,8 @@ export function ProductsTable() {
 
                 <div className="py-1 min-w-sm">
                   <Slider
-                    min={mnprice}
-                    max={mxprice}
+                    min={filters.priceRange?.minPrice}
+                    max={filters.priceRange?.maxPrice}
                     step={100}
                     value={[minPrice, maxPrice]}
                     onValueChange={(value) => {
