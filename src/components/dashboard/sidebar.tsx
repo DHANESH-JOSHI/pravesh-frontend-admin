@@ -71,7 +71,7 @@ export const AppSidebar = ({ user }: { user: User }) => {
                   <SidebarMenuButton
                     asChild
                     data-active={isActive}
-                    className={`relative h-10 px-3 rounded-xl flex items-center gap-3 font-medium text-sm transition-all
+                    className={`relative h-10 px-3 flex items-center gap-3 font-medium text-sm transition-all
                     hover:bg-slate-200
                     data-[active=true]:bg-primary/10 data-[active=true]:text-primary`}
                   >

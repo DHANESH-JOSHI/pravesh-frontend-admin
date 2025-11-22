@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Edit, MoreHorizontal, Trash2, Eye, ImageIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
 import { EmptyState } from "@/components/dashboard/common/empty-state";
@@ -39,6 +39,7 @@ import {
 import { Category } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { isFiltersSelected } from "@/lib/utils";
+import { useDebounce } from "use-debounce";
 
 export function ProductsTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -57,13 +58,28 @@ export function ProductsTable() {
   const brands = filters.brands ?? [];
   // const sizesOptions = filters.sizes ?? [];
   // const colorsOptions = filters.colors ?? [];
-  const minPrice = filters.priceRange?.minPrice ?? 0;
-  const maxPrice = filters.priceRange?.maxPrice ?? 0;
   const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["products", appliedFilters],
     queryFn: async () =>
       await productService.getAll(appliedFilters),
   });
+
+  const mnprice = filters.priceRange.minPrice;
+  const mxprice = filters.priceRange.maxPrice;
+
+  const [minPrice, setMinPrice] = useState(filters.priceRange.minPrice);
+  const [maxPrice, setMaxPrice] = useState(filters.priceRange.maxPrice);
+
+  const [debouncedMinPrice] = useDebounce(minPrice, 500);
+  const [debouncedMaxPrice] = useDebounce(maxPrice, 500);
+  useEffect(() => {
+    setAppliedFilters((prev) => ({
+      ...prev,
+      minPrice: debouncedMinPrice,
+      maxPrice: debouncedMaxPrice,
+      page: 1,
+    }));
+  }, [debouncedMinPrice, debouncedMaxPrice]);
 
   const products = data?.data?.products ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
@@ -193,11 +209,14 @@ export function ProductsTable() {
 
                 <div className="py-1 min-w-sm">
                   <Slider
-                    min={minPrice}
-                    max={maxPrice}
+                    min={mnprice}
+                    max={mxprice}
                     step={100}
-                    value={[appliedFilters.minPrice ?? minPrice, appliedFilters.maxPrice ?? maxPrice]}
-                    onValueChange={(value) => setAppliedFilters((prev) => ({ ...prev, minPrice: value[0], maxPrice: value[1] }))}
+                    value={[minPrice, maxPrice]}
+                    onValueChange={(value) => {
+                      setMinPrice(value[0]);
+                      setMaxPrice(value[1]);
+                    }}
                   />
                 </div>
                 <div>Max: ₹{appliedFilters.maxPrice ?? maxPrice}</div>

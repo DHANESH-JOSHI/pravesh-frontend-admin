@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Eye} from "lucide-react";
-import { useState } from "react";
+import { Eye } from "lucide-react";
+import { useEffect, useState } from "react";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
 import { EmptyState } from "@/components/dashboard/common/empty-state";
 import { OverlaySpinner as CommonOverlaySpinner } from "@/components/dashboard/common/overlay-spinner";
@@ -23,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Product, User } from "@/types";
 import { Link } from "next-view-transitions";
 import { isFiltersSelected } from "@/lib/utils";
+import { useDebounce } from "use-debounce";
 export function ReviewsTable() {
   const [appliedFilters, setAppliedFilters] = useState<ReviewQueryOptions>({ page: 1, limit: 8 });
   const { data, isLoading, isFetching, refetch } = useQuery({
@@ -31,12 +32,26 @@ export function ReviewsTable() {
       await reviewService.getAllReviews(appliedFilters),
   });
 
+  const [userSearch, setUserSearch] = useState(appliedFilters.user || "");
+  const [debouncedUser] = useDebounce(userSearch, 500);
+
+  const [productSearch, setProductSearch] = useState(appliedFilters.product || "");
+  const [debouncedProduct] = useDebounce(productSearch, 500);
+
   const reviews = data?.data?.reviews ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
 
   function resetFilters() {
     setAppliedFilters((prev) => ({ page: 1, search: "", limit: prev.limit }));
   }
+  useEffect(() => {
+    setAppliedFilters((prev) => ({
+      ...prev,
+      user: debouncedUser.trim() || undefined,
+      product: debouncedProduct.trim() || undefined,
+      page: 1,
+    }));
+  }, [debouncedUser.trim(), debouncedProduct.trim()]);
 
   const hasFiltersSelected = isFiltersSelected(appliedFilters);
 
@@ -84,8 +99,8 @@ export function ReviewsTable() {
               <input
                 type="text"
                 placeholder="User ID or name"
-                value={appliedFilters.user || ""}
-                onChange={(e) => setAppliedFilters((d) => ({ ...d, user: e.target.value || undefined }))}
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
                 className="w-full px-3 py-2 text-sm border rounded"
               />
             </div>
@@ -95,8 +110,8 @@ export function ReviewsTable() {
               <input
                 type="text"
                 placeholder="Product ID or name"
-                value={appliedFilters.product || ""}
-                onChange={(e) => setAppliedFilters((d) => ({ ...d, product: e.target.value || undefined }))}
+                value={productSearch}
+                onChange={(e) => setProductSearch(e.target.value)}
                 className="w-full px-3 py-2 text-sm border rounded"
               />
             </div>
