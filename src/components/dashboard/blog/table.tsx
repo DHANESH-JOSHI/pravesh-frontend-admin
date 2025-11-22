@@ -98,7 +98,7 @@ export function BlogsTable() {
   return (
     <div className="space-y-4">
 
-      <div className="flex flex-col gap-4 rounded border bg-background/50 p-4 backdrop-blur-sm">
+      <div className="flex flex-col gap-4 rounded border bg-secondary/10 p-4  ">
         <div className="flex flex-col gap-2">
           <TableHeaderControls
             title="Blogs"
@@ -163,11 +163,11 @@ export function BlogsTable() {
         </div>
       </div>
       <div>
-        <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
+        <div className="relative rounded border bg-background/50  overflow-hidden">
 
           <CommonOverlaySpinner show={isFetching && !isLoading} />
           <Table>
-            <TableHeader className="bg-secondary">
+            <TableHeader className="bg-primary/5">
               <TableRow className="[&>th]:py-3">
                 <TableHead>Thumbnail</TableHead>
                 <TableHead>Title</TableHead>

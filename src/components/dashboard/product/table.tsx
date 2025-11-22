@@ -126,7 +126,7 @@ export function ProductsTable() {
   return (
     <div className="space-y-4">
       {/* Header + Controls */}
-      <div className="flex flex-col gap-4 rounded border bg-background/50 p-4 backdrop-blur-sm">
+      <div className="flex flex-col gap-4 rounded border bg-secondary/10 p-4  ">
         <div className="flex flex-col gap-2">
           <TableHeaderControls
             title="Products"
@@ -144,7 +144,7 @@ export function ProductsTable() {
 
           <div className="flex gap-6">
             <div className="space-y-1">
-              <label className="text-xs text-muted-foreground ">
+              <label className="text-xs text-muted-foreground">
                 Category
               </label>
               <Select value={appliedFilters.categoryId || ""} onValueChange={(v) => setAppliedFilters((d) => ({ ...d, categoryId: v || undefined }))}>
@@ -187,7 +187,7 @@ export function ProductsTable() {
               <label className="text-xs text-muted-foreground">
                 Price range
               </label>
-              <div className="flex items-center space-x-2 justify-between px-2 py-1.5 rounded border bg-muted/30">
+              <div className="flex items-center space-x-2 justify-between px-2 py-1.5 rounded border bg-background">
 
                 <div>Min: ₹{appliedFilters.minPrice ?? minPrice}</div>
 
@@ -220,10 +220,10 @@ export function ProductsTable() {
       </div>
 
       <div>
-        <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
+        <div className="relative rounded border bg-background/50  overflow-hidden">
           <CommonOverlaySpinner show={isFetching && !isLoading} />
           <Table>
-            <TableHeader className="bg-secondary">
+            <TableHeader className="bg-primary/5">
               <TableRow className="[&>th]:py-3">
                 <TableHead className="w-24">Thumbnail</TableHead>
                 <TableHead>SKU</TableHead>

@@ -24,6 +24,7 @@ import { Order, OrderQueryOptions } from "@/types/order";
 import { User } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { isFiltersSelected } from "@/lib/utils";
+import { StatusBadge } from "@/app/(dashboard)/page";
 export function OrdersTable() {
   const [appliedFilters, setAppliedFilters] = useState<OrderQueryOptions>({ page: 1, limit: 8 });
   const { data, isLoading, isFetching, refetch } = useQuery({
@@ -44,7 +45,7 @@ export function OrdersTable() {
   return (
     <div className="space-y-4">
 
-      <div className="flex flex-col gap-4 rounded border bg-background/50 p-4 backdrop-blur-sm">
+      <div className="flex flex-col gap-4 rounded border bg-secondary/10 p-4  ">
         <div className="flex flex-col gap-2">
           <TableHeaderControls
             title="Orders"
@@ -113,11 +114,11 @@ export function OrdersTable() {
         </div>
       </div>
       <div>
-        <div className="relative rounded border bg-background/50 backdrop-blur-sm overflow-hidden">
+        <div className="relative rounded border bg-background/50  overflow-hidden">
 
           <CommonOverlaySpinner show={isFetching && !isLoading} />
           <Table>
-            <TableHeader className="bg-secondary">
+            <TableHeader className="bg-primary/5">
               <TableRow className="[&>th]:py-3">
                 <TableHead>ID</TableHead>
                 <TableHead>User</TableHead>
@@ -170,7 +171,7 @@ export function OrdersTable() {
                         ₹{order.totalAmount}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {order.status}
+                        <StatusBadge status={order.status} />
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {new Date(order.updatedAt).toLocaleDateString("en-GB", {
