@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Edit, Trash2, Eye, ImageIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
 import { EmptyState } from "@/components/dashboard/common/empty-state";
@@ -65,11 +65,18 @@ export function ProductsTable() {
   });
 
   useEffect(() => {
-    if (filters.priceRange) {
+    if (filters?.priceRange) {
       setMinPrice(filters.priceRange.minPrice);
       setMaxPrice(filters.priceRange.maxPrice);
+
+      setAppliedFilters((prev) => ({
+        ...prev,
+        minPrice: filters.priceRange.minPrice,
+        maxPrice: filters.priceRange.maxPrice,
+      }));
     }
-  }, [filters])
+  }, [filters?.priceRange]);
+
   useEffect(() => {
     setAppliedFilters((prev) => ({
       ...prev,
@@ -78,6 +85,7 @@ export function ProductsTable() {
       page: 1,
     }));
   }, [debouncedMinPrice, debouncedMaxPrice]);
+
 
   const products = data?.data?.products ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
@@ -202,7 +210,7 @@ export function ProductsTable() {
               </label>
               <div className="flex items-center space-x-2 justify-between px-2 py-1.5 rounded border bg-background">
 
-                <div>Min: ₹{appliedFilters.minPrice ?? minPrice}</div>
+                <div>Min: ₹{minPrice}</div>
 
                 <div className="py-1 min-w-sm">
                   <Slider
@@ -216,7 +224,7 @@ export function ProductsTable() {
                     }}
                   />
                 </div>
-                <div>Max: ₹{appliedFilters.maxPrice ?? maxPrice}</div>
+                <div>Max: ₹{maxPrice}</div>
               </div>
             </div>
             <div className="flex items-end justify-end">
@@ -324,16 +332,9 @@ export function ProductsTable() {
                         <div className="flex items-center gap-2">
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 rounded-lg hover:bg-muted/60 transition-colors"
-                                asChild
-                              >
-                                <Link href={`/products/${product._id}`} className="flex items-center justify-center">
-                                  <Eye className="h-4 w-4" />
-                                </Link>
-                              </Button>
+                              <Link href={`/products/${product._id}`} className="flex items-center justify-center">
+                                <Eye className="h-4 w-4" />
+                              </Link>
                             </TooltipTrigger>
                             <TooltipContent>
                               <p>View</p>

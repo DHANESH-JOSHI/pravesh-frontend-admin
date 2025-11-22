@@ -136,9 +136,7 @@ export function CartsTable() {
                         <Tooltip>
                           <TooltipTrigger className="w-full flex justify-center">
                             <Link href={`/carts/${cart._id}`}>
-                              <Button variant="ghost">
                                 <Eye className="h-4 w-4" />
-                              </Button>
                             </Link>
                           </TooltipTrigger>
                           <TooltipContent>

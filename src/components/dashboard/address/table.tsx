@@ -180,20 +180,16 @@ export function AddressesTable() {
                         })}
                       </TableCell>
                       {!address.isDeleted && <TableCell>
-                        <Link href={`/addresses/${address._id}`}>
-                          <Tooltip>
-                            <TooltipTrigger className="w-full flex justify-center">
-                              <Link href={`/addresses/${address._id}`}>
-                                <Button variant="ghost">
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              View
-                            </TooltipContent>
-                          </Tooltip>
-                        </Link>
+                        <Tooltip>
+                          <TooltipTrigger className="w-full flex justify-center">
+                            <Link href={`/addresses/${address._id}`}>
+                              <Eye className="h-4 w-4" />
+                            </Link>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            View
+                          </TooltipContent>
+                        </Tooltip>
                       </TableCell>}
                     </TableRow>
                   ))}

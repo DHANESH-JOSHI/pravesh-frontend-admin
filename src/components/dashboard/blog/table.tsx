@@ -237,16 +237,9 @@ export function BlogsTable() {
                         <div className="flex items-center gap-2">
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 rounded-lg hover:bg-muted/60 transition-colors"
-                                asChild
-                              >
-                                <Link href={`/blogs/${blog._id}`} className="flex items-center justify-center">
+                              <Link href={`/blogs/${blog._id}`} className="flex items-center justify-center">
                                   <Eye className="h-4 w-4" />
                                 </Link>
-                              </Button>
                             </TooltipTrigger>
                             <TooltipContent>
                               <p>View</p>

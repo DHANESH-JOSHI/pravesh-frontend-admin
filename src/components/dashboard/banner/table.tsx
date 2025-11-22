@@ -237,16 +237,9 @@ export function BannersTable() {
                         <div className="flex items-center gap-2">
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 rounded-lg hover:bg-muted/60 transition-colors"
-                                asChild
-                              >
-                                <Link href={`/banners/${banner._id}`} className="flex items-center justify-center">
-                                  <Eye className="h-4 w-4" />
-                                </Link>
-                              </Button>
+                              <Link href={`/banners/${banner._id}`} className="flex items-center justify-center">
+                                <Eye className="h-4 w-4" />
+                              </Link>
                             </TooltipTrigger>
                             <TooltipContent>
                               <p>View</p>

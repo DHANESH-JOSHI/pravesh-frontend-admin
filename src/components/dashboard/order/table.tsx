@@ -185,9 +185,7 @@ export function OrdersTable() {
                         <Tooltip>
                           <TooltipTrigger className="w-full flex justify-center">
                             <Link href={`/orders/${order._id}`}>
-                              <Button variant="ghost">
                                 <Eye className="h-4 w-4" />
-                              </Button>
                             </Link>
                           </TooltipTrigger>
                           <TooltipContent>
