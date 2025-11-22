@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, MoreHorizontal, Trash2, Eye, Image } from "lucide-react";
+import { Edit, Trash2, Eye, Image } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
@@ -10,12 +10,6 @@ import { OverlaySpinner as CommonOverlaySpinner } from "@/components/dashboard/c
 import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
 import TableHeaderControls from "@/components/dashboard/common/table-header-controls";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -31,6 +25,7 @@ import { categoryService } from "@/services/category.service";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "next-view-transitions";
 import { isFiltersSelected } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function CategoriesTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -165,7 +160,7 @@ export function CategoriesTable() {
                 <TableHead>Products</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead>Updated</TableHead>
-                {!appliedFilters?.isDeleted && <TableHead className="w-16">Actions</TableHead>}
+                {!appliedFilters?.isDeleted && <TableHead className="w-16 text-center">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -235,46 +230,59 @@ export function CategoriesTable() {
                           year: "numeric",
                         })}
                       </TableCell>
-                      {!category.isDeleted && <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild className="gap-2">
-                              <Link href={`/categories/${category._id}`}>
-                                <Eye className="h-4 w-4" />
-                                View
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="gap-2"
-                              onClick={() =>
-                                setEditingCategory(category)
-                              }
-                            >
-                              <Edit className="h-4 w-4" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="gap-2 text-destructive"
-                              onClick={() => {
-                                setIsOpen(true);
-                                pendingDeleteSlug =
-                                  category._id;
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                      {!category.isDeleted && <TableCell className="py-4 px-4 text-center">
+                        <div className="flex items-center gap-2">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 rounded-lg hover:bg-muted/60 transition-colors"
+                                asChild
+                              >
+                                <Link href={`/categories/${category._id}`} className="flex items-center justify-center">
+                                  <Eye className="h-4 w-4" />
+                                </Link>
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>View</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 rounded-lg hover:bg-muted/60 transition-colors"
+                                onClick={() => setEditingCategory(category)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Edit</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 text-destructive rounded-lg hover:bg-muted/60 transition-colors"
+                                onClick={() => {
+                                  setIsOpen(true);
+                                  pendingDeleteId = category._id;
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Delete</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
                       </TableCell>}
                     </TableRow>
                   ))}
@@ -316,12 +324,12 @@ export function CategoriesTable() {
         isOpen={isOpen}
         onCancel={() => setIsOpen(false)}
         onContinue={() => {
-          if (pendingDeleteSlug)
-            deleteMutation.mutate(pendingDeleteSlug);
+          if (pendingDeleteId)
+            deleteMutation.mutate(pendingDeleteId);
         }}
       />
     </div>
   );
 }
 
-let pendingDeleteSlug: string | null = null;
+let pendingDeleteId: string | null = null;

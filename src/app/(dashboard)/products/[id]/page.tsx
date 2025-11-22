@@ -440,7 +440,7 @@ export default function ProductDetailPage() {
                       <TableHead>Rating</TableHead>
                       <TableHead>Comment</TableHead>
                       <TableHead>Date</TableHead>
-                      <TableHead className="w-16">Actions</TableHead>
+                      <TableHead className="w-16 text-center">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

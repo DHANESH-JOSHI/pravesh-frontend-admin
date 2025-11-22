@@ -226,7 +226,7 @@ export default function AddressDetailPage() {
                   <TableHead>Status</TableHead>
                   <TableHead>Created Date</TableHead>
                   <TableHead>Updated Date</TableHead>
-                  <TableHead className="w-16">Actions</TableHead>
+                  <TableHead className="w-16 text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

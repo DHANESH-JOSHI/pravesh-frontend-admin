@@ -27,7 +27,6 @@ export function CategoryFormDialog({
   open,
   onOpenChange,
   onSubmit,
-  title,
   initialData,
   isLoading,
 }: FormDialogProps<CreateCategory, Category>) {
@@ -73,7 +72,7 @@ export function CategoryFormDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            {title || "Create Category"}
+            {initialData ? "Edit Category" : "Create Category"}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>

@@ -23,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Link } from "next-view-transitions";
 import { isFiltersSelected } from "@/lib/utils";
 import { useDebounce } from "use-debounce";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function AddressesTable() {
   const [appliedFilters, setAppliedFilters] = useState<AddressQueryOptions>({ page: 1, limit: 8 });
@@ -124,7 +125,7 @@ export function AddressesTable() {
                 <TableHead>City</TableHead>
                 <TableHead>State</TableHead>
                 <TableHead>Updated</TableHead>
-                <TableHead className="w-16">Actions</TableHead>
+                <TableHead className="w-16 text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -180,9 +181,18 @@ export function AddressesTable() {
                       </TableCell>
                       {!address.isDeleted && <TableCell>
                         <Link href={`/addresses/${address._id}`}>
-                          <Button variant="ghost">
-                            <Eye className="h-4 w-4" />
-                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger className="w-full flex justify-center">
+                              <Link href={`/addresses/${address._id}`}>
+                                <Button variant="ghost">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              View
+                            </TooltipContent>
+                          </Tooltip>
                         </Link>
                       </TableCell>}
                     </TableRow>

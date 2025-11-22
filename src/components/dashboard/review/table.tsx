@@ -24,6 +24,7 @@ import { Product, User } from "@/types";
 import { Link } from "next-view-transitions";
 import { isFiltersSelected } from "@/lib/utils";
 import { useDebounce } from "use-debounce";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 export function ReviewsTable() {
   const [appliedFilters, setAppliedFilters] = useState<ReviewQueryOptions>({ page: 1, limit: 8 });
   const { data, isLoading, isFetching, refetch } = useQuery({
@@ -142,7 +143,7 @@ export function ReviewsTable() {
                 <TableHead>Rating</TableHead>
                 <TableHead>Comment</TableHead>
                 <TableHead>Created</TableHead>
-                <TableHead className="w-16">Actions</TableHead>
+                <TableHead className="w-16 text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -192,11 +193,18 @@ export function ReviewsTable() {
                         })}
                       </TableCell>
                       <TableCell>
-                        <Link href={`/reviews/${review._id}`}>
-                          <Button variant="ghost">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </Link>
+                        <Tooltip>
+                          <TooltipTrigger className="w-full flex justify-center">
+                            <Link href={`/reviews/${review._id}`}>
+                              <Button variant="ghost">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            View
+                          </TooltipContent>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   ))}

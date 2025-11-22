@@ -165,7 +165,7 @@ export default function BrandDetailPage() {
                     <TableHead>Title</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead>Updated</TableHead>
-                    <TableHead className="w-16">Actions</TableHead>
+                    <TableHead className="w-16 text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -222,7 +222,7 @@ export default function BrandDetailPage() {
                     <TableHead>Price</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead>Updated</TableHead>
-                    <TableHead className="w-16">Actions</TableHead>
+                    <TableHead className="w-16 text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

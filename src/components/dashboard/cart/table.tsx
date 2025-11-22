@@ -27,6 +27,7 @@ import {
 import { cartService } from "@/services/cart.service";
 import { Cart } from "@/types/cart";
 import { Product, User } from "@/types";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function CartsTable() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -80,7 +81,7 @@ export function CartsTable() {
                 <TableHead>Quantity</TableHead>
                 <TableHead>Total Amount</TableHead>
                 <TableHead>Updated</TableHead>
-                <TableHead className="w-16">Actions</TableHead>
+                <TableHead className="w-16 text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -132,25 +133,18 @@ export function CartsTable() {
                         })}
                       </TableCell>
                       <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild className="gap-2">
-                              <Link href={`/carts/${cart._id}`}>
+                        <Tooltip>
+                          <TooltipTrigger className="w-full flex justify-center">
+                            <Link href={`/carts/${cart._id}`}>
+                              <Button variant="ghost">
                                 <Eye className="h-4 w-4" />
-                                View
-                              </Link>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                              </Button>
+                            </Link>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            View
+                          </TooltipContent>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   ))}

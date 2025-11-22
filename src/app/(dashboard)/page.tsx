@@ -248,11 +248,7 @@ export default function DashboardPage() {
                 data={formattedRevenueData}
                 margin={{ top: 30, right: 20, left: 40, bottom: 40 }}
               >
-
-
                 <CartesianGrid vertical={false} />
-
-
                 <XAxis
                   dataKey="month"
                   axisLine={false}
@@ -265,8 +261,6 @@ export default function DashboardPage() {
                   tickLine={false}
                   tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
                 />
-
-
                 <Tooltip
                   cursor={{ fill: "transparent" }}
                   formatter={(value: any) => [`₹${value}`, "Revenue"]}
@@ -280,7 +274,6 @@ export default function DashboardPage() {
                     fontSize: 12,
                   }}
                 />
-
                 <Bar
                   dataKey="revenue"
                   radius={[8, 8, 0, 0]}

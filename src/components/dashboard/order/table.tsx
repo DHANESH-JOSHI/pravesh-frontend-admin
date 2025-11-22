@@ -25,6 +25,7 @@ import { User } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { isFiltersSelected } from "@/lib/utils";
 import { StatusBadge } from "@/app/(dashboard)/page";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 export function OrdersTable() {
   const [appliedFilters, setAppliedFilters] = useState<OrderQueryOptions>({ page: 1, limit: 8 });
   const { data, isLoading, isFetching, refetch } = useQuery({
@@ -125,7 +126,7 @@ export function OrdersTable() {
                 <TableHead>Total</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Updated</TableHead>
-                <TableHead className="w-16">Actions</TableHead>
+                <TableHead className="w-16 text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -181,11 +182,18 @@ export function OrdersTable() {
                         })}
                       </TableCell>
                       <TableCell>
-                        <Link href={`/orders/${order._id}`}>
-                          <Button variant="ghost">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </Link>
+                        <Tooltip>
+                          <TooltipTrigger className="w-full flex justify-center">
+                            <Link href={`/orders/${order._id}`}>
+                              <Button variant="ghost">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            View
+                          </TooltipContent>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   ))}

@@ -301,7 +301,7 @@ export default function CategoryDetailPage() {
                     <TableHead>Title</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead>Updated</TableHead>
-                    <TableHead className="w-16">Actions</TableHead>
+                    <TableHead className="w-16 text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -357,7 +357,7 @@ export default function CategoryDetailPage() {
                     <TableHead>Name</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead>Updated</TableHead>
-                    <TableHead className="w-16">Actions</TableHead>
+                    <TableHead className="w-16 text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -430,7 +430,7 @@ export default function CategoryDetailPage() {
                       <TableHead className="text-right">Price</TableHead>
                       <TableHead>New Arrival</TableHead>
                       <TableHead>Featured</TableHead>
-                      <TableHead className="w-16">Actions</TableHead>
+                      <TableHead className="w-16 text-center">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
