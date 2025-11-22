@@ -1,4 +1,4 @@
-import {Link} from "next-view-transitions"
+import { Link } from "next-view-transitions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { LucideIcon } from "lucide-react";
 

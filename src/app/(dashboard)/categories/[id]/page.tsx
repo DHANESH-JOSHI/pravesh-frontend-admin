@@ -1,6 +1,6 @@
 "use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Folder, Package, Eye, MoreHorizontal, Edit, Trash2, Plus, ImageIcon } from "lucide-react";
+import { ArrowLeft, Folder, Package, Eye, Plus, ImageIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,12 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
 
 import { categoryService } from "@/services/category.service";

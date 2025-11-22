@@ -18,7 +18,7 @@ export default function BannerDetailPage() {
   const router = useTransitionRouter()
   const id = params?.id as string;
 
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["banner", id],
     queryFn: async () => await bannerService.getById(id),
     enabled: !!id,

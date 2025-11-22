@@ -115,7 +115,7 @@ export function CategoriesTable() {
             searchPlaceholder="Search categories..."
             pageSize={appliedFilters.limit}
             onChangePageSizeAction={(v) => {
-              setAppliedFilters((v) => ({ ...v, page: 1, limit: Number(v) }));
+              setAppliedFilters((d) => ({ ...d, page: 1, limit: Number(v) }));
             }}
           />
 
