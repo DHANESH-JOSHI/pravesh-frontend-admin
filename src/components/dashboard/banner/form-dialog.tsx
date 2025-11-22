@@ -315,7 +315,7 @@ export function ProductSearchableSelect({ value, action }: { value: string; acti
   }, [inputValue, debouncedSetSearch]);
 
   const { data: productsData, isLoading: isLoadingProducts } = useQuery({
-    queryKey: ["products", "search", search],
+    queryKey: ["products", { page: 1, limit: 20, search }],
     queryFn: () => productService.getAll({
       page: 1,
       limit: 20,

@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Eye } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
 import { EmptyState } from "@/components/dashboard/common/empty-state";
 import { OverlaySpinner as CommonOverlaySpinner } from "@/components/dashboard/common/overlay-spinner";
@@ -22,6 +22,7 @@ import { Address, AddressQueryOptions } from "@/types/address";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "next-view-transitions";
 import { isFiltersSelected } from "@/lib/utils";
+import { useDebounce } from "use-debounce";
 
 export function AddressesTable() {
   const [appliedFilters, setAppliedFilters] = useState<AddressQueryOptions>({ page: 1, limit: 8 });
@@ -31,6 +32,8 @@ export function AddressesTable() {
     queryFn: async () =>
       await addressService.getAllAddresses(appliedFilters),
   });
+  const [userSearch, setUserSearch] = useState(appliedFilters.user || "");
+  const [debouncedUser] = useDebounce(userSearch, 500);
 
   const addresses = data?.data?.addresses ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
@@ -38,6 +41,14 @@ export function AddressesTable() {
   function resetFilters() {
     setAppliedFilters((prev) => ({ page: 1, search: "", limit: prev.limit }));
   }
+  useEffect(() => {
+    setAppliedFilters((prev) => ({
+      ...prev,
+      user: debouncedUser.trim() || undefined,
+      page: 1,
+    }));
+  }, [debouncedUser]);
+
 
   const hasFiltersSelected = isFiltersSelected(appliedFilters);
 
@@ -64,8 +75,8 @@ export function AddressesTable() {
               <input
                 type="text"
                 placeholder="User ID or name"
-                value={appliedFilters.user || ""}
-                onChange={(e) => setAppliedFilters((d) => ({ ...d, user: e.target.value || undefined }))}
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
                 className="w-full px-3 py-2 text-sm border rounded"
               />
             </div>
@@ -74,7 +85,7 @@ export function AddressesTable() {
               <label className="text-xs font-medium text-muted-foreground">Status</label>
               <Select
                 value={appliedFilters.isDeleted?.toString() || ""}
-                onValueChange={(v) => setAppliedFilters((d) => ({ ...d, isDeleted: v === "true" }))}
+                onValueChange={(v) => setAppliedFilters((d) => ({ ...d, isDeleted: v === "true", page: 1 }))}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Active" />
