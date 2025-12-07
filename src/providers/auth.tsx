@@ -17,6 +17,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const fetched = useRef(false);
+
+  const logout = useCallback(async () => {
+    await authService.logout();
+    setUser(null);
+  }, []);
+
+  const login = useCallback((user: User) => {
+    setUser(user);
+  }, []);
+
   useEffect(() => {
     if (fetched.current) return;
     fetched.current = true;
@@ -24,7 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const res = await userService.getMe();
         if (res.data?.role === "user") {
-          logout()
+          await logout();
         }
         setUser(res?.data || null);
       } catch (e: any) {
@@ -33,16 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
       }
     })();
-  }, []);
-
-  const login = useCallback((user: User) => {
-    setUser(user);
-  }, []);
-
-  const logout = useCallback(async () => {
-    await authService.logout();
-    setUser(null);
-  }, []);
+  }, [logout]);
 
   const value = useMemo(() => ({ user, loading, login, logout }), [user, loading, login, logout]);
 

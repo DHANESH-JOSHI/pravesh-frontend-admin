@@ -52,7 +52,7 @@ export function BlogsTable() {
     },
     onError: (error: any) => {
       setIsOpen(false);
-      toast.error(error.response.data.message ?? "Failed to delete blog. Please try again.");
+      toast.error(error.response?.data?.message ?? "Failed to delete blog. Please try again.");
     },
   });
 
@@ -67,7 +67,7 @@ export function BlogsTable() {
       setEditingBlog(null);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Failed to update blog. Please try again.");
+      toast.error(error.response?.data?.message ?? "Failed to update blog. Please try again.");
     },
   });
   const createMutation = useMutation({

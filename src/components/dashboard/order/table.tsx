@@ -146,7 +146,7 @@ export function OrdersTable() {
                 />
               ) : orders.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="p-6">
+                  <TableCell colSpan={7} className="p-6">
                     <EmptyState
                       title="No orders found"
                       description="Try a different search."
