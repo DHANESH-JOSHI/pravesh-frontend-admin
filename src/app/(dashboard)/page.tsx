@@ -176,19 +176,19 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="min-h-screen bg-background px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-8">
+    <div className="min-h-screen bg-background p-4 sm:px-6 sm:py-6 lg:px-8 overflow-x-hidden">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:gap-6 lg:gap-8 w-full">
         {/* Page header */}
         <header className="flex flex-col gap-2">
           <PageHeader title="Dashboard" />
-          <p className="max-w-xl text-sm text-muted-foreground">
+          <p className="max-w-xl text-xs sm:text-sm text-muted-foreground">
             A calm overview of your store performance. See revenue, orders and
             customers at a glance.
           </p>
         </header>
 
         {/* Primary KPI row */}
-        <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <section className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 md:grid-cols-2 xl:grid-cols-4">
           <StatCard
             icon={IndianRupee}
             label="Total Revenue"
@@ -216,7 +216,7 @@ export default function DashboardPage() {
         </section>
 
         {/* Secondary KPIs (spacious row of 3) */}
-        <section className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <section className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-6 md:grid-cols-3">
           <MiniMetricCard
             label="This Month’s Revenue"
             value={`₹${stats.thisMonthRevenue.toLocaleString()}`}
@@ -239,14 +239,14 @@ export default function DashboardPage() {
         </section>
 
 
-        <div className="rounded-2xl border border-border bg-card/80 p-5 shadow-sm  flex flex-col justify-between">
-          <h2 className="text-sm font-semibold text-foreground">Monthly Sales</h2>
+        <div className="rounded-xl sm:rounded-2xl border border-border bg-card/80 p-3 sm:p-5 shadow-sm flex flex-col justify-between overflow-hidden">
+          <h2 className="text-xs sm:text-sm font-semibold text-foreground mb-2 sm:mb-0">Monthly Sales</h2>
 
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height={310}>
+          <div className="h-52 sm:h-60 lg:h-68 w-full overflow-x-auto">
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={formattedRevenueData}
-                margin={{ top: 30, right: 20, left: 40, bottom: 40 }}
+                margin={{ top: 10, right: 10, left: 5, bottom: 10 }}
               >
                 <CartesianGrid vertical={false} />
                 <XAxis
@@ -254,19 +254,29 @@ export default function DashboardPage() {
                   axisLine={false}
                   tickLine={false}
                   interval={0}
-                  tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                  angle={-45}
+                  textAnchor="end"
+                  height={35}
+                  tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                  width={30}
+                  tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
+                  domain={['dataMin', 'auto']}
                 />
                 <Tooltip
-                  cursor={{ fill: "transparent" }}
-                  formatter={(value: any) => [`₹${value}`, "Revenue"]}
+                  cursor={{ fill: "rgba(59, 130, 246, 0.1)" }}
+                  formatter={(value: any) => {
+                    // Always show revenue, even if 0
+                    const revenueValue = value === null || value === undefined || isNaN(Number(value)) ? 0 : Number(value);
+                    return [`₹${revenueValue.toLocaleString()}`, "Revenue"];
+                  }}
                   labelFormatter={(label, payload) => {
                     if (!payload?.[0]) return label;
-                    return payload[0].payload.month;
+                    const monthData = payload[0].payload;
+                    return monthData.fullLabel || monthData.month;
                   }}
                   contentStyle={{
                     borderRadius: 10,
@@ -286,29 +296,46 @@ export default function DashboardPage() {
           </div>
 
         </div>
-        <section className="grid grid-cols-1 gap-8 xl:grid-cols-2">
+        <section className="grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8 xl:grid-cols-2">
 
 
 
-          <div className="rounded-2xl border border-border bg-card/80 p-5 shadow-sm ">
-            <div className="mb-4">
-              <h2 className="text-sm font-semibold text-foreground">Order Status Distribution</h2>
-              <p className="text-xs text-muted-foreground">Distribution of order fulfillment</p>
+          <div className="rounded-xl sm:rounded-2xl border border-border bg-card/80 p-3 sm:p-5 shadow-sm overflow-hidden">
+            <div className="mb-2 sm:mb-4">
+              <h2 className="text-xs sm:text-sm font-semibold text-foreground">Order Status Distribution</h2>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Distribution of order fulfillment</p>
             </div>
 
-            <ReactECharts
-              style={{ height: "310px", width: "100%" }}
-
-              option={{
-                tooltip: { trigger: "item" },
-                legend: { bottom: 0, textStyle: { color: "var(--muted-foreground)" } },
+            <div className="w-full overflow-hidden">
+              <ReactECharts
+                style={{ height: "250px", width: "100%", minHeight: "250px" }}
+                className="!h-[250px] sm:!h-[280px] lg:!h-[310px]"
+                option={{
+                  tooltip: { trigger: "item" },
+                  legend: { 
+                    bottom: 5, 
+                    left: "center",
+                    textStyle: { color: "var(--muted-foreground)", fontSize: 9 },
+                    itemWidth: 10,
+                    itemHeight: 6,
+                    itemGap: 8,
+                  },
                 series: [
                   {
                     type: "pie",
-                    radius: ["45%", "75%"],
-                    avoidLabelOverlap: false,
+                    radius: ["40%", "70%"],
+                    center: ["50%", "45%"],
+                    avoidLabelOverlap: true,
                     itemStyle: { borderRadius: 6, borderColor: "#fff", borderWidth: 2 },
-                    label: { show: true, formatter: "{b}: {d}%" },
+                    label: { 
+                      show: true, 
+                      formatter: "{b}: {d}%",
+                      fontSize: 9,
+                    },
+                    labelLine: {
+                      length: 8,
+                      length2: 5,
+                    },
                     data: orderStatusData.map((o, i) => ({
                       value: o.value,
                       name: o.name,
@@ -317,43 +344,53 @@ export default function DashboardPage() {
                   },
                 ],
               }}
-            />
+              />
+            </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card/80 p-5 shadow-sm  flex flex-col justify-between">
-            <h2 className="text-sm font-semibold text-foreground">Monthly Orders</h2>
-            <ReactECharts
-              style={{ height: "260px", width: "100%" }}
-              option={{
-                tooltip: {
-                  trigger: "axis",
-                  backgroundColor: "rgba(0,0,0,0.65)",
-                  borderRadius: 8,
-                  padding: 10,
-                  textStyle: { color: "#fff" },
-                  formatter: (params: any) => {
-                    const p = params[0];
-                    return `
-            <div style="font-size:12px;">
+          <div className="rounded-xl sm:rounded-2xl border border-border bg-card/80 p-3 sm:p-5 shadow-sm flex flex-col justify-between overflow-hidden">
+            <h2 className="text-xs sm:text-sm font-semibold text-foreground mb-2 sm:mb-0">Monthly Orders</h2>
+            <div className="w-full overflow-hidden">
+              <ReactECharts
+                style={{ height: "250px", width: "100%", minHeight: "250px" }}
+                className="!h-[250px] sm:!h-[260px]"
+                option={{
+                  tooltip: {
+                    trigger: "axis",
+                    backgroundColor: "rgba(0,0,0,0.65)",
+                    borderRadius: 8,
+                    padding: 8,
+                    textStyle: { color: "#fff", fontSize: 11 },
+                    formatter: (params: any) => {
+                      const p = params[0];
+                      return `
+            <div style="font-size:11px;">
               <b>${p.axisValue}</b><br/>
               Orders : <b>${p.data}</b>
             </div>`;
+                    },
                   },
-                },
-                grid: { left: 40, right: 20, top: 30, bottom: 40 },
-                xAxis: {
-                  type: "category",
-                  data: formattedRevenueData.map((d) => d.month),
-                  axisLabel: { color: "var(--muted-foreground)", fontSize: 12 },
-                  axisLine: { show: false },
-                  axisTick: { show: false },
-                },
+                  grid: { left: 30, right: 15, top: 20, bottom: 30 },
+                  xAxis: {
+                    type: "category",
+                    data: formattedRevenueData.map((d) => d.month),
+                    axisLabel: { 
+                      color: "var(--muted-foreground)", 
+                      fontSize: 9,
+                      rotate: -30,
+                      margin: 12,
+                    },
+                    axisLine: { show: false },
+                    axisTick: { show: false },
+                  },
 
-                yAxis: {
-                  type: "value",
-                  axisLabel: { color: "var(--muted-foreground)", fontSize: 12 },
-                  splitLine: { lineStyle: { color: "rgba(120,120,120,0.40)" } }
-                },
+                  yAxis: {
+                    type: "value",
+                    min: 0,
+                    axisLabel: { color: "var(--muted-foreground)", fontSize: 9 },
+                    splitLine: { lineStyle: { color: "rgba(120,120,120,0.40)" } },
+                    scale: false,
+                  },
                 series: [
                   {
                     type: "line",
@@ -372,24 +409,25 @@ export default function DashboardPage() {
                   },
                 ],
               }}
-            />
+              />
+            </div>
           </div>
         </section>
 
 
 
-        <section className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <div className="rounded-2xl border border-border bg-card/80 p-5 shadow-sm ">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-foreground">Recent Orders</h2>
+        <section className="grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-2">
+          <div className="rounded-xl sm:rounded-2xl border border-border bg-card/80 p-3 sm:p-5 shadow-sm overflow-hidden">
+            <div className="mb-3 sm:mb-5 flex items-center justify-between">
+              <h2 className="text-sm sm:text-lg font-semibold text-foreground">Recent Orders</h2>
 
               <Link href="/orders">
-                <Button className="rounded-full">See all</Button>
+                <Button className="rounded-full text-xs sm:text-sm h-7 sm:h-9 px-3 sm:px-4">See all</Button>
               </Link>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+            <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
+              <table className="w-full text-xs sm:text-sm min-w-[500px] sm:min-w-0">
                 <thead>
                   <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
                     <th className="py-2">Customer</th>
@@ -439,19 +477,19 @@ export default function DashboardPage() {
           </div>
 
 
-          <div className="rounded-2xl border border-border bg-card/80 p-5 shadow-sm ">
-            <div className="mb-4 flex items-center justify-between">
+          <div className="rounded-xl sm:rounded-2xl border border-border bg-card/80 p-3 sm:p-5 shadow-sm overflow-hidden">
+            <div className="mb-3 sm:mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-sm font-semibold text-foreground">
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground">
                   Top Products
                 </h2>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
                   Best performing products by revenue.
                 </p>
               </div>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs sm:text-sm">
+            <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
+              <table className="w-full text-xs sm:text-sm min-w-[400px] sm:min-w-0">
                 <thead>
                   <tr className="border-b border-border text-left text-[11px] uppercase tracking-wide text-muted-foreground">
                     <th className="py-2 pr-2">Product</th>
@@ -545,20 +583,20 @@ function StatCard({
 
   return (
     <div
-      className={`relative flex flex-col justify-between rounded-2xl border border-border bg-card/80 p-5 shadow ring-1 ring-inset ${colors.ring}`}
+      className={`relative flex flex-col justify-between rounded-xl sm:rounded-2xl border border-border bg-card/80 p-3 sm:p-4 md:p-5 shadow ring-1 ring-inset ${colors.ring}`}
     >
       <div className="mb-4 flex items-center justify-between gap-3">
         <div
-          className={`flex h-11 w-11 items-center justify-center rounded-2xl ${colors.iconBg}`}
+          className={`flex h-9 w-9 sm:h-10 sm:w-10 md:h-11 md:w-11 items-center justify-center rounded-xl sm:rounded-2xl ${colors.iconBg}`}
         >
-          <Icon className="h-5 w-5" />
+          <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
         </div>
       </div>
       <div className="space-y-1">
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           {label}
         </p>
-        <p className="text-2xl font-semibold text-foreground sm:text-3xl">
+        <p className="text-xl sm:text-2xl md:text-3xl font-semibold text-foreground">
           {value}
         </p>
       </div>
@@ -571,16 +609,16 @@ function StatCard({
 
 function MiniMetricCard({ label, value, helper, icon: Icon, color }: any) {
   return (
-    <div className={`rounded-2xl border border-border px-4 shadow- py-3 ${color}`}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1">
-          <p className="text-[11px] font-medium uppercase">{label}</p>
-          <p className="text-xl font-bold">{value}</p>
-          {helper && <p className="text-[11px] opacity-70">{helper}</p>}
+    <div className={`rounded-xl sm:rounded-2xl border border-border px-3 sm:px-4 shadow-sm py-2 sm:py-3 ${color}`}>
+      <div className="flex items-start justify-between gap-2 sm:gap-3">
+        <div className="space-y-0.5 sm:space-y-1">
+          <p className="text-[10px] sm:text-[11px] font-medium uppercase">{label}</p>
+          <p className="text-lg sm:text-xl font-bold">{value}</p>
+          {helper && <p className="text-[10px] sm:text-[11px] opacity-70">{helper}</p>}
         </div>
         {Icon && (
-          <div className="p-2 rounded-full bg-white/50 dark:bg-white/10 ">
-            <Icon className="h-5 w-5" />
+          <div className="p-1.5 sm:p-2 rounded-full bg-white/50 dark:bg-white/10 flex-shrink-0">
+            <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
         )}
       </div>

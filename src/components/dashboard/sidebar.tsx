@@ -102,7 +102,7 @@ export const AppSidebar = ({ user }: { user: User }) => {
           user={{
             name: user.name,
             email: user.email || "",
-            avatar: "https://i.pravatar.cc/150?img=3",
+            avatar: user.img || "https://i.pravatar.cc/150?img=3",
           }}
         />
       </SidebarFooter>
