@@ -33,7 +33,6 @@ export default function OrderDetailPage() {
 
 
   const order = data?.data;
-  console.log({ order })
 
   const { mutate: updateStatus } = useMutation({
     mutationFn: (status: OrderStatus) => orderService.updateOrderStatus(orderId, status),

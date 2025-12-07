@@ -253,7 +253,6 @@ export function OrderFormDialog({
 }
 
 function ProductSearchableSelect({ product, onChange }: { product: Partial<Product> | null; onChange: (value: string) => void }) {
-  console.log({ product })
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string>(product?._id || "");

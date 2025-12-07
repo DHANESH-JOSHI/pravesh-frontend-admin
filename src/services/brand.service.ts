@@ -17,7 +17,6 @@ class BrandService {
 
   async create(data: CreateBrand) {
     const formData = new FormData();
-    console.log("Creating brand with data:", data);
     formData.append('name', data.name);
     if (data.image && data.image instanceof File) {
       formData.append('image', data.image);

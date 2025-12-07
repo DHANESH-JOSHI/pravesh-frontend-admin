@@ -182,7 +182,7 @@ export function MessagesTable() {
                       <TableCell className="font-medium">
                         {message.name}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-muted-foreground text-sm">
                         {message.email}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
@@ -215,7 +215,7 @@ export function MessagesTable() {
                           </Tooltip>
                           {message.status === "open" && (
                             <Tooltip>
-                              <TooltipTrigger>
+                              <TooltipTrigger asChild>
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -232,7 +232,7 @@ export function MessagesTable() {
                             </Tooltip>
                           )}
                           <Tooltip>
-                            <TooltipTrigger>
+                            <TooltipTrigger asChild>
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -275,7 +275,7 @@ export function MessagesTable() {
           }
         }}
         title="Delete Message"
-        description={`Are you sure you want to delete the contact from ${selectedMessage?.name}? This action cannot be undone.`}
+        description={`Are you sure you want to delete the message from ${selectedMessage?.name}? This action cannot be undone.`}
       />
     </div>
   );

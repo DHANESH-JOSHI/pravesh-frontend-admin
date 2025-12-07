@@ -23,6 +23,7 @@ import {
   Receipt,
   LayoutDashboard,
   MessageSquare,
+  Settings,
 } from "lucide-react"
 import { NavUser } from "./nav-user"
 import { Link } from "next-view-transitions"
@@ -42,6 +43,7 @@ const items = [
   { title: "Wallets", url: "/wallets", icon: Wallet },
   { title: "Addresses", url: "/addresses", icon: MapPin },
   { title: "Messages", url: "/messages", icon: MessageSquare },
+  { title: "Settings", url: "/settings", icon: Settings },
 ]
 
 export const AppSidebar = ({ user }: { user: User }) => {
