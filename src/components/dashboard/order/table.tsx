@@ -121,10 +121,11 @@ export function OrdersTable() {
           <Table>
             <TableHeader className="bg-primary/5">
               <TableRow className="[&>th]:py-3">
-                <TableHead>ID</TableHead>
-                <TableHead>User</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead>Total</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Updated</TableHead>
                 <TableHead className="w-16 text-center">Actions</TableHead>
               </TableRow>
@@ -134,11 +135,13 @@ export function OrdersTable() {
                 <TableLoadingRows
                   rows={6}
                   columns={[
-                    "h-12 w-40 rounded",
-                    "h-4 w-40",
-                    "h-4 w-40",
-                    "h-4 w-40",
-                    "h-8 w-12 rounded",
+                    "h-5 w-32",
+                    "h-5 w-40",
+                    "h-5 w-24",
+                    "h-6 w-20",
+                    "h-6 w-20",
+                    "h-5 w-24",
+                    "h-4 w-4 rounded",
                   ]}
                 />
               ) : orders.length === 0 ? (
@@ -154,25 +157,24 @@ export function OrdersTable() {
                 <>
                   {orders.map((order: Order) => (
                     <TableRow key={order._id}>
-                      <TableCell className="font-mono text-sm">
-                        <div className="flex items-center gap-2">
-                          {order._id}
-                          {order.isCustomOrder && (
-                            <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-                              <Palette className="h-3 w-3 mr-1" />
-                              Custom
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
                       <TableCell className="font-medium">
                         {(order.user as User).name}
+                      </TableCell>
+                      <TableCell className="font-mono text-sm">
+                        <div className="flex items-center gap-2">
+                          {(order.user as User).email}
+                        </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         ₹{order.totalAmount}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         <StatusBadge status={order.status} />
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+                          {order.isCustomOrder ? "Custom" : "Regular"}
+                        </Badge>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {new Date(order.updatedAt).toLocaleDateString("en-GB", {
@@ -185,7 +187,7 @@ export function OrdersTable() {
                         <Tooltip>
                           <TooltipTrigger className="w-full flex justify-center">
                             <Link href={`/orders/${order._id}`}>
-                                <Eye className="h-4 w-4" />
+                              <Eye className="h-4 w-4" />
                             </Link>
                           </TooltipTrigger>
                           <TooltipContent>

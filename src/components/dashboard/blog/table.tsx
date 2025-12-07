@@ -178,11 +178,12 @@ export function BlogsTable() {
                 <TableLoadingRows
                   rows={6}
                   columns={[
-                    "h-12 w-40 rounded",
-                    "h-4 w-40",
-                    "h-4 w-40",
-                    "h-4 w-40",
-                    "h-8 w-12 rounded",
+                    "h-12 w-12 rounded",
+                    "h-5 w-48",
+                    "h-5 w-32",
+                    "h-5 w-24",
+                    "h-5 w-24",
+                    "h-4 w-4 rounded",
                   ]}
                 />
               ) : blogs.length === 0 ? (
@@ -233,7 +234,7 @@ export function BlogsTable() {
                           year: "numeric",
                         })}
                       </TableCell>
-                      <TableCell className="py-4 px-4 text-center">
+                      <TableCell className="px-4 text-center">
                         <div className="flex items-center gap-2">
                           <Tooltip>
                             <TooltipTrigger asChild>

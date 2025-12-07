@@ -108,13 +108,13 @@ export function WalletsTable() {
                 <TableLoadingRows
                   rows={6}
                   columns={[
-                    "h-4 w-32",
-                    "h-4 w-24",
-                    "h-4 w-24",
-                    "h-4 w-16",
-                    "h-4 w-24",
-                    "h-4 w-24",
-                    "h-8 w-12 rounded",
+                    "h-5 w-32",
+                    "h-5 w-24",
+                    "h-5 w-24",
+                    "h-5 w-16",
+                    "h-5 w-24",
+                    "h-5 w-24",
+                    "h-4 w-4 rounded",
                   ]}
                 />
               ) : wallets.length === 0 ? (
@@ -130,10 +130,10 @@ export function WalletsTable() {
                 <>
                   {wallets.map((wallet) => (
                     <TableRow key={wallet._id}>
-                      <TableCell className="font-medium font-mono text-sm">
+                      <TableCell className="font-medium text-sm">
                         {(wallet.user as User).name}
                       </TableCell>
-                      <TableCell className="font-medium font-mono text-sm">
+                      <TableCell className="font-mono text-sm">
                         {(wallet.user as User).email}
                       </TableCell>
                       <TableCell className="text-muted-foreground font-semibold">
@@ -156,16 +156,16 @@ export function WalletsTable() {
                           year: "numeric",
                         })}
                       </TableCell>
-                      <TableCell className="py-4 px-4 text-center">
+                      <TableCell className="px-4 text-center">
                         <div className="flex items-center gap-2">
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button variant="ghost" className="flex items-center justify-center" onClick={() => {
+                              <div className="flex items-center justify-center" onClick={() => {
                                 setEditingWallet(wallet);
                                 setViewOpen(true);
                               }}>
                                 <Eye className="h-4 w-4" />
-                              </Button>
+                              </div>
                             </TooltipTrigger>
                             <TooltipContent>
                               <p>View wallet</p>

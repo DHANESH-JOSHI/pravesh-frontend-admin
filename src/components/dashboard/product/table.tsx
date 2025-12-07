@@ -265,15 +265,15 @@ export function ProductsTable() {
                 <TableLoadingRows
                   rows={6}
                   columns={[
-                    "h-12 w-24 rounded",
-                    "h-4 w-24",
-                    "h-4 w-24",
-                    "h-4 w-24",
-                    "h-4 w-24",
-                    "h-4 w-24",
-                    "h-4 w-24",
-                    "h-4 w-24",
-                    "h-4 w-20",
+                    "h-12 w-12 rounded",
+                    "h-5 w-24",
+                    "h-5 w-48",
+                    "h-5 w-24",
+                    "h-5 w-24",
+                    "h-5 w-20",
+                    "h-6 w-16",
+                    "h-6 w-16",
+                    "h-4 w-4 rounded",
                   ]}
                 />
               ) : products.length === 0 ? (
@@ -328,7 +328,7 @@ export function ProductsTable() {
                           {product.isFeatured ? "Yes" : "No"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="py-4 px-4 text-center">
+                      <TableCell className="px-4 text-center">
                         <div className="flex items-center gap-2">
                           <Tooltip>
                             <TooltipTrigger asChild>

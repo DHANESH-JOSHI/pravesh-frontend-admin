@@ -89,12 +89,12 @@ export function CartsTable() {
                 <TableLoadingRows
                   rows={6}
                   columns={[
-                    "h-4 w-32",
-                    "h-4 w-20",
-                    "h-4 w-24",
-                    "h-4 w-32",
-                    "h-4 w-24",
-                    "h-8 w-12 rounded",
+                    "h-5 w-32",
+                    "h-5 w-20",
+                    "h-5 w-24",
+                    "h-5 w-32",
+                    "h-5 w-24",
+                    "h-4 w-4 rounded",
                   ]}
                 />
               ) : paginatedCarts.length === 0 ? (
