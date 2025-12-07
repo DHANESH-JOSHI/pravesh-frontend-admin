@@ -42,7 +42,7 @@ export function MessagesTable() {
 
   const messages = data?.data?.messages ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
-
+  const total = data?.data?.total ?? 0;
   const deleteMutation = useMutation({
     mutationFn: messageService.delete,
     onSuccess: ({ message }) => {
@@ -256,6 +256,7 @@ export function MessagesTable() {
           </Table>
         </div>
         <PaginationControls
+          total={total}
           limit={appliedFilters.limit || 8}
           page={appliedFilters.page || 1}
           totalPages={totalPages}

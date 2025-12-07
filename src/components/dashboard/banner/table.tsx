@@ -40,7 +40,7 @@ export function BannersTable() {
 
   const banners = data?.data?.banners ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
-
+  const total = data?.data?.total ?? 0;
   const deleteMutation = useMutation({
     mutationFn: bannerService.delete,
     onSuccess: ({ message }) => {
@@ -289,6 +289,7 @@ export function BannersTable() {
           </Table>
         </div>
         <PaginationControls
+          total={total}
           limit={appliedFilters.limit || 8}
           page={appliedFilters.page || 1}
           totalPages={totalPages}

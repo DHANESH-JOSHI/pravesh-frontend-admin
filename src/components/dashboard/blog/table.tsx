@@ -41,6 +41,7 @@ export function BlogsTable() {
 
   const blogs = data?.data?.blogs ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
+  const total = data?.data?.total ?? 0;
 
   const deleteMutation = useMutation({
     mutationFn: blogService.delete,
@@ -290,6 +291,7 @@ export function BlogsTable() {
         </div>
         <PaginationControls
           limit={appliedFilters.limit || 8}
+          total={total}
           page={appliedFilters.page || 1}
           totalPages={totalPages}
           isFetching={isFetching}

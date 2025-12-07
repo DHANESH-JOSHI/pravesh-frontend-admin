@@ -4,6 +4,7 @@ type Props = {
   page: number;
   totalPages: number;
   limit: number;
+  total: number;
   isFetching?: boolean;
   onPrev: () => void;
   onNext: () => void;
@@ -13,6 +14,7 @@ type Props = {
 export function PaginationControls({
   page,
   totalPages,
+  total,
   isFetching,
   onPrev,
   onNext,
@@ -37,7 +39,7 @@ export function PaginationControls({
   const items = getItems();
   return (
     <div className="flex items-center justify-between">
-      <div className="text-sm">Showing <span className="font-semibold">{(page - 1) * limit + 1}</span> to <span className="font-semibold">{Math.min(page * limit, tp * limit)}</span> of <span className="font-semibold">{tp * limit}</span></div>
+      <div className="text-sm">Showing <span className="font-semibold">{(page - 1) * limit + 1}</span> to <span className="font-semibold">{Math.min(page * limit, total)}</span> of <span className="font-semibold">{total}</span></div>
       <div className="mt-2 flex items-center justify-center">
         <Pagination>
           <PaginationContent>

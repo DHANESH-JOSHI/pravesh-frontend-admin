@@ -43,7 +43,7 @@ export function UsersTable() {
 
   const users = data?.data?.users ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
-
+  const total = data?.data?.total ?? 0;
   const deleteMutation = useMutation({
     mutationFn: userService.deleteById,
     onSuccess: ({ message }) => {
@@ -259,6 +259,7 @@ export function UsersTable() {
           </Table>
         </div>
         <PaginationControls
+          total={total}
           limit={appliedFilters.limit || 8}
           page={appliedFilters.page || 1}
           totalPages={totalPages}

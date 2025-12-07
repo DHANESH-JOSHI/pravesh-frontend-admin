@@ -89,6 +89,7 @@ export function ProductsTable() {
 
   const products = data?.data?.products ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
+  const total = data?.data?.total ?? 0;
 
   const deleteMutation = useMutation({
     mutationFn: productService.delete,
@@ -385,7 +386,7 @@ export function ProductsTable() {
 
         <PaginationControls
           limit={appliedFilters.limit || 8}
-
+              total={total}
           page={appliedFilters.page || 1}
           totalPages={totalPages}
           isFetching={isFetching}

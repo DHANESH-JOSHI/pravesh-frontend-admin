@@ -41,7 +41,7 @@ export function CategoriesTable() {
 
   const categories = data?.data?.categories ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
-
+  const total = data?.data?.total ?? 0;
   function resetFilters() {
     setAppliedFilters((prev) => ({ page: 1, search: "", limit: prev.limit, parentCategoryId: "null" }));
   }
@@ -287,6 +287,7 @@ export function CategoriesTable() {
           </Table>
         </div>
         <PaginationControls
+        total={total}
           limit={appliedFilters.limit || 8}
           page={appliedFilters.page || 1}
           totalPages={totalPages}

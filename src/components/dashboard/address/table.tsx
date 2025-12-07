@@ -38,7 +38,7 @@ export function AddressesTable() {
 
   const addresses = data?.data?.addresses ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
-
+  const total = data?.data?.total ?? 0;
   function resetFilters() {
     setAppliedFilters((prev) => ({ page: 1, search: "", limit: prev.limit }));
   }
@@ -199,6 +199,7 @@ export function AddressesTable() {
           </Table>
         </div>
         <PaginationControls
+          total={total}
           limit={appliedFilters.limit || 8}
           page={appliedFilters.page || 1}
           totalPages={totalPages}

@@ -47,7 +47,7 @@ export function WalletsTable() {
 
   const wallets = data?.data?.wallets ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
-
+  const total = data?.data?.total ?? 0;
   const addFundsMutation = useMutation({
     mutationFn: async (data: { userId: string; amount: number; description?: string }) => {
       const result = await walletService.addFunds(data);
@@ -197,6 +197,7 @@ export function WalletsTable() {
           </Table>
         </div>
         <PaginationControls
+          total={total}
           limit={limit}
           page={page}
           totalPages={totalPages}

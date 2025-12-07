@@ -36,7 +36,7 @@ export function OrdersTable() {
 
   const orders = data?.data?.orders ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
-
+  const total = data?.data?.total ?? 0;
   function resetFilters() {
     setAppliedFilters((prev) => ({ page: 1, user: "", limit: prev.limit }));
   }
@@ -204,6 +204,7 @@ export function OrdersTable() {
         </div>
         <PaginationControls
           limit={appliedFilters.limit || 8}
+          total={total}
           page={appliedFilters.page || 1}
           totalPages={totalPages}
           isFetching={isFetching}

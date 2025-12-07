@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { MoreHorizontal, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
 import { useState } from "react";
 import { Link } from "next-view-transitions"
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";
@@ -9,13 +9,7 @@ import { EmptyState } from "@/components/dashboard/common/empty-state";
 import { OverlaySpinner as CommonOverlaySpinner } from "@/components/dashboard/common/overlay-spinner";
 import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
 import TableHeaderControls from "@/components/dashboard/common/table-header-controls";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   Table,
   TableBody,
@@ -44,7 +38,7 @@ export function CartsTable() {
 
   const carts = data?.data?.carts ?? [];
   const totalPages = data?.data?.totalPages ?? 1;
-
+  const total = data?.data?.total ?? 0;
   const paginatedCarts = carts.slice((page - 1) * limit, page * limit);
 
   return (
@@ -152,6 +146,7 @@ export function CartsTable() {
           </Table>
         </div>
         <PaginationControls
+          total={total}
           limit={limit}
           page={page}
           totalPages={totalPages}
