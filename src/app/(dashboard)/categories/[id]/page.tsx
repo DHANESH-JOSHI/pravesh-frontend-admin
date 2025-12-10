@@ -473,7 +473,8 @@ export default function CategoryDetailPage() {
               {(category.products || []).length > itemsPerPage && (
                 <div className="mt-4">
                   <PaginationControls
-                  limit={itemsPerPage}
+                    total={category.products?.length || 0}
+                    limit={itemsPerPage}
                     page={productsPage}
                     totalPages={Math.ceil((category.products || []).length / itemsPerPage)}
                     isFetching={false}

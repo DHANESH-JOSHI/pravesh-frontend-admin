@@ -36,6 +36,7 @@ export default function BrandDetailPage() {
   });
 
   const brand = data?.data;
+  const total = brand?.products?.length || 0;
 
   if (isLoading) {
     return <Loader />;
@@ -269,6 +270,7 @@ export default function BrandDetailPage() {
             {(brand.products || []).length > itemsPerPage && (
               <div className="mt-4">
                 <PaginationControls
+                  total={total}
                   limit={itemsPerPage}
                   page={productsPage}
                   totalPages={Math.ceil((brand.products || []).length / itemsPerPage)}

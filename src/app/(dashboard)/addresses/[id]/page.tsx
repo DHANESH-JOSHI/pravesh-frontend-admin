@@ -45,10 +45,11 @@ export default function AddressDetailPage() {
   const user = typeof address?.user === 'object' ? address.user : null;
   const orders = address?.orders || [];
   const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const total = orders.length;
   const paginatedOrders = orders.slice((ordersPage - 1) * itemsPerPage, ordersPage * itemsPerPage);
 
   if (isLoading) {
-    return <Loader/>
+    return <Loader />
   }
 
   if (error || !address) {
@@ -284,6 +285,7 @@ export default function AddressDetailPage() {
         {totalPages > 1 && (
           <div className="px-6 pb-4">
             <PaginationControls
+              total={total}
               limit={itemsPerPage}
               page={ordersPage}
               totalPages={totalPages}

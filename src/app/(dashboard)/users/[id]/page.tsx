@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, User, Mail, Shield, Calendar, ShoppingCart, MapPin, Heart, Package, Star, Wallet, Eye } from "lucide-react";
+import { ArrowLeft, User, Mail, Shield, Calendar, MapPin, Package, Star, Wallet, Eye } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -274,6 +274,7 @@ export default function UserDetailPage() {
           {(user.addresses || []).length > itemsPerPage && (
             <div className="px-6 pb-4">
               <PaginationControls
+                total={(user.addresses || []).length}
                 limit={itemsPerPage}
                 page={addressesPage}
                 totalPages={Math.ceil((user.addresses || []).length / itemsPerPage)}
@@ -401,7 +402,8 @@ export default function UserDetailPage() {
           {(user.orders || []).length > itemsPerPage && (
             <div className="px-6 pb-4">
               <PaginationControls
-              limit={itemsPerPage}
+                total={(user.orders || []).length}
+                limit={itemsPerPage}
                 page={ordersPage}
                 totalPages={Math.ceil((user.orders || []).length / itemsPerPage)}
                 isFetching={false}
@@ -511,6 +513,7 @@ export default function UserDetailPage() {
             {(user.reviews || []).length > itemsPerPage && (
               <div className="mt-4">
                 <PaginationControls
+                  total={(user.reviews || []).length}
                   limit={itemsPerPage}
                   page={reviewsPage}
                   totalPages={Math.ceil((user.reviews || []).length / itemsPerPage)}
