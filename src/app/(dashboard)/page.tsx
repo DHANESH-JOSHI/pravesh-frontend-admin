@@ -8,9 +8,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
 } from 'recharts';
 import ReactECharts from "echarts-for-react";
 import {
@@ -309,11 +306,11 @@ export default function DashboardPage() {
             <div className="w-full overflow-hidden">
               <ReactECharts
                 style={{ height: "250px", width: "100%", minHeight: "250px" }}
-                className="!h-[250px] sm:!h-[280px] lg:!h-[310px]"
+                className="h-[250px]! sm:h-[280px]! lg:h-[310px]!"
                 option={{
                   tooltip: { trigger: "item" },
-                  legend: { 
-                    bottom: 5, 
+                  legend: {
+                    bottom: 5,
                     left: "center",
                     textStyle: { color: "var(--muted-foreground)", fontSize: 9 },
                     itemWidth: 10,
@@ -327,8 +324,8 @@ export default function DashboardPage() {
                     center: ["50%", "45%"],
                     avoidLabelOverlap: true,
                     itemStyle: { borderRadius: 6, borderColor: "#fff", borderWidth: 2 },
-                    label: { 
-                      show: true, 
+                    label: {
+                      show: true,
                       formatter: "{b}: {d}%",
                       fontSize: 9,
                     },
@@ -353,7 +350,7 @@ export default function DashboardPage() {
             <div className="w-full overflow-hidden">
               <ReactECharts
                 style={{ height: "250px", width: "100%", minHeight: "250px" }}
-                className="!h-[250px] sm:!h-[260px]"
+                className="h-[250px]! sm:h-[260px]!"
                 option={{
                   tooltip: {
                     trigger: "axis",
@@ -374,8 +371,8 @@ export default function DashboardPage() {
                   xAxis: {
                     type: "category",
                     data: formattedRevenueData.map((d) => d.month),
-                    axisLabel: { 
-                      color: "var(--muted-foreground)", 
+                    axisLabel: {
+                      color: "var(--muted-foreground)",
                       fontSize: 9,
                       rotate: -30,
                       margin: 12,
@@ -617,7 +614,7 @@ function MiniMetricCard({ label, value, helper, icon: Icon, color }: any) {
           {helper && <p className="text-[10px] sm:text-[11px] opacity-70">{helper}</p>}
         </div>
         {Icon && (
-          <div className="p-1.5 sm:p-2 rounded-full bg-white/50 dark:bg-white/10 flex-shrink-0">
+          <div className="p-1.5 sm:p-2 rounded-full bg-white/50 dark:bg-white/10 shrink-0">
             <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
         )}

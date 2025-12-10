@@ -13,13 +13,13 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-export default function AdminLayout({
+export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ViewTransitions>
       <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
           <AuthProvider>
             <QueryProvider>
               <main className="min-h-screen vt-page">{children}</main>
