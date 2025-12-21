@@ -4,18 +4,21 @@ type MaybeString = string | undefined | null;
 
 /**
  * Product-related invalidation
- * Matches backend: invalidateProductCaches
+ * Matches backend: PRODUCT_ANY, PRODUCTS_ALL, PRODUCT_RELATED_ANY, PRODUCT_FILTERS
  */
 export function invalidateProductQueries(
   queryClient: QueryClient,
   params: {
     productId?: MaybeString;
     productSlug?: MaybeString;
+    oldSlug?: MaybeString;
     categoryId?: MaybeString;
     brandId?: MaybeString;
-  }
+    oldCategoryId?: MaybeString;
+    oldBrandId?: MaybeString;
+  } = {}
 ) {
-  const { productId, productSlug, categoryId, brandId } = params;
+  const { productId, productSlug, oldSlug, categoryId, brandId, oldCategoryId, oldBrandId } = params;
 
   // Invalidate all product list variations
   queryClient.invalidateQueries({ queryKey: ["products"], exact: false });
@@ -107,22 +110,51 @@ export function invalidateMessageQueries(
 
 /**
  * Category-related invalidation
- * Matches backend: invalidateCategoryCaches
+ * Matches backend: CATEGORY_ANY, CATEGORIES_ALL, CATEGORY_BY_SLUG_ANY, CATEGORY_TREE, CATEGORY_LEAF
  */
 export function invalidateCategoryQueries(
   queryClient: QueryClient,
-  categoryId?: MaybeString
+  params: {
+    categoryId?: MaybeString;
+    categorySlug?: MaybeString;
+    oldSlug?: MaybeString;
+    parentCategoryId?: MaybeString;
+    oldParentCategoryId?: MaybeString;
+  } = {}
 ) {
-  // Invalidate specific category
+  const { categoryId, categorySlug, oldSlug, parentCategoryId, oldParentCategoryId } = params;
+  
+  // Invalidate specific category by ID (matches: category:${id}*)
   if (categoryId) {
     queryClient.invalidateQueries({ queryKey: ["category", categoryId], exact: false });
   }
   
-  // Invalidate all category list variations
+  // Invalidate category by slug (matches: category:${slug}*)
+  if (categorySlug) {
+    queryClient.invalidateQueries({ queryKey: ["category"], exact: false });
+  }
+  
+  // Invalidate old slug if changed (matches: category:${oldSlug}*)
+  if (oldSlug && oldSlug !== categorySlug) {
+    queryClient.invalidateQueries({ queryKey: ["category"], exact: false });
+  }
+  
+  // Invalidate all category list variations (matches: categories*)
   queryClient.invalidateQueries({ queryKey: ["categories"], exact: false });
   queryClient.invalidateQueries({ queryKey: ["category"], exact: false });
-  // Invalidate category tree (used in select components)
+  
+  // Invalidate category tree (matches: categories:tree)
   queryClient.invalidateQueries({ queryKey: ["categories", "tree"] });
+  
+  // Invalidate parent category if changed (matches: category:${parentId}*)
+  if (parentCategoryId) {
+    queryClient.invalidateQueries({ queryKey: ["category", parentCategoryId], exact: false });
+    queryClient.invalidateQueries({ queryKey: ["category"], exact: false });
+  }
+  if (oldParentCategoryId && oldParentCategoryId !== parentCategoryId) {
+    queryClient.invalidateQueries({ queryKey: ["category", oldParentCategoryId], exact: false });
+    queryClient.invalidateQueries({ queryKey: ["category"], exact: false });
+  }
   
   // Invalidate related products (categories affect products)
   queryClient.invalidateQueries({ queryKey: ["products"], exact: false });
@@ -136,25 +168,53 @@ export function invalidateCategoryQueries(
 
 /**
  * Brand-related invalidation
- * Matches backend: invalidateBrandCaches
+ * Matches backend: BRAND_ANY, BRANDS_ALL, BRAND_BY_SLUG_ANY
  */
 export function invalidateBrandQueries(
   queryClient: QueryClient,
-  brandId?: MaybeString
+  params: {
+    brandId?: MaybeString;
+    brandSlug?: MaybeString;
+    oldSlug?: MaybeString;
+    categoryIds?: MaybeString[];
+    oldCategoryIds?: MaybeString[];
+    nameChanged?: boolean;
+  } = {}
 ) {
-  // Invalidate specific brand
+  const { brandId, brandSlug, oldSlug, categoryIds, oldCategoryIds, nameChanged } = params;
+  
+  // Invalidate specific brand by ID (matches: brand:${id}*)
   if (brandId) {
     queryClient.invalidateQueries({ queryKey: ["brand", brandId], exact: false });
   }
   
-  // Invalidate all brand list variations
+  // Invalidate brand by slug (matches: brand:${slug}*)
+  if (brandSlug) {
+    queryClient.invalidateQueries({ queryKey: ["brand"], exact: false });
+  }
+  
+  // Invalidate old slug if changed (matches: brand:${oldSlug}*)
+  if (oldSlug && oldSlug !== brandSlug) {
+    queryClient.invalidateQueries({ queryKey: ["brand"], exact: false });
+  }
+  
+  // Invalidate all brand list variations (matches: brands*)
   queryClient.invalidateQueries({ queryKey: ["brands"], exact: false });
   queryClient.invalidateQueries({ queryKey: ["brand"], exact: false });
   
-  // Invalidate related categories (brands affect categories)
-  queryClient.invalidateQueries({ queryKey: ["category"], exact: false });
+  // Invalidate affected categories (matches: category:${categoryId}*)
+  const allCategoryIds = new Set([...(categoryIds || []), ...(oldCategoryIds || [])]);
+  allCategoryIds.forEach((categoryId) => {
+    if (categoryId) {
+      queryClient.invalidateQueries({ queryKey: ["category", categoryId], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["category"], exact: false });
+    }
+  });
   
-  // Invalidate related products (brands affect products)
+  // Invalidate related products (brands affect products, especially if name changed)
+  if (nameChanged) {
+    queryClient.invalidateQueries({ queryKey: ["products"], exact: false });
+  }
   queryClient.invalidateQueries({ queryKey: ["products"], exact: false });
   
   // Invalidate dashboard stats
