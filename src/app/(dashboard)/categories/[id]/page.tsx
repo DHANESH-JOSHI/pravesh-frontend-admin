@@ -27,6 +27,7 @@ import { ApiResponse, Brand, Product } from "@/types";
 import { productService } from "@/services/product.service";
 import Image from "next/image";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { invalidateCategoryQueries } from "@/lib/invalidateQueries";
 
 export default function CategoryDetailPage() {
   const queryClient = useQueryClient();
@@ -57,13 +58,10 @@ export default function CategoryDetailPage() {
   const category = data?.data as Category;
   const deleteMutation = useMutation({
     mutationFn: categoryService.delete,
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message }, deletedCategoryId) => {
       setIsOpen(false);
       toast.success(message ?? "Category deleted.");
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      queryClient.invalidateQueries({ queryKey: ["category"] });
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-      queryClient.invalidateQueries({ queryKey: ["brands"] });
+      invalidateCategoryQueries(queryClient, deletedCategoryId);
       // Update local cache to remove deleted subcategory
       queryClient.setQueryData(["category", categoryId], (oldData: ApiResponse<Category>) => ({
         ...oldData,
@@ -88,8 +86,7 @@ export default function CategoryDetailPage() {
     },
     onSuccess: ({ data: updatedCategory, message }) => {
       toast.success(message ?? "Category updated successfully!");
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      queryClient.invalidateQueries({ queryKey: ["category", categoryId] });
+      invalidateCategoryQueries(queryClient, editingCategory?._id);
       // Update local cache for immediate UI update
       queryClient.setQueryData(["category", categoryId], (oldData: ApiResponse<Category>) => ({
         ...oldData,
@@ -114,8 +111,7 @@ export default function CategoryDetailPage() {
     },
     onSuccess: ({ data: createdCategory, message }) => {
       toast.success(message ?? "Category created successfully!");
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      queryClient.invalidateQueries({ queryKey: ["category", categoryId] });
+      invalidateCategoryQueries(queryClient, createdCategory?._id);
       // Update local cache for immediate UI update
       queryClient.setQueryData(["category", categoryId], (oldData: ApiResponse<Category>) => ({
         ...oldData,
@@ -514,8 +510,12 @@ export default function CategoryDetailPage() {
                               {product.name}
                             </div>
                           </TableCell>
-                          <TableCell className="text-muted-foreground truncate w-20">{(product.brand as Brand).name}</TableCell>
-                          <TableCell className="text-muted-foreground truncate w-20">{(product.category as Category).title}</TableCell>
+                          <TableCell className="text-muted-foreground truncate w-20">
+                            {typeof product.brand === "string" ? "N/A" : (product.brand as Brand)?.name ?? "N/A"}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground truncate w-20">
+                            {typeof product.category === "string" ? "N/A" : (product.category as Category)?.title ?? "N/A"}
+                          </TableCell>
                           <TableCell className="text-center font-semibold">₹{product.originalPrice}</TableCell>
                           <TableCell className="text-center font-semibold"><Badge variant="outline">{product.isNewArrival ? 'Yes' : 'No'}</Badge></TableCell>
                           <TableCell className="text-center font-semibold"><Badge variant="outline">{product.isFeatured ? 'Yes' : 'No'}</Badge></TableCell>

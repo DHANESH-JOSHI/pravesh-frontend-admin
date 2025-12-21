@@ -36,6 +36,7 @@ import { isFiltersSelected } from "@/lib/utils";
 import { useDebounce } from "use-debounce";
 import { Link } from "next-view-transitions";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { invalidateProductQueries } from "@/lib/invalidateQueries";
 
 export function ProductsTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -96,11 +97,7 @@ export function ProductsTable() {
     onSuccess: ({ message }, deletedProductId) => {
       setIsOpen(false);
       toast.success(message ?? "Product deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-      queryClient.invalidateQueries({ queryKey: ["product", deletedProductId] });
-      queryClient.invalidateQueries({ queryKey: ["product"] });
-      queryClient.invalidateQueries({ queryKey: ["category"] });
-      queryClient.invalidateQueries({ queryKey: ["brand"] });
+      invalidateProductQueries(queryClient, { productId: deletedProductId });
     },
     onError: (error: any) => {
       setIsOpen(false);
@@ -113,13 +110,13 @@ export function ProductsTable() {
       const data = await productService.update(editingProduct?._id!, values);
       return data;
     },
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message, data: updatedProduct }) => {
       toast.success(message ?? "Product updated successfully!");
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-      queryClient.invalidateQueries({ queryKey: ["product", editingProduct?._id] });
-      queryClient.invalidateQueries({ queryKey: ["product"] });
-      queryClient.invalidateQueries({ queryKey: ["category"] });
-      queryClient.invalidateQueries({ queryKey: ["brand"] });
+      invalidateProductQueries(queryClient, {
+        productId: editingProduct?._id,
+        categoryId: typeof updatedProduct?.category === 'string' ? updatedProduct.category : updatedProduct?.category?._id,
+        brandId: typeof updatedProduct?.brand === 'string' ? updatedProduct.brand : updatedProduct?.brand?._id,
+      });
       setEditingProduct(null);
     },
     onError: (error: any) => {
@@ -131,11 +128,13 @@ export function ProductsTable() {
       const data = await productService.create(values);
       return data;
     },
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message, data: createdProduct }) => {
       toast.success(message ?? "Product created successfully!");
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-      queryClient.invalidateQueries({ queryKey: ["category"] });
-      queryClient.invalidateQueries({ queryKey: ["brand"] });
+      invalidateProductQueries(queryClient, {
+        productId: createdProduct?._id,
+        categoryId: typeof createdProduct?.category === 'string' ? createdProduct.category : createdProduct?.category?._id,
+        brandId: typeof createdProduct?.brand === 'string' ? createdProduct.brand : createdProduct?.brand?._id,
+      });
       setIsCreateDialogOpen(false);
     },
     onError: (error: any) => {

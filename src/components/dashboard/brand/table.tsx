@@ -26,6 +26,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Link } from "next-view-transitions";
 import { isFiltersSelected } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { invalidateBrandQueries } from "@/lib/invalidateQueries";
 
 export function BrandsTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,13 +51,10 @@ export function BrandsTable() {
 
   const deleteMutation = useMutation({
     mutationFn: brandService.delete,
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message }, deletedBrandId) => {
       setIsOpen(false);
       toast.success(message ?? "Brand deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["brands"] });
-      queryClient.invalidateQueries({ queryKey: ["brand"] });
-      queryClient.invalidateQueries({ queryKey: ["category"] });
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      invalidateBrandQueries(queryClient, deletedBrandId);
     },
     onError: (error: any) => {
       setIsOpen(false);
@@ -71,10 +69,7 @@ export function BrandsTable() {
     },
     onSuccess: ({ message }) => {
       toast.success(message ?? "Brand updated successfully!");
-      queryClient.invalidateQueries({ queryKey: ["brands"] });
-      queryClient.invalidateQueries({ queryKey: ["brand", editingBrand?._id] });
-      queryClient.invalidateQueries({ queryKey: ["brand"] });
-      queryClient.invalidateQueries({ queryKey: ["category"] });
+      invalidateBrandQueries(queryClient, editingBrand?._id);
       setEditingBrand(null);
     },
     onError: (error: any) => {
@@ -86,10 +81,9 @@ export function BrandsTable() {
       const data = await brandService.create(values);
       return data;
     },
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message, data: createdBrand }) => {
       toast.success(message ?? "Brand created successfully!");
-      queryClient.invalidateQueries({ queryKey: ["brands"] });
-      queryClient.invalidateQueries({ queryKey: ["category"] });
+      invalidateBrandQueries(queryClient, createdBrand?._id);
       setIsCreateDialogOpen(false);
     },
     onError: (error: any) => {

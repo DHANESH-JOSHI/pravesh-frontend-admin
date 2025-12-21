@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { OrderFormDialog } from "@/components/dashboard/order/form-dialog";
 import { useState } from "react";
 import Loader from "@/components/ui/loader";
+import { invalidateOrderQueries } from "@/lib/invalidateQueries";
 
 
 export default function OrderDetailPage() {
@@ -48,7 +49,7 @@ export default function OrderDetailPage() {
         };
       });
       // Invalidate orders list to ensure it reflects the status change
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      invalidateOrderQueries(queryClient, { orderId, userId: typeof order?.user === 'string' ? order.user : order?.user?._id });
       toast.success(message ?? "Order status updated successfully");
     },
     onError: (error: any) => {
@@ -63,8 +64,7 @@ export default function OrderDetailPage() {
     },
     onSuccess: ({ message }) => {
       toast.success(message ?? "Order updated.");
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
-      queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+      invalidateOrderQueries(queryClient, { orderId, userId: typeof order?.user === 'string' ? order.user : order?.user?._id });
       setOpen(false);
     },
     onError: (error: any) => {

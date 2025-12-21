@@ -30,6 +30,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Link } from "next-view-transitions";
 import { UserFormDialog } from "./form-dialog";
 import { isFiltersSelected } from "@/lib/utils";
+import { invalidateUserQueries } from "@/lib/invalidateQueries";
+
 export function UsersTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -46,10 +48,10 @@ export function UsersTable() {
   const total = data?.data?.total ?? 0;
   const deleteMutation = useMutation({
     mutationFn: userService.deleteById,
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message }, deletedUserId) => {
       setIsOpen(false);
       toast.success(message ?? "User deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["users"], exact: false });
+      invalidateUserQueries(queryClient, deletedUserId);
     },
     onError: (error: any) => {
       setIsOpen(false);
@@ -59,9 +61,9 @@ export function UsersTable() {
 
   const createMutation = useMutation({
     mutationFn: userService.createVerifiedUser,
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message, data: createdUser }) => {
       toast.success(message ?? "User created successfully");
-      queryClient.invalidateQueries({ queryKey: ["users"], exact: false });
+      invalidateUserQueries(queryClient, createdUser?._id);
     },
     onError: (error: any) => {
       toast.error(error.response.data.message ?? "Failed to create user. Please try again.");

@@ -22,6 +22,7 @@ import { settingService } from "@/services/setting.service";
 import { Setting, UpdateSetting, updateSettingSchema } from "@/types/setting";
 import { toast } from "sonner";
 import Loader from "@/components/ui/loader";
+import { invalidateSettingQueries } from "@/lib/invalidateQueries";
 
 export function SettingsForm() {
   const logoRef = useRef<HTMLInputElement>(null);
@@ -99,7 +100,7 @@ export function SettingsForm() {
     mutationFn: settingService.update,
     onSuccess: ({ message }) => {
       toast.success(message ?? "Settings updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["settings"] });
+      invalidateSettingQueries(queryClient);
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message ?? "Failed to update settings. Please try again.");

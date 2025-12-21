@@ -26,6 +26,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Link } from "next-view-transitions";
 import { isFiltersSelected } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { invalidateBannerQueries } from "@/lib/invalidateQueries";
+
 export function BannersTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -43,10 +45,10 @@ export function BannersTable() {
   const total = data?.data?.total ?? 0;
   const deleteMutation = useMutation({
     mutationFn: bannerService.delete,
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message }, deletedBannerId) => {
       setIsOpen(false);
       toast.success(message ?? "Banner deleted.");
-      queryClient.invalidateQueries({ queryKey: ["banners"], exact: false });
+      invalidateBannerQueries(queryClient, deletedBannerId);
     },
     onError: (error: any) => {
       setIsOpen(false);
@@ -61,7 +63,7 @@ export function BannersTable() {
     },
     onSuccess: ({ message }) => {
       toast.success(message ?? "Banner updated.");
-      queryClient.invalidateQueries({ queryKey: ["banners"] });
+      invalidateBannerQueries(queryClient, editingBanner?._id);
       setEditingBanner(null);
     },
     onError: (error: any) => {
@@ -73,9 +75,9 @@ export function BannersTable() {
       const data = await bannerService.create(values);
       return data;
     },
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message, data: createdBanner }) => {
       toast.success(message ?? "Banner created.");
-      queryClient.invalidateQueries({ queryKey: ["banners"] });
+      invalidateBannerQueries(queryClient, createdBanner?._id);
       setIsCreateDialogOpen(false);
     },
     onError: (error: any) => {

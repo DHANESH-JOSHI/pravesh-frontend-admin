@@ -33,7 +33,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      router.push("/");
+      router.replace("/");
     }
   }, [user, loading, router]);
 
@@ -64,8 +64,8 @@ export default function LoginPage() {
     onSuccess: ({ data, message }) => {
       if (!data) return;
       login(data);
-      toast.success(message ?? "Logged in");  
-      router.push("/");
+      toast.success(message ?? "Logged in");
+      // Navigation will be handled by useEffect when user state updates
     },
     onError: (error: any) => {
       toast.error(error.response.data.message ?? "Failed to login. Check credentials and try again.");

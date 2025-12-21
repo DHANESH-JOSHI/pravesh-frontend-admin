@@ -26,6 +26,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { toast } from "sonner";
 import { CustomAlertDialog } from "@/components/dashboard/common/custom-alert-dialog";
 import { Badge } from "@/components/ui/badge";
+import { invalidateMessageQueries } from "@/lib/invalidateQueries";
 
 export function MessagesTable() {
   const [appliedFilters, setAppliedFilters] = useState<MessagesQueryOptions>({ page: 1, limit: 8 });
@@ -45,11 +46,11 @@ export function MessagesTable() {
   const total = data?.data?.total ?? 0;
   const deleteMutation = useMutation({
     mutationFn: messageService.delete,
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message }, deletedMessageId) => {
       setIsDeleteDialogOpen(false);
       setSelectedMessage(null);
       toast.success(message ?? "Message deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["messages"] });
+      invalidateMessageQueries(queryClient, deletedMessageId);
     },
     onError: (error: any) => {
       setIsDeleteDialogOpen(false);
@@ -59,9 +60,9 @@ export function MessagesTable() {
 
   const resolveMutation = useMutation({
     mutationFn: messageService.resolve,
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message }, messageId) => {
       toast.success(message ?? "Message resolved successfully");
-      queryClient.invalidateQueries({ queryKey: ["messages"] });
+      invalidateMessageQueries(queryClient, messageId);
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message ?? "Failed to resolve message. Please try again.");

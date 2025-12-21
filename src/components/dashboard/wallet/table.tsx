@@ -27,6 +27,7 @@ import { WalletFormDialog } from "./form-dialog";
 import { walletService } from "@/services/wallet.service";
 import { Wallet } from "@/types/wallet";
 import { User } from "@/types";
+import { invalidateWalletQueries } from "@/lib/invalidateQueries";
 
 export function WalletsTable() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -53,9 +54,9 @@ export function WalletsTable() {
       const result = await walletService.addFunds(data);
       return result;
     },
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message }, variables) => {
       toast.success(message ?? "Funds added successfully!");
-      queryClient.invalidateQueries({ queryKey: ["wallets"] });
+      invalidateWalletQueries(queryClient, variables.userId);
       setEditingWallet(null);
       setViewOpen(false);
     },

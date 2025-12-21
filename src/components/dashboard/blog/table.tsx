@@ -27,6 +27,8 @@ import { Link } from "next-view-transitions";
 import { Badge } from "@/components/ui/badge";
 import { isFiltersSelected } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { invalidateBlogQueries } from "@/lib/invalidateQueries";
+
 export function BlogsTable() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -48,9 +50,7 @@ export function BlogsTable() {
     onSuccess: ({ message }, deletedBlogId) => {
       setIsOpen(false);
       toast.success(message ?? "Blog deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["blogs"], exact: false });
-      queryClient.invalidateQueries({ queryKey: ["blog", deletedBlogId] });
-      queryClient.invalidateQueries({ queryKey: ["blog"] });
+      invalidateBlogQueries(queryClient, { blogId: deletedBlogId });
     },
     onError: (error: any) => {
       setIsOpen(false);
@@ -63,11 +63,9 @@ export function BlogsTable() {
       const data = await blogService.update(editingBlog?._id!, values);
       return data;
     },
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message, data: updatedBlog }) => {
       toast.success(message ?? "Blog updated successfully!");
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      queryClient.invalidateQueries({ queryKey: ["blog", editingBlog?._id] });
-      queryClient.invalidateQueries({ queryKey: ["blog"] });
+      invalidateBlogQueries(queryClient, { blogId: editingBlog?._id, slug: updatedBlog?.slug });
       setEditingBlog(null);
     },
     onError: (error: any) => {
@@ -79,9 +77,9 @@ export function BlogsTable() {
       const data = await blogService.create(values);
       return data;
     },
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message, data: createdBlog }) => {
       toast.success(message ?? "Blog created successfully!");
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      invalidateBlogQueries(queryClient, { blogId: createdBlog?._id, slug: createdBlog?.slug });
       setIsCreateDialogOpen(false);
     },
     onError: (error: any) => {

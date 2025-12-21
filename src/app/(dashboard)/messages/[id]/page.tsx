@@ -14,6 +14,7 @@ import Loader from "@/components/ui/loader";
 import { toast } from "sonner";
 import { CustomAlertDialog } from "@/components/dashboard/common/custom-alert-dialog";
 import { useState } from "react";
+import { invalidateMessageQueries } from "@/lib/invalidateQueries";
 
 export default function MessageDetailPage() {
   const router = useTransitionRouter();
@@ -34,8 +35,7 @@ export default function MessageDetailPage() {
     mutationFn: messageService.resolve,
     onSuccess: ({ message }) => {
       toast.success(message ?? "Message resolved successfully");
-      queryClient.invalidateQueries({ queryKey: ["message", messageId] });
-      queryClient.invalidateQueries({ queryKey: ["messages"] });
+      invalidateMessageQueries(queryClient, messageId);
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message ?? "Failed to resolve message. Please try again.");
@@ -47,8 +47,9 @@ export default function MessageDetailPage() {
     onSuccess: ({ message }) => {
       setDeleteDialogOpen(false);
       toast.success(message ?? "Message deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["messages"] });
-      router.push("/messages");
+      invalidateMessageQueries(queryClient, messageId);
+      // Use replace to avoid adding to history and prevent transition conflicts
+      router.replace("/messages");
     },
     onError: (error: any) => {
       setDeleteDialogOpen(false);

@@ -26,6 +26,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Link } from "next-view-transitions";
 import { isFiltersSelected } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { invalidateCategoryQueries } from "@/lib/invalidateQueries";
 
 export function CategoriesTable() {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,13 +51,10 @@ export function CategoriesTable() {
 
   const deleteMutation = useMutation({
     mutationFn: categoryService.delete,
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message }, deletedCategoryId) => {
       setIsOpen(false);
       toast.success(message ?? "Category deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      queryClient.invalidateQueries({ queryKey: ["category"] });
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-      queryClient.invalidateQueries({ queryKey: ["brands"] });
+      invalidateCategoryQueries(queryClient, deletedCategoryId);
     },
     onError: (error: any) => {
       setIsOpen(false);
@@ -71,8 +69,7 @@ export function CategoriesTable() {
     },
     onSuccess: ({ message, data: updatedCategory }) => {
       toast.success(message ?? "Category updated successfully!");
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      queryClient.invalidateQueries({ queryKey: ["category"] });
+      invalidateCategoryQueries(queryClient, editingCategory?._id);
       // If the category has a parent, invalidate that parent's detail page
       if (updatedCategory && typeof updatedCategory.parentCategory === 'string') {
         queryClient.invalidateQueries({ queryKey: ["category", updatedCategory.parentCategory] });
@@ -92,8 +89,7 @@ export function CategoriesTable() {
     },
     onSuccess: ({ message, data: createdCategory }) => {
       toast.success(message ?? "Category created successfully!");
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      queryClient.invalidateQueries({ queryKey: ["category"] });
+      invalidateCategoryQueries(queryClient, createdCategory?._id);
       // If the category has a parent, invalidate that parent's detail page
       if (createdCategory && typeof createdCategory.parentCategory === 'string') {
         queryClient.invalidateQueries({ queryKey: ["category", createdCategory.parentCategory] });
