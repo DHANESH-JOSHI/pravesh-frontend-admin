@@ -653,7 +653,7 @@ export function BrandSearchableSelect({ value, action }: { value: string; action
   }, [inputValue, debouncedSetSearch]);
 
   const { data: brandsData, isLoading: isLoadingBrands } = useQuery({
-    queryKey: ["brands", "search", search],
+    queryKey: ["brands", { search }],
     queryFn: () => brandService.getAll({
       page: 1,
       limit: 20,
@@ -663,7 +663,7 @@ export function BrandSearchableSelect({ value, action }: { value: string; action
   });
 
   const { data: selectedBrandData } = useQuery({
-    queryKey: ["brands", value],
+    queryKey: ["brand", value],
     queryFn: () => brandService.getById(value),
     enabled: !!value && !open,
   });

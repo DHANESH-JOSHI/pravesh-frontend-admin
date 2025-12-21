@@ -47,7 +47,7 @@ export function invalidateProductQueries(
 
 /**
  * Order-related invalidation
- * Matches backend: invalidateOrderCaches
+ * Matches backend: ORDER_ANY, ORDERS_BY_USER, ORDERS_ALL, PRODUCTS_ALL, WALLET_BY_USER_ANY
  */
 export function invalidateOrderQueries(
   queryClient: QueryClient,
@@ -55,26 +55,33 @@ export function invalidateOrderQueries(
     orderId?: MaybeString;
     userId?: MaybeString;
     touchesProducts?: boolean;
-  }
+    touchesWallet?: boolean;
+  } = {}
 ) {
-  const { orderId, userId, touchesProducts = false } = params;
+  const { orderId, userId, touchesProducts, touchesWallet } = params;
 
-  // Invalidate specific order
+  // Invalidate specific order (matches: order:${orderId})
   if (orderId) {
     queryClient.invalidateQueries({ queryKey: ["order", orderId], exact: false });
   }
   
-  // Invalidate all order list variations
-  queryClient.invalidateQueries({ queryKey: ["orders"], exact: false });
-  
-  // Invalidate user-specific orders
+  // Invalidate user-specific orders (matches: orders:user:${userId}*)
   if (userId) {
     queryClient.invalidateQueries({ queryKey: ["orders"], exact: false });
   }
   
-  // If order touches products (e.g., stock changes), invalidate products
+  // Invalidate all order list variations (matches: orders*)
+  queryClient.invalidateQueries({ queryKey: ["orders"], exact: false });
+  
+  // If order touches products (e.g., stock changes), invalidate products (matches: products*)
   if (touchesProducts) {
     queryClient.invalidateQueries({ queryKey: ["products"], exact: false });
+  }
+  
+  // If order touches wallet, invalidate wallet (matches: wallet:user:${userId}*)
+  if (touchesWallet && userId) {
+    queryClient.invalidateQueries({ queryKey: ["wallet", userId], exact: false });
+    queryClient.invalidateQueries({ queryKey: ["wallet"], exact: false });
   }
   
   // Invalidate dashboard stats

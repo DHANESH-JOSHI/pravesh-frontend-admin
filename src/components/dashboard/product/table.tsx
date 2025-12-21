@@ -112,10 +112,18 @@ export function ProductsTable() {
     },
     onSuccess: ({ message, data: updatedProduct }) => {
       toast.success(message ?? "Product updated successfully!");
+      const oldCategoryId = typeof editingProduct?.category === 'string' ? editingProduct.category : editingProduct?.category?._id;
+      const newCategoryId = typeof updatedProduct?.category === 'string' ? updatedProduct.category : updatedProduct?.category?._id;
+      const oldBrandId = typeof editingProduct?.brand === 'string' ? editingProduct.brand : editingProduct?.brand?._id;
+      const newBrandId = typeof updatedProduct?.brand === 'string' ? updatedProduct.brand : updatedProduct?.brand?._id;
       invalidateProductQueries(queryClient, {
         productId: editingProduct?._id,
-        categoryId: typeof updatedProduct?.category === 'string' ? updatedProduct.category : updatedProduct?.category?._id,
-        brandId: typeof updatedProduct?.brand === 'string' ? updatedProduct.brand : updatedProduct?.brand?._id,
+        productSlug: updatedProduct?.slug,
+        oldSlug: editingProduct?.slug,
+        categoryId: newCategoryId,
+        oldCategoryId: oldCategoryId,
+        brandId: newBrandId,
+        oldBrandId: oldBrandId,
       });
       setEditingProduct(null);
     },

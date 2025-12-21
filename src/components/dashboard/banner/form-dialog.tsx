@@ -325,7 +325,7 @@ export function ProductSearchableSelect({ value, action }: { value: string; acti
   });
 
   const { data: selectedProductData } = useQuery({
-    queryKey: ["products", value],
+    queryKey: ["product", value],
     queryFn: () => productService.getById(value),
     enabled: !!value && !open,
   });

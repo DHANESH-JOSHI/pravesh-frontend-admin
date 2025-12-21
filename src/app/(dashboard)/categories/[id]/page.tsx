@@ -48,7 +48,7 @@ export default function CategoryDetailPage() {
   });
 
   const { data: productsData, isLoading: isProductsLoading } = useQuery({
-    queryKey: ["products", categoryId],
+    queryKey: ["products", { categoryId }],
     queryFn: async () => await productService.getAll({ categoryId }),
     enabled: !!categoryId,
   });
@@ -61,7 +61,7 @@ export default function CategoryDetailPage() {
     onSuccess: ({ message }, deletedCategoryId) => {
       setIsOpen(false);
       toast.success(message ?? "Category deleted.");
-      invalidateCategoryQueries(queryClient, deletedCategoryId);
+      invalidateCategoryQueries(queryClient, { categoryId: deletedCategoryId });
       // Update local cache to remove deleted subcategory
       queryClient.setQueryData(["category", categoryId], (oldData: ApiResponse<Category>) => ({
         ...oldData,
@@ -86,7 +86,7 @@ export default function CategoryDetailPage() {
     },
     onSuccess: ({ data: updatedCategory, message }) => {
       toast.success(message ?? "Category updated successfully!");
-      invalidateCategoryQueries(queryClient, editingCategory?._id);
+      invalidateCategoryQueries(queryClient, { categoryId: editingCategory?._id });
       // Update local cache for immediate UI update
       queryClient.setQueryData(["category", categoryId], (oldData: ApiResponse<Category>) => ({
         ...oldData,
@@ -111,7 +111,7 @@ export default function CategoryDetailPage() {
     },
     onSuccess: ({ data: createdCategory, message }) => {
       toast.success(message ?? "Category created successfully!");
-      invalidateCategoryQueries(queryClient, createdCategory?._id);
+      invalidateCategoryQueries(queryClient, { categoryId: createdCategory?._id });
       // Update local cache for immediate UI update
       queryClient.setQueryData(["category", categoryId], (oldData: ApiResponse<Category>) => ({
         ...oldData,

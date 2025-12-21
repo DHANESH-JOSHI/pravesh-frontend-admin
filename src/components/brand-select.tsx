@@ -33,7 +33,7 @@ export function BrandSingleSelect({
     refetch,
     isFetching,
   } = useQuery({
-    queryKey: ["brands", categoryId],
+    queryKey: ["brands", { categoryId }],
     queryFn: () => brandService.getAll({ categoryId }),
     enabled: !!categoryId,
     staleTime: 1000 * 60 * 10,

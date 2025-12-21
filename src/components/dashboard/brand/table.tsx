@@ -54,7 +54,7 @@ export function BrandsTable() {
     onSuccess: ({ message }, deletedBrandId) => {
       setIsOpen(false);
       toast.success(message ?? "Brand deleted successfully");
-      invalidateBrandQueries(queryClient, deletedBrandId);
+      invalidateBrandQueries(queryClient, { brandId: deletedBrandId });
     },
     onError: (error: any) => {
       setIsOpen(false);
@@ -69,7 +69,7 @@ export function BrandsTable() {
     },
     onSuccess: ({ message }) => {
       toast.success(message ?? "Brand updated successfully!");
-      invalidateBrandQueries(queryClient, editingBrand?._id);
+      invalidateBrandQueries(queryClient, { brandId: editingBrand?._id });
       setEditingBrand(null);
     },
     onError: (error: any) => {
@@ -83,7 +83,7 @@ export function BrandsTable() {
     },
     onSuccess: ({ message, data: createdBrand }) => {
       toast.success(message ?? "Brand created successfully!");
-      invalidateBrandQueries(queryClient, createdBrand?._id);
+      invalidateBrandQueries(queryClient, { brandId: createdBrand?._id });
       setIsCreateDialogOpen(false);
     },
     onError: (error: any) => {

@@ -54,7 +54,7 @@ export function CategoriesTable() {
     onSuccess: ({ message }, deletedCategoryId) => {
       setIsOpen(false);
       toast.success(message ?? "Category deleted successfully");
-      invalidateCategoryQueries(queryClient, deletedCategoryId);
+      invalidateCategoryQueries(queryClient, { categoryId: deletedCategoryId });
     },
     onError: (error: any) => {
       setIsOpen(false);
@@ -69,7 +69,7 @@ export function CategoriesTable() {
     },
     onSuccess: ({ message, data: updatedCategory }) => {
       toast.success(message ?? "Category updated successfully!");
-      invalidateCategoryQueries(queryClient, editingCategory?._id);
+      invalidateCategoryQueries(queryClient, { categoryId: editingCategory?._id });
       // If the category has a parent, invalidate that parent's detail page
       if (updatedCategory && typeof updatedCategory.parentCategory === 'string') {
         queryClient.invalidateQueries({ queryKey: ["category", updatedCategory.parentCategory] });
@@ -89,7 +89,7 @@ export function CategoriesTable() {
     },
     onSuccess: ({ message, data: createdCategory }) => {
       toast.success(message ?? "Category created successfully!");
-      invalidateCategoryQueries(queryClient, createdCategory?._id);
+      invalidateCategoryQueries(queryClient, { categoryId: createdCategory?._id });
       // If the category has a parent, invalidate that parent's detail page
       if (createdCategory && typeof createdCategory.parentCategory === 'string') {
         queryClient.invalidateQueries({ queryKey: ["category", createdCategory.parentCategory] });
