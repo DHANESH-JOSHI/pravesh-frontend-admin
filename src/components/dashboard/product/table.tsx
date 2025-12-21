@@ -93,10 +93,12 @@ export function ProductsTable() {
 
   const deleteMutation = useMutation({
     mutationFn: productService.delete,
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message }, deletedProductId) => {
       setIsOpen(false);
       toast.success(message ?? "Product deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product", deletedProductId] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
       queryClient.invalidateQueries({ queryKey: ["category"] });
       queryClient.invalidateQueries({ queryKey: ["brand"] });
     },
@@ -114,6 +116,8 @@ export function ProductsTable() {
     onSuccess: ({ message }) => {
       toast.success(message ?? "Product updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product", editingProduct?._id] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
       queryClient.invalidateQueries({ queryKey: ["category"] });
       queryClient.invalidateQueries({ queryKey: ["brand"] });
       setEditingProduct(null);

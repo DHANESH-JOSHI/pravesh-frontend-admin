@@ -45,10 +45,12 @@ export function BlogsTable() {
 
   const deleteMutation = useMutation({
     mutationFn: blogService.delete,
-    onSuccess: ({ message }) => {
+    onSuccess: ({ message }, deletedBlogId) => {
       setIsOpen(false);
       toast.success(message ?? "Blog deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["blogs"], exact: false });
+      queryClient.invalidateQueries({ queryKey: ["blog", deletedBlogId] });
+      queryClient.invalidateQueries({ queryKey: ["blog"] });
     },
     onError: (error: any) => {
       setIsOpen(false);
@@ -64,6 +66,8 @@ export function BlogsTable() {
     onSuccess: ({ message }) => {
       toast.success(message ?? "Blog updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      queryClient.invalidateQueries({ queryKey: ["blog", editingBlog?._id] });
+      queryClient.invalidateQueries({ queryKey: ["blog"] });
       setEditingBlog(null);
     },
     onError: (error: any) => {

@@ -53,8 +53,10 @@ export function CategoriesTable() {
     onSuccess: ({ message }) => {
       setIsOpen(false);
       toast.success(message ?? "Category deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["categories"] })
-      queryClient.invalidateQueries({ queryKey: ["category"] })
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["category"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["brands"] });
     },
     onError: (error: any) => {
       setIsOpen(false);
@@ -67,10 +69,16 @@ export function CategoriesTable() {
       const data = await categoryService.update(editingCategory?._id!, values);
       return data;
     },
-    onSuccess: ({ message }, { parentCategoryId }) => {
+    onSuccess: ({ message, data: updatedCategory }) => {
       toast.success(message ?? "Category updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      queryClient.invalidateQueries({ queryKey: ["category", parentCategoryId], exact: true })
+      queryClient.invalidateQueries({ queryKey: ["category"] });
+      // If the category has a parent, invalidate that parent's detail page
+      if (updatedCategory && typeof updatedCategory.parentCategory === 'string') {
+        queryClient.invalidateQueries({ queryKey: ["category", updatedCategory.parentCategory] });
+      } else if (updatedCategory && updatedCategory.parentCategory && typeof updatedCategory.parentCategory === 'object') {
+        queryClient.invalidateQueries({ queryKey: ["category", updatedCategory.parentCategory._id] });
+      }
       setEditingCategory(null);
     },
     onError: (error: any) => {
@@ -82,10 +90,16 @@ export function CategoriesTable() {
       const data = await categoryService.create(values);
       return data;
     },
-    onSuccess: ({ message }, { parentCategoryId }) => {
+    onSuccess: ({ message, data: createdCategory }) => {
       toast.success(message ?? "Category created successfully!");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      queryClient.invalidateQueries({ queryKey: ["category", parentCategoryId], exact: true })
+      queryClient.invalidateQueries({ queryKey: ["category"] });
+      // If the category has a parent, invalidate that parent's detail page
+      if (createdCategory && typeof createdCategory.parentCategory === 'string') {
+        queryClient.invalidateQueries({ queryKey: ["category", createdCategory.parentCategory] });
+      } else if (createdCategory && createdCategory.parentCategory && typeof createdCategory.parentCategory === 'object') {
+        queryClient.invalidateQueries({ queryKey: ["category", createdCategory.parentCategory._id] });
+      }
       setIsCreateDialogOpen(false);
     },
     onError: (error: any) => {

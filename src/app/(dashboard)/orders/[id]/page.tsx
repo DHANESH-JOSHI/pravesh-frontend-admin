@@ -46,7 +46,9 @@ export default function OrderDetailPage() {
             status,
           },
         };
-      })
+      });
+      // Invalidate orders list to ensure it reflects the status change
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
       toast.success(message ?? "Order status updated successfully");
     },
     onError: (error: any) => {
@@ -62,6 +64,7 @@ export default function OrderDetailPage() {
     onSuccess: ({ message }) => {
       toast.success(message ?? "Order updated.");
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order", orderId] });
       setOpen(false);
     },
     onError: (error: any) => {

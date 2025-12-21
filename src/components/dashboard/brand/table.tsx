@@ -54,7 +54,9 @@ export function BrandsTable() {
       setIsOpen(false);
       toast.success(message ?? "Brand deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["brands"] });
+      queryClient.invalidateQueries({ queryKey: ["brand"] });
       queryClient.invalidateQueries({ queryKey: ["category"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     },
     onError: (error: any) => {
       setIsOpen(false);
@@ -70,6 +72,8 @@ export function BrandsTable() {
     onSuccess: ({ message }) => {
       toast.success(message ?? "Brand updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["brands"] });
+      queryClient.invalidateQueries({ queryKey: ["brand", editingBrand?._id] });
+      queryClient.invalidateQueries({ queryKey: ["brand"] });
       queryClient.invalidateQueries({ queryKey: ["category"] });
       setEditingBrand(null);
     },

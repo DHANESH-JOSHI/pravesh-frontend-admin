@@ -1,6 +1,6 @@
 "use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Folder, Package, Eye, Plus, ImageIcon } from "lucide-react";
+import { ArrowLeft, Folder, Package, Eye, Plus, ImageIcon, Edit, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +26,7 @@ import Loader from "@/components/ui/loader";
 import { ApiResponse, Brand, Product } from "@/types";
 import { productService } from "@/services/product.service";
 import Image from "next/image";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function CategoryDetailPage() {
   const queryClient = useQueryClient();
@@ -36,6 +37,7 @@ export default function CategoryDetailPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const itemsPerPage = 8;
 
   const { data, isLoading, error } = useQuery({
@@ -58,11 +60,24 @@ export default function CategoryDetailPage() {
     onSuccess: ({ message }) => {
       setIsOpen(false);
       toast.success(message ?? "Category deleted.");
-      queryClient.invalidateQueries({ queryKey: ["categories"] })
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["category"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["brands"] });
+      // Update local cache to remove deleted subcategory
+      queryClient.setQueryData(["category", categoryId], (oldData: ApiResponse<Category>) => ({
+        ...oldData,
+        data: {
+          ...oldData.data,
+          children: oldData?.data?.children?.filter((child) => child._id !== pendingDeleteId) || []
+        }
+      }));
+      setPendingDeleteId(null);
     },
     onError: (error: any) => {
       setIsOpen(false);
       toast.error(error.response.data.message ?? "Failed to delete category.");
+      setPendingDeleteId(null);
     },
   });
 
@@ -74,6 +89,8 @@ export default function CategoryDetailPage() {
     onSuccess: ({ data: updatedCategory, message }) => {
       toast.success(message ?? "Category updated successfully!");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["category", categoryId] });
+      // Update local cache for immediate UI update
       queryClient.setQueryData(["category", categoryId], (oldData: ApiResponse<Category>) => ({
         ...oldData,
         data: {
@@ -98,6 +115,8 @@ export default function CategoryDetailPage() {
     onSuccess: ({ data: createdCategory, message }) => {
       toast.success(message ?? "Category created successfully!");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["category", categoryId] });
+      // Update local cache for immediate UI update
       queryClient.setQueryData(["category", categoryId], (oldData: ApiResponse<Category>) => ({
         ...oldData,
         data: {
@@ -301,7 +320,7 @@ export default function CategoryDetailPage() {
                     <TableHead>Title</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead>Updated</TableHead>
-                    <TableHead className="w-16 text-center">Actions</TableHead>
+                    <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -321,11 +340,53 @@ export default function CategoryDetailPage() {
                           {c.updatedAt}
                         </TableCell>
                         <TableCell>
-                          <Link href={`/categories/${c._id}`}>
-                            <Button variant="ghost" size="sm">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </Link>
+                          <div className="flex items-center justify-center gap-2">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Link href={`/categories/${c._id}`} className="flex items-center justify-center">
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg hover:bg-muted/60 transition-colors">
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                </Link>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>View</p>
+                              </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 rounded-lg hover:bg-muted/60 transition-colors"
+                                  onClick={() => setEditingCategory(c as Category)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Edit</p>
+                              </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 text-destructive rounded-lg hover:bg-muted/60 transition-colors"
+                                  onClick={() => {
+                                    setIsOpen(true);
+                                    setPendingDeleteId(c._id);
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Delete</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -510,13 +571,15 @@ export default function CategoryDetailPage() {
 
       <CustomAlertDialog
         isOpen={isOpen}
-        onCancel={() => setIsOpen(false)}
+        onCancel={() => {
+          setIsOpen(false);
+          setPendingDeleteId(null);
+        }}
         onContinue={() => {
-          if (pendingDeleteSlug)
-            deleteMutation.mutate(pendingDeleteSlug);
+          if (pendingDeleteId)
+            deleteMutation.mutate(pendingDeleteId);
         }}
       />
     </div >
   );
 }
-let pendingDeleteSlug: string | null = null;
