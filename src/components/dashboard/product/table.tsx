@@ -36,7 +36,7 @@ import { isFiltersSelected } from "@/lib/utils";
 import { useDebounce } from "use-debounce";
 import { Link } from "next-view-transitions";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { invalidateProductQueries } from "@/lib/invalidateQueries";
+import { invalidateProductQueries } from "@/lib/invalidate-queries";
 
 export function ProductsTable() {
   const [isOpen, setIsOpen] = useState(false);

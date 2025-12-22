@@ -14,7 +14,7 @@ import Loader from "@/components/ui/loader";
 import { toast } from "sonner";
 import { CustomAlertDialog } from "@/components/dashboard/common/custom-alert-dialog";
 import { useState } from "react";
-import { invalidateMessageQueries } from "@/lib/invalidateQueries";
+import { invalidateMessageQueries } from "@/lib/invalidate-queries";
 
 export default function MessageDetailPage() {
   const router = useTransitionRouter();

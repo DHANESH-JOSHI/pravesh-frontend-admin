@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { OrderFormDialog } from "@/components/dashboard/order/form-dialog";
 import { useState } from "react";
 import Loader from "@/components/ui/loader";
-import { invalidateOrderQueries } from "@/lib/invalidateQueries";
+import { invalidateOrderQueries } from "@/lib/invalidate-queries";
 
 
 export default function OrderDetailPage() {
@@ -37,19 +37,60 @@ export default function OrderDetailPage() {
 
   const { mutate: updateStatus } = useMutation({
     mutationFn: (status: OrderStatus) => orderService.updateOrderStatus(orderId, status),
-    onSuccess: ({ message }, status) => {
+    onSuccess: ({ message }, newStatus) => {
       queryClient.cancelQueries({ queryKey: ["order", orderId] });
       queryClient.setQueryData(["order", orderId], (oldData: ApiResponse<Order>) => {
         return {
           ...oldData,
           data: {
             ...oldData.data,
-            status,
+            status: newStatus,
           },
         };
       });
+      
+      const userId = typeof order?.user === 'string' ? order.user : order?.user?._id;
+      const oldStatus = order?.status;
+      
+      // Extract product/category/brand IDs from order items for delivered status
+      const productIds: string[] = [];
+      const categoryIds: string[] = [];
+      const brandIds: string[] = [];
+      
+      if (newStatus === 'delivered' && order?.items) {
+        order.items.forEach((item) => {
+          const product = item.product as Partial<Product>;
+          if (product._id) productIds.push(product._id);
+          if (product.category) {
+            const categoryId = typeof product.category === 'string' ? product.category : product.category._id;
+            if (categoryId) categoryIds.push(categoryId);
+          }
+          if (product.brand) {
+            const brandId = typeof product.brand === 'string' ? product.brand : product.brand._id;
+            if (brandId) brandIds.push(brandId);
+          }
+        });
+      }
+      
+      // Determine if wallet is touched (confirmed, refunded status changes)
+      const walletTouched = 
+        (oldStatus === 'received' && newStatus === 'confirmed') ||
+        (oldStatus === 'approved' && newStatus === 'confirmed') ||
+        (oldStatus === 'cancelled' && newStatus === 'refunded');
+      
+      // Determine if products are touched (on create or delivered)
+      const productsTouched = newStatus === 'delivered';
+      
       // Invalidate orders list to ensure it reflects the status change
-      invalidateOrderQueries(queryClient, { orderId, userId: typeof order?.user === 'string' ? order.user : order?.user?._id });
+      invalidateOrderQueries(queryClient, { 
+        orderId, 
+        userId,
+        touchesProducts: productsTouched,
+        touchesWallet: walletTouched,
+        productIds: productIds.length > 0 ? productIds : undefined,
+        categoryIds: categoryIds.length > 0 ? categoryIds : undefined,
+        brandIds: brandIds.length > 0 ? brandIds : undefined,
+      });
       toast.success(message ?? "Order status updated successfully");
     },
     onError: (error: any) => {
@@ -64,7 +105,12 @@ export default function OrderDetailPage() {
     },
     onSuccess: ({ message }) => {
       toast.success(message ?? "Order updated.");
-      invalidateOrderQueries(queryClient, { orderId, userId: typeof order?.user === 'string' ? order.user : order?.user?._id });
+      invalidateOrderQueries(queryClient, { 
+        orderId, 
+        userId: typeof order?.user === 'string' ? order.user : order?.user?._id,
+        touchesProducts: false,
+        touchesWallet: false,
+      });
       setOpen(false);
     },
     onError: (error: any) => {

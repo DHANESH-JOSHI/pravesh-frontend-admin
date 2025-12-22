@@ -27,7 +27,7 @@ import { Link } from "next-view-transitions";
 import { Badge } from "@/components/ui/badge";
 import { isFiltersSelected } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { invalidateBlogQueries } from "@/lib/invalidateQueries";
+import { invalidateBlogQueries } from "@/lib/invalidate-queries";
 
 export function BlogsTable() {
   const [isOpen, setIsOpen] = useState(false);

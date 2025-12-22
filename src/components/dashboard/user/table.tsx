@@ -30,7 +30,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Link } from "next-view-transitions";
 import { UserFormDialog } from "./form-dialog";
 import { isFiltersSelected } from "@/lib/utils";
-import { invalidateUserQueries } from "@/lib/invalidateQueries";
+import { invalidateUserQueries } from "@/lib/invalidate-queries";
 
 export function UsersTable() {
   const [isOpen, setIsOpen] = useState(false);

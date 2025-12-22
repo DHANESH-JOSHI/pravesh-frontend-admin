@@ -27,7 +27,7 @@ import { ApiResponse, Brand, Product } from "@/types";
 import { productService } from "@/services/product.service";
 import Image from "next/image";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { invalidateCategoryQueries } from "@/lib/invalidateQueries";
+import { invalidateCategoryQueries } from "@/lib/invalidate-queries";
 
 export default function CategoryDetailPage() {
   const queryClient = useQueryClient();

@@ -26,7 +26,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { toast } from "sonner";
 import { CustomAlertDialog } from "@/components/dashboard/common/custom-alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { invalidateMessageQueries } from "@/lib/invalidateQueries";
+import { invalidateMessageQueries } from "@/lib/invalidate-queries";
 
 export function MessagesTable() {
   const [appliedFilters, setAppliedFilters] = useState<MessagesQueryOptions>({ page: 1, limit: 8 });

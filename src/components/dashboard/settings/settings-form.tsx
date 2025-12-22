@@ -22,7 +22,7 @@ import { settingService } from "@/services/setting.service";
 import { Setting, UpdateSetting, updateSettingSchema } from "@/types/setting";
 import { toast } from "sonner";
 import Loader from "@/components/ui/loader";
-import { invalidateSettingQueries } from "@/lib/invalidateQueries";
+import { invalidateSettingQueries } from "@/lib/invalidate-queries";
 
 export function SettingsForm() {
   const logoRef = useRef<HTMLInputElement>(null);

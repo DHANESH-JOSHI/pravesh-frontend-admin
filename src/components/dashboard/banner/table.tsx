@@ -26,7 +26,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Link } from "next-view-transitions";
 import { isFiltersSelected } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { invalidateBannerQueries } from "@/lib/invalidateQueries";
+import { invalidateBannerQueries } from "@/lib/invalidate-queries";
 
 export function BannersTable() {
   const [isOpen, setIsOpen] = useState(false);

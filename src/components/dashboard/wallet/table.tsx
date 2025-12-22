@@ -27,7 +27,7 @@ import { WalletFormDialog } from "./form-dialog";
 import { walletService } from "@/services/wallet.service";
 import { Wallet } from "@/types/wallet";
 import { User } from "@/types";
-import { invalidateWalletQueries } from "@/lib/invalidateQueries";
+import { invalidateWalletQueries } from "@/lib/invalidate-queries";
 
 export function WalletsTable() {
   const [searchTerm, setSearchTerm] = useState("");
