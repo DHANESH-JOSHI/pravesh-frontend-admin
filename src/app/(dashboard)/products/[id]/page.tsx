@@ -226,10 +226,6 @@ export default function ProductDetailPage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
             <div>
-              <label className="text-sm font-medium">Original Price</label>
-              <p className="text-2xl font-bold">₹{product.originalPrice.toFixed(2)}</p>
-            </div>
-            <div>
               <label className="text-sm font-medium">Total Sold</label>
               <p className="text-2xl">{product.totalSold}</p>
             </div>

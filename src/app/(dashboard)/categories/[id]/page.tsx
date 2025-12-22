@@ -484,7 +484,6 @@ export default function CategoryDetailPage() {
                       <TableHead>Name</TableHead>
                       <TableHead>Brand</TableHead>
                       <TableHead>Category</TableHead>
-                      <TableHead className="text-right">Price</TableHead>
                       <TableHead>New Arrival</TableHead>
                       <TableHead>Featured</TableHead>
                       <TableHead className="w-16 text-center">Actions</TableHead>
@@ -516,7 +515,6 @@ export default function CategoryDetailPage() {
                           <TableCell className="text-muted-foreground truncate w-20">
                             {typeof product.category === "string" ? "N/A" : (product.category as Category)?.title ?? "N/A"}
                           </TableCell>
-                          <TableCell className="text-center font-semibold">₹{product.originalPrice}</TableCell>
                           <TableCell className="text-center font-semibold"><Badge variant="outline">{product.isNewArrival ? 'Yes' : 'No'}</Badge></TableCell>
                           <TableCell className="text-center font-semibold"><Badge variant="outline">{product.isFeatured ? 'Yes' : 'No'}</Badge></TableCell>
                           <TableCell>

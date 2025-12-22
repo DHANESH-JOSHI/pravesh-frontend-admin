@@ -220,7 +220,6 @@ export default function BrandDetailPage() {
                     <TableHead>Thumbnail</TableHead>
                     <TableHead>SKU</TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead>Price</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead>Updated</TableHead>
                     <TableHead className="w-16 text-center">Actions</TableHead>
@@ -245,9 +244,6 @@ export default function BrandDetailPage() {
                         </TableCell>
                         <TableCell className="font-medium">
                           {product.name}
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          ₹{product.originalPrice}
                         </TableCell>
                         <TableCell className="font-medium">
                           ₹{product.createdAt}
