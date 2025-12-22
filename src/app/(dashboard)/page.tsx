@@ -14,7 +14,6 @@ import {
   Users,
   ShoppingCart,
   Package,
-  IndianRupee,
   TrendingUp,
 } from 'lucide-react';
 import { PageHeader } from '@/components/dashboard/common/page-header';
@@ -25,21 +24,16 @@ import Loader from '@/components/ui/loader';
 import * as React from 'react';
 import { Link } from "next-view-transitions";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface IDashboardStats {
   totalUsers: number;
   totalOrders: number;
-  totalRevenue: number;
   totalProducts: number;
 
   newUsersToday: number;
   newUsersThisWeek: number;
   newUsersThisMonth: number;
-
-  todayRevenue: number;
-  thisWeekRevenue: number;
-  thisMonthRevenue: number;
-  averageOrderValue: number;
 
   pendingOrders: number;
   processingOrders: number;
@@ -54,7 +48,6 @@ interface IDashboardStats {
   recentOrders: Array<{
     _id: string;
     user: { name: string; email: string };
-    totalAmount: number;
     status: string;
     createdAt: string;
   }>;
@@ -62,17 +55,26 @@ interface IDashboardStats {
     _id: string;
     name: string;
     totalSold: number;
-    revenue: number;
+    salesCount: number;
+    reviewCount: number;
+    rating: number;
+  }>;
+
+  trendingProducts: Array<{
+    _id: string;
+    name: string;
+    salesCount: number;
+    totalSold: number;
+    reviewCount: number;
+    rating: number;
   }>;
   topCategories: Array<{
     _id: string;
     name: string;
     totalSold: number;
-    revenue: number;
   }>;
-  monthlyRevenue: Array<{
+  monthlyOrders: Array<{
     month: string;
-    revenue: number;
     orders: number;
   }>;
   orderStatusStats: { [key: string]: number };
@@ -95,6 +97,7 @@ const PIE_COLORS = [
 ];
 
 export default function DashboardPage() {
+  const isMobile = useIsMobile();
   const {
     data: stats,
     isLoading,
@@ -125,46 +128,101 @@ export default function DashboardPage() {
 
   if (!stats) return null;
 
-  const orderStatusData = Object.entries(stats.orderStatusStats).map(
+  // ===== FALLBACK DATA FOR TESTING - REMOVE WHEN DONE TESTING =====
+  const FALLBACK_TRENDING_PRODUCTS = [
+    { _id: '1', name: 'Wireless Headphones', salesCount: 245, totalSold: 320, reviewCount: 45, rating: 4.5 },
+    { _id: '2', name: 'Smart Watch Pro', salesCount: 189, totalSold: 250, reviewCount: 38, rating: 4.3 },
+    { _id: '3', name: 'Laptop Stand', salesCount: 156, totalSold: 200, reviewCount: 32, rating: 4.2 },
+    { _id: '4', name: 'USB-C Cable', salesCount: 142, totalSold: 180, reviewCount: 28, rating: 4.0 },
+    { _id: '5', name: 'Mechanical Keyboard', salesCount: 128, totalSold: 165, reviewCount: 25, rating: 4.4 },
+    { _id: '6', name: 'Mouse Pad XL', salesCount: 115, totalSold: 150, reviewCount: 22, rating: 3.9 },
+    { _id: '7', name: 'Webcam HD', salesCount: 98, totalSold: 130, reviewCount: 20, rating: 4.1 },
+    { _id: '8', name: 'Monitor Stand', salesCount: 87, totalSold: 110, reviewCount: 18, rating: 3.8 },
+  ];
+
+  const FALLBACK_TOP_PRODUCTS = [
+    { _id: '1', name: 'Wireless Headphones', totalSold: 320, salesCount: 245, reviewCount: 45, rating: 4.5 },
+    { _id: '2', name: 'Smart Watch Pro', totalSold: 250, salesCount: 189, reviewCount: 38, rating: 4.3 },
+    { _id: '3', name: 'Laptop Stand', totalSold: 200, salesCount: 156, reviewCount: 32, rating: 4.2 },
+    { _id: '4', name: 'USB-C Cable', totalSold: 180, salesCount: 142, reviewCount: 28, rating: 4.0 },
+    { _id: '5', name: 'Mechanical Keyboard', totalSold: 165, salesCount: 128, reviewCount: 25, rating: 4.4 },
+    { _id: '6', name: 'Mouse Pad XL', totalSold: 150, salesCount: 115, reviewCount: 22, rating: 3.9 },
+    { _id: '7', name: 'Webcam HD', totalSold: 130, salesCount: 98, reviewCount: 20, rating: 4.1 },
+    { _id: '8', name: 'Monitor Stand', totalSold: 110, salesCount: 87, reviewCount: 18, rating: 3.8 },
+    { _id: '9', name: 'Desk Organizer', totalSold: 95, salesCount: 75, reviewCount: 15, rating: 3.7 },
+    { _id: '10', name: 'Cable Management', totalSold: 85, salesCount: 68, reviewCount: 12, rating: 3.6 },
+  ];
+
+  const FALLBACK_RECENT_ORDERS = [
+    { _id: '1', user: { name: 'John Doe', email: 'john@example.com' }, status: 'DELIVERED', createdAt: '2024-01-15' },
+    { _id: '2', user: { name: 'Jane Smith', email: 'jane@example.com' }, status: 'CONFIRMED', createdAt: '2024-01-14' },
+    { _id: '3', user: { name: 'Bob Johnson', email: 'bob@example.com' }, status: 'PROCESSING', createdAt: '2024-01-13' },
+    { _id: '4', user: { name: 'Alice Brown', email: 'alice@example.com' }, status: 'SHIPPED', createdAt: '2024-01-12' },
+    { _id: '5', user: { name: 'Charlie Wilson', email: 'charlie@example.com' }, status: 'RECEIVED', createdAt: '2024-01-11' },
+    { _id: '6', user: { name: 'Diana Lee', email: 'diana@example.com' }, status: 'DELIVERED', createdAt: '2024-01-10' },
+  ];
+
+  const FALLBACK_MONTHLY_ORDERS = [
+    { month: '2024-01', orders: 45 },
+    { month: '2024-02', orders: 52 },
+    { month: '2024-03', orders: 38 },
+    { month: '2024-04', orders: 61 },
+    { month: '2024-05', orders: 48 },
+    { month: '2024-06', orders: 55 },
+    { month: '2024-07', orders: 42 },
+    { month: '2024-08', orders: 58 },
+    { month: '2024-09', orders: 49 },
+    { month: '2024-10', orders: 53 },
+    { month: '2024-11', orders: 47 },
+    { month: '2024-12', orders: 51 },
+  ];
+  // ===== END FALLBACK DATA =====
+
+  const orderStatusData = Object.entries(stats.orderStatusStats || {}).map(
     ([status, count]) => ({
       name: status.replace('_', ' ').toUpperCase(),
       value: count,
     }),
   );
 
-  const recentOrders = stats.recentOrders.slice(0, 6);
-  const topProducts = stats.topProducts.slice(0, 5);
+  // Use fallback data if real data is empty (for testing)
+  // Backend returns 10 items for each, use all of them
+  const recentOrders = ((stats.recentOrders || []).length > 0 ? stats.recentOrders : FALLBACK_RECENT_ORDERS).slice(0, 10);
+  const topProducts = ((stats.topProducts || []).length > 0 ? stats.topProducts : FALLBACK_TOP_PRODUCTS).slice(0, 10);
+  const trendingProducts = ((stats.trendingProducts || []).length > 0 ? stats.trendingProducts : FALLBACK_TRENDING_PRODUCTS).slice(0, 10);
   const monthNames = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
 
-  const parsedData = stats.monthlyRevenue.map((item) => {
+  const monthlyOrdersData = (stats.monthlyOrders || []).length > 0 ? stats.monthlyOrders : FALLBACK_MONTHLY_ORDERS;
+  const parsedData = monthlyOrdersData.map((item) => {
+    if (!item || !item.month) return null;
     const [yearStr, monthStr] = item.month.split("-");
 
     const year = Number(yearStr);
     const monthIndex = Number(monthStr);
+
+    if (isNaN(year) || isNaN(monthIndex)) return null;
 
     return {
       label: `${monthNames[monthIndex - 1]} ${year}`,
       month: monthIndex,
       year: year,
       orders: item.orders || 0,
-      revenue: item.revenue || 0,
     };
-  });
+  }).filter(Boolean) as Array<{ label: string; month: number; year: number; orders: number }>;
 
 
-  const latestYear = parsedData[0]?.year || new Date().getFullYear();
+  const latestYear = parsedData.length > 0 ? parsedData[0]?.year : new Date().getFullYear();
 
-  const formattedRevenueData = Array.from({ length: 12 }, (_, i) => {
+  const formattedOrdersData = Array.from({ length: 12 }, (_, i) => {
     const existing = parsedData.find(
       (d) => d.month === i + 1 && d.year === latestYear
     );
 
     return {
       month: monthNames[i].slice(0, 3),
-      revenue: existing?.revenue || 0,
       orders: existing?.orders || 0,
       fullLabel: `${monthNames[i]} ${latestYear}`,
     };
@@ -179,19 +237,13 @@ export default function DashboardPage() {
         <header className="flex flex-col gap-2">
           <PageHeader title="Dashboard" />
           <p className="max-w-xl text-xs sm:text-sm text-muted-foreground">
-            A calm overview of your store performance. See revenue, orders and
+            A calm overview of your store performance. See orders and
             customers at a glance.
           </p>
         </header>
 
         {/* Primary KPI row */}
-        <section className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 md:grid-cols-2 xl:grid-cols-4">
-          <StatCard
-            icon={IndianRupee}
-            label="Total Revenue"
-            value={`₹${stats.totalRevenue.toLocaleString()}`}
-            tone="blue"
-          />
+        <section className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 md:grid-cols-3 xl:grid-cols-3">
           <StatCard
             icon={ShoppingCart}
             label="Total Orders"
@@ -212,15 +264,8 @@ export default function DashboardPage() {
           />
         </section>
 
-        {/* Secondary KPIs (spacious row of 3) */}
-        <section className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-6 md:grid-cols-3">
-          <MiniMetricCard
-            label="This Month’s Revenue"
-            value={`₹${stats.thisMonthRevenue.toLocaleString()}`}
-            helper="vs last 30 days"
-            icon={TrendingUp}
-            color="bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300"
-          />
+        {/* Secondary KPIs (spacious row of 2) */}
+        <section className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-6 md:grid-cols-2">
           <MiniMetricCard
             label="New Users This Month"
             value={stats.newUsersThisMonth.toString()}
@@ -228,22 +273,28 @@ export default function DashboardPage() {
             color="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
           />
           <MiniMetricCard
-            label="Average Order Value"
-            value={`₹${stats.averageOrderValue.toFixed(0)}`}
-            helper="Per completed order"
-            color="bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300"
+            label="New Products This Month"
+            value={stats.newProductsThisMonth.toString()}
+            helper="Products added"
+            color="bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300"
+            icon={TrendingUp}
           />
         </section>
 
 
         <div className="rounded-xl sm:rounded-2xl border border-border bg-card/80 p-3 sm:p-5 shadow-sm flex flex-col justify-between overflow-hidden">
-          <h2 className="text-xs sm:text-sm font-semibold text-foreground mb-2 sm:mb-0">Monthly Sales</h2>
+          <h2 className="text-xs sm:text-sm font-semibold text-foreground mb-2 sm:mb-0">Monthly Orders</h2>
 
           <div className="h-52 sm:h-60 lg:h-68 w-full overflow-x-auto">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={formattedRevenueData}
-                margin={{ top: 10, right: 10, left: 5, bottom: 10 }}
+                data={formattedOrdersData}
+                margin={{ 
+                  top: isMobile ? 10 : 20, 
+                  right: isMobile ? 10 : 20, 
+                  left: isMobile ? 10 : 20, 
+                  bottom: isMobile ? 15 : 20 
+                }}
               >
                 <CartesianGrid vertical={false} />
                 <XAxis
@@ -251,24 +302,23 @@ export default function DashboardPage() {
                   axisLine={false}
                   tickLine={false}
                   interval={0}
-                  angle={-45}
+                  angle={isMobile ? -60 : -45}
                   textAnchor="end"
-                  height={35}
-                  tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
+                  height={isMobile ? 45 : 35}
+                  tick={{ fontSize: isMobile ? 8 : 9, fill: "hsl(var(--muted-foreground))" }}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  width={30}
-                  tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
+                  width={isMobile ? 25 : 30}
+                  tick={{ fontSize: isMobile ? 8 : 9, fill: "hsl(var(--muted-foreground))" }}
                   domain={['dataMin', 'auto']}
                 />
                 <Tooltip
                   cursor={{ fill: "rgba(59, 130, 246, 0.1)" }}
                   formatter={(value: any) => {
-                    // Always show revenue, even if 0
-                    const revenueValue = value === null || value === undefined || isNaN(Number(value)) ? 0 : Number(value);
-                    return [`₹${revenueValue.toLocaleString()}`, "Revenue"];
+                    const orderValue = value === null || value === undefined || isNaN(Number(value)) ? 0 : Number(value);
+                    return [`${orderValue.toLocaleString()}`, "Orders"];
                   }}
                   labelFormatter={(label, payload) => {
                     if (!payload?.[0]) return label;
@@ -282,7 +332,7 @@ export default function DashboardPage() {
                   }}
                 />
                 <Bar
-                  dataKey="revenue"
+                  dataKey="orders"
                   radius={[8, 8, 0, 0]}
                   fill="#3b82f6"
                   animationDuration={700}
@@ -345,8 +395,16 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="rounded-xl sm:rounded-2xl border border-border bg-card/80 p-3 sm:p-5 shadow-sm flex flex-col justify-between overflow-hidden">
-            <h2 className="text-xs sm:text-sm font-semibold text-foreground mb-2 sm:mb-0">Monthly Orders</h2>
+          <div className="rounded-xl sm:rounded-2xl border border-border bg-card/80 p-3 sm:p-5 shadow-sm overflow-hidden">
+            <div className="mb-2 sm:mb-4">
+              <h2 className="text-xs sm:text-sm font-semibold text-foreground">Trending Products</h2>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Top products by sales activity</p>
+            </div>
+            {trendingProducts.length === 0 ? (
+              <div className="h-[250px] flex items-center justify-center text-muted-foreground text-sm">
+                No trending products data available
+              </div>
+            ) : (
             <div className="w-full overflow-hidden">
               <ReactECharts
                 style={{ height: "250px", width: "100%", minHeight: "250px" }}
@@ -359,64 +417,299 @@ export default function DashboardPage() {
                     padding: 8,
                     textStyle: { color: "#fff", fontSize: 11 },
                     formatter: (params: any) => {
+                      if (!params || !Array.isArray(params) || params.length === 0) return '';
                       const p = params[0];
+                      const product = trendingProducts[p.dataIndex];
+                      const fullName = product?.name || p.axisValue || 'Unknown';
+                      const data = p.data;
                       return `
             <div style="font-size:11px;">
-              <b>${p.axisValue}</b><br/>
-              Orders : <b>${p.data}</b>
+              <b>${fullName}</b><br/>
+              Sales Count: <b>${data.salesCount}</b><br/>
+              Total Sold: <b>${data.totalSold}</b><br/>
+              Reviews: <b>${data.reviewCount}</b>
             </div>`;
                     },
                   },
-                  grid: { left: 30, right: 15, top: 20, bottom: 30 },
+                  grid: { 
+                    left: isMobile ? 40 : 50, 
+                    right: isMobile ? 10 : 20, 
+                    top: isMobile ? 20 : 30, 
+                    bottom: isMobile ? 40 : 35 
+                  },
                   xAxis: {
                     type: "category",
-                    data: formattedRevenueData.map((d) => d.month),
+                    data: trendingProducts.slice(0, isMobile ? 6 : 10).map((p) => {
+                      const name = p.name || 'Unknown';
+                      // Truncate more aggressively on mobile
+                      const maxLength = isMobile ? 6 : 8;
+                      return name.length > maxLength ? name.substring(0, maxLength) + '...' : name;
+                    }),
                     axisLabel: {
                       color: "var(--muted-foreground)",
-                      fontSize: 9,
-                      rotate: -30,
-                      margin: 12,
+                      fontSize: isMobile ? 8 : 9,
+                      interval: 0,
+                      formatter: (value: string) => {
+                        // More aggressive truncation on mobile
+                        const maxLength = isMobile ? 7 : 10;
+                        return value.length > maxLength ? value.substring(0, maxLength) + '...' : value;
+                      },
                     },
                     axisLine: { show: false },
                     axisTick: { show: false },
                   },
-
                   yAxis: {
                     type: "value",
                     min: 0,
                     axisLabel: { color: "var(--muted-foreground)", fontSize: 9 },
                     splitLine: { lineStyle: { color: "rgba(120,120,120,0.40)" } },
-                    scale: false,
                   },
-                series: [
-                  {
-                    type: "line",
-                    smooth: true,
-                    symbol: "circle",
-                    symbolSize: 6,
-                    data: formattedRevenueData.map((d) => d.orders || 0),
-                    lineStyle: { width: 3, color: "#465fff" },
-                    itemStyle: { color: "#465fff" },
-                    areaStyle: {
-                      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        { offset: 0, color: "#5caffd" },
-                        { offset: 1, color: "#e6f0ff" },
-                      ]),
+                  series: [
+                    {
+                      type: "bar",
+                      data: trendingProducts.slice(0, isMobile ? 6 : 10).map((p) => ({
+                        value: p.salesCount || 0,
+                        salesCount: p.salesCount || 0,
+                        totalSold: p.totalSold || 0,
+                        reviewCount: p.reviewCount || 0,
+                      })),
+                      itemStyle: {
+                        borderRadius: [4, 4, 0, 0],
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                          { offset: 0, color: "#8b5cf6" },
+                          { offset: 1, color: "#a78bfa" },
+                        ]),
+                      },
+                      barWidth: "60%",
                     },
-                  },
-                ],
-              }}
+                  ],
+                }}
               />
             </div>
+            )}
           </div>
         </section>
 
+        <section className="grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8 xl:grid-cols-2">
+          <div className="rounded-xl sm:rounded-2xl border border-border bg-card/80 p-3 sm:p-5 shadow-sm overflow-hidden">
+            <div className="mb-2 sm:mb-4">
+              <h2 className="text-xs sm:text-sm font-semibold text-foreground">Product Performance</h2>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Sales vs Reviews correlation</p>
+            </div>
+            {topProducts.length === 0 ? (
+              <div className="h-[280px] flex items-center justify-center text-muted-foreground text-sm">
+                No product performance data available
+              </div>
+            ) : (
+            <div className="w-full overflow-hidden">
+              <ReactECharts
+                style={{ height: "280px", width: "100%", minHeight: "280px" }}
+                className="h-[280px]!"
+                option={{
+                  tooltip: {
+                    trigger: "axis",
+                    axisPointer: { type: "cross" },
+                    backgroundColor: "rgba(0,0,0,0.65)",
+                    borderRadius: 8,
+                    padding: 8,
+                    textStyle: { color: "#fff", fontSize: 11 },
+                    formatter: (params: any) => {
+                      if (!params || !Array.isArray(params) || params.length === 0) return '';
+                      const param = params[0];
+                      const product = topProducts[param.dataIndex];
+                      const fullName = product?.name || param.axisValue || 'Unknown';
+                      return `
+                        <div style="font-size:11px; margin-bottom:4px;">
+                          <b>${fullName}</b>
+                        </div>
+                        ${params.map((p: any) => `
+                          <div style="font-size:11px;">
+                            ${p.marker} ${p.seriesName}: <b>${p.value}</b>
+                          </div>
+                        `).join('')}
+                      `;
+                    },
+                  },
+                  legend: {
+                    data: ["Total Sold", "Reviews"],
+                    bottom: 0,
+                    textStyle: { color: "var(--muted-foreground)", fontSize: 10 },
+                  },
+                  grid: { 
+                    left: isMobile ? 40 : 50, 
+                    right: isMobile ? 10 : 20, 
+                    top: isMobile ? 20 : 30, 
+                    bottom: isMobile ? 40 : 50 
+                  },
+                  xAxis: {
+                    type: "category",
+                    data: topProducts.length > 0 ? topProducts.slice(0, isMobile ? 6 : 10).map((p) => {
+                      const name = p.name || 'Unknown';
+                      // Truncate more aggressively on mobile
+                      const maxLength = isMobile ? 6 : 8;
+                      return name.length > maxLength ? name.substring(0, maxLength) + '...' : name;
+                    }) : [],
+                    axisLabel: {
+                      color: "var(--muted-foreground)",
+                      fontSize: isMobile ? 8 : 9,
+                      interval: 0, // Show all labels
+                      formatter: (value: string) => {
+                        // More aggressive truncation on mobile
+                        const maxLength = isMobile ? 7 : 10;
+                        return value.length > maxLength ? value.substring(0, maxLength) + '...' : value;
+                      },
+                    },
+                    axisLine: { show: false },
+                    axisTick: { show: false },
+                  },
+                  yAxis: [
+                    {
+                      type: "value",
+                      name: "Sold",
+                      position: "left",
+                      axisLabel: { color: "var(--muted-foreground)", fontSize: 9 },
+                      splitLine: { lineStyle: { color: "rgba(120,120,120,0.20)" } },
+                    },
+                    {
+                      type: "value",
+                      name: "Reviews",
+                      position: "right",
+                      axisLabel: { color: "var(--muted-foreground)", fontSize: 9 },
+                      splitLine: { show: false },
+                    },
+                  ],
+                  series: [
+                    {
+                      name: "Total Sold",
+                      type: "bar",
+                      data: topProducts.length > 0 ? topProducts.map((p) => p.totalSold || 0) : [],
+                      itemStyle: {
+                        borderRadius: [4, 4, 0, 0],
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                          { offset: 0, color: "#10b981" },
+                          { offset: 1, color: "#34d399" },
+                        ]),
+                      },
+                    },
+                    {
+                      name: "Reviews",
+                      type: "line",
+                      yAxisIndex: 1,
+                      data: topProducts.length > 0 ? topProducts.map((p) => p.reviewCount || 0) : [],
+                      lineStyle: { width: 3, color: "#f59e0b" },
+                      itemStyle: { color: "#f59e0b" },
+                      symbol: "circle",
+                      symbolSize: 8,
+                    },
+                  ],
+                }}
+              />
+            </div>
+            )}
+          </div>
 
+          <div className="rounded-xl sm:rounded-2xl border border-border bg-card/80 p-3 sm:p-5 shadow-sm overflow-hidden">
+            <div className="mb-2 sm:mb-4">
+              <h2 className="text-xs sm:text-sm font-semibold text-foreground">Sales Activity Heatmap</h2>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Total Sold vs Sales Count</p>
+            </div>
+            {topProducts.length === 0 ? (
+              <div className="h-[280px] flex items-center justify-center text-muted-foreground text-sm">
+                No sales activity data available
+              </div>
+            ) : (
+            <div className="w-full overflow-hidden">
+              <ReactECharts
+                style={{ height: "280px", width: "100%", minHeight: "280px" }}
+                className="h-[280px]!"
+                option={{
+                  tooltip: {
+                    trigger: "item",
+                    backgroundColor: "rgba(0,0,0,0.65)",
+                    borderRadius: 8,
+                    padding: 8,
+                    textStyle: { color: "#fff", fontSize: 11 },
+                    formatter: (params: any) => {
+                      const data = params.data;
+                      return `
+            <div style="font-size:11px;">
+              <b>${data.name}</b><br/>
+              Total Sold: <b>${data.totalSold}</b><br/>
+              Sales Count: <b>${data.salesCount}</b><br/>
+              Rating: <b>${data.rating?.toFixed(1) || 0}⭐</b>
+            </div>`;
+                    },
+                  },
+                  grid: { 
+                    left: isMobile ? 40 : 50, 
+                    right: isMobile ? 10 : 20, 
+                    top: isMobile ? 20 : 30, 
+                    bottom: isMobile ? 40 : 50 
+                  },
+                  xAxis: {
+                    type: "value",
+                    name: "Sales Count",
+                    nameLocation: "middle",
+                    nameGap: 30,
+                    axisLabel: { color: "var(--muted-foreground)", fontSize: 9 },
+                    splitLine: { lineStyle: { color: "rgba(120,120,120,0.20)" } },
+                  },
+                  yAxis: {
+                    type: "value",
+                    name: "Total Sold",
+                    nameLocation: "middle",
+                    nameGap: 50,
+                    axisLabel: { color: "var(--muted-foreground)", fontSize: 9 },
+                    splitLine: { lineStyle: { color: "rgba(120,120,120,0.20)" } },
+                  },
+                  series: [
+                    {
+                      type: "scatter",
+                      data: topProducts.length > 0 ? topProducts.map((p) => {
+                        const salesCount = p.salesCount || 0;
+                        const totalSold = p.totalSold || 0;
+                        const rating = p.rating || 0;
+                        return {
+                          value: [salesCount, totalSold],
+                          name: p.name || 'Unknown',
+                          totalSold: totalSold,
+                          salesCount: salesCount,
+                          rating: rating,
+                        };
+                      }) : [],
+                      symbolSize: (data: any) => {
+                        const totalSold = (data?.value && Array.isArray(data.value) && data.value[1]) ? data.value[1] : 0;
+                        return Math.max(20, Math.min(60, totalSold / 10));
+                      },
+                      itemStyle: {
+                        color: (params: any) => {
+                          const rating = params.data.rating || 0;
+                          if (rating >= 4) return "#10b981";
+                          if (rating >= 3) return "#f59e0b";
+                          return "#ef4444";
+                        },
+                        opacity: 0.7,
+                      },
+                      emphasis: {
+                        itemStyle: {
+                          opacity: 1,
+                          borderColor: "#fff",
+                          borderWidth: 2,
+                        },
+                      },
+                    },
+                  ],
+                }}
+              />
+            </div>
+            )}
+          </div>
+        </section>
 
         <section className="grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-2">
           <div className="rounded-xl sm:rounded-2xl border border-border bg-card/80 p-3 sm:p-5 shadow-sm overflow-hidden">
-            <div className="mb-3 sm:mb-5 flex items-center justify-between">
-              <h2 className="text-sm sm:text-lg font-semibold text-foreground">Recent Orders</h2>
+            <div className="mb-3 sm:mb-4 flex items-center justify-between">
+              <h2 className="text-sm sm:text-base font-semibold text-foreground">Recent Orders</h2>
 
               <Link href="/orders">
                 <Button className="rounded-full text-xs sm:text-sm h-7 sm:h-9 px-3 sm:px-4">See all</Button>
@@ -426,9 +719,9 @@ export default function DashboardPage() {
             <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
               <table className="w-full text-xs sm:text-sm min-w-[500px] sm:min-w-0">
                 <thead>
-                  <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
-                    <th className="py-2">Customer</th>
-                    <th className="py-2">Amount</th>
+                  <tr className="border-b text-left text-sm uppercase tracking-wide text-muted-foreground">
+                    <th className="py-2">Name</th>
+                    <th className="py-2">Email</th>
                     <th className="py-2">Status</th>
                     <th className="py-2">Date</th>
                   </tr>
@@ -447,22 +740,19 @@ export default function DashboardPage() {
                         key={order._id}
                         className="border-b last:border-0 hover:bg-muted/40 transition-colors"
                       >
-                        <td className="py-3 pr-4">
-                          <div className="flex flex-col">
-                            <span className="font-medium text-foreground">{order.user.name}</span>
-                            <span className="text-[11px] text-muted-foreground">{order.user.email}</span>
-                          </div>
+                        <td className="py-2 pr-4 font-medium text-foreground text-xs">
+                          {order.user.name}
                         </td>
 
-                        <td className="py-3 pr-4 font-medium whitespace-nowrap">
-                          ₹{order.totalAmount.toLocaleString()}
+                        <td className="py-2 pr-4 text-[11px] text-muted-foreground">
+                          {order.user.email}
                         </td>
 
-                        <td className="py-3 pr-4">
+                        <td className="py-2 pr-4">
                           <StatusBadge status={order.status} />
                         </td>
 
-                        <td className="py-3 pr-4 text-[11px] text-muted-foreground whitespace-nowrap">
+                        <td className="py-2 pr-4 text-[11px] text-muted-foreground whitespace-nowrap">
                           {order.createdAt}
                         </td>
                       </tr>
@@ -481,7 +771,7 @@ export default function DashboardPage() {
                   Top Products
                 </h2>
                 <p className="text-[10px] sm:text-xs text-muted-foreground">
-                  Best performing products by revenue.
+                  Best performing products by sales.
                 </p>
               </div>
             </div>
@@ -491,14 +781,15 @@ export default function DashboardPage() {
                   <tr className="border-b border-border text-left text-[11px] uppercase tracking-wide text-muted-foreground">
                     <th className="py-2 pr-2">Product</th>
                     <th className="py-2 pr-2">Sold</th>
-                    <th className="py-2 pr-2">Revenue</th>
+                    <th className="py-2 pr-2">Reviews</th>
+                    <th className="py-2 pr-2">Rating</th>
                   </tr>
                 </thead>
                 <tbody>
                   {topProducts.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={3}
+                        colSpan={4}
                         className="py-4 text-center text-xs text-muted-foreground"
                       >
                         No products data yet.
@@ -516,9 +807,15 @@ export default function DashboardPage() {
                             {product.totalSold}
                           </span>
                         </td>
-
-                        <td className="py-2 pr-2 whitespace-nowrap">
-                          ₹{product.revenue.toLocaleString()}
+                        <td className="py-2 pr-2">
+                          <span className="bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 px-2 py-1 rounded-md font-semibold">
+                            {product.reviewCount || 0}
+                          </span>
+                        </td>
+                        <td className="py-2 pr-2">
+                          <span className="bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 px-2 py-1 rounded-md font-semibold">
+                            {(product.rating || 0).toFixed(1)}⭐
+                          </span>
                         </td>
                       </tr>
                     ))
