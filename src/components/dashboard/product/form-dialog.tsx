@@ -86,7 +86,6 @@ export function ProductFormDialog({
       // shortDescription: initialData?.shortDescription || "",
       categoryId: initialData?.category as string || "",
       brandId: initialData?.brand as string || "",
-      originalPrice: initialData?.originalPrice || 0,
       // discountType: initialData?.discountType || undefined,
       // discountValue: initialData?.discountValue || 0,
       // stock: initialData?.stock || 0,
@@ -295,24 +294,6 @@ export function ProductFormDialog({
                           value={field.value || null}
                           action={(val) => field.onChange(val)}
                         />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="originalPrice"
-                    render={({ field }) => (
-                      <FormItem className="space-y-2">
-                        <FormLabel>Price *</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="Enter price..."
-                            {...field}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                          />
-                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}

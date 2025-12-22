@@ -95,7 +95,6 @@ class ProductService {
     formData.append('name', data.name);
     // if (data.description) formData.append('description', data.description);
     // if (data.shortDescription) formData.append('shortDescription', data.shortDescription);
-    formData.append('originalPrice', data.originalPrice.toString());
     // if (data.discountValue) formData.append('discountedPrice', data.discountValue.toString());
     // if (data.discountType) formData.append('discountType', data.discountType);
     if (data.brandId) formData.append('brandId', data.brandId);
@@ -127,7 +126,6 @@ class ProductService {
     if (data.name) formData.append('name', data.name);
     // if (data.description) formData.append('description', data.description);
     // if (data.shortDescription) formData.append('shortDescription', data.shortDescription);
-    if (data.originalPrice) formData.append('originalPrice', data.originalPrice.toString());
     // if (data.discountValue) formData.append('discountedPrice', data.discountValue.toString());
     // if (data.discountType) formData.append('discountType', data.discountType);
     if (data.brandId) formData.append('brandId', data.brandId);

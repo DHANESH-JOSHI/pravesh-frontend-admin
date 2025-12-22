@@ -19,12 +19,10 @@ export type OrderStatus = z.infer<typeof orderStatusSchema>;
 export const orderUpdateItemSchema = z.object({
   product: z.string(),
   quantity: z.number().min(1, "Quantity must be at least 1"),
-  price: z.number().min(1, "Price must be at least 0"),
 });
 type OrderItem = {
   product: string | Partial<Product>;
   quantity: number;
-  price: number;
 }
 
 type OrderHistoryItem = {

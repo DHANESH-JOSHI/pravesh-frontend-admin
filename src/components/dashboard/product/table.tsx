@@ -44,17 +44,13 @@ export function ProductsTable() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [appliedFilters, setAppliedFilters] = useState<QueryOptions>({ page: 1, limit: 8 });
   const [filterSearch, setFilterSearch] = useState("");
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(0);
-  const [debouncedMaxPrice] = useDebounce(maxPrice, 500);
-  const [debouncedMinPrice] = useDebounce(minPrice, 500);
   const queryClient = useQueryClient();
 
   const { data: filtersResp } = useQuery({
     queryKey: ["product-filters"],
     queryFn: () => productService.getFilters(),
   });
-  const filters = filtersResp?.data ?? { categories: [], brands: [], sizes: [], colors: [], priceRange: { minPrice: 0, maxPrice: 0 } };
+  const filters = filtersResp?.data ?? { categories: [], brands: [], sizes: [], colors: [] };
   const categories = filters?.categories ?? [];
   const brands = filters.brands ?? [];
   // const sizesOptions = filters.sizes ?? [];
@@ -65,27 +61,6 @@ export function ProductsTable() {
       await productService.getAll(appliedFilters),
   });
 
-  useEffect(() => {
-    if (filters?.priceRange) {
-      setMinPrice(filters.priceRange.minPrice);
-      setMaxPrice(filters.priceRange.maxPrice);
-
-      setAppliedFilters((prev) => ({
-        ...prev,
-        minPrice: filters.priceRange.minPrice,
-        maxPrice: filters.priceRange.maxPrice,
-      }));
-    }
-  }, [filters?.priceRange]);
-
-  useEffect(() => {
-    setAppliedFilters((prev) => ({
-      ...prev,
-      minPrice: debouncedMinPrice,
-      maxPrice: debouncedMaxPrice,
-      page: 1,
-    }));
-  }, [debouncedMinPrice, debouncedMaxPrice]);
 
 
   const products = data?.data?.products ?? [];
@@ -217,27 +192,6 @@ export function ProductsTable() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">
-                Price range
-              </label>
-              <div className="flex items-center space-x-2 justify-between px-2 py-1.5 rounded border bg-background">
-
-                <div>Min: ₹{minPrice}</div>
-
-                <div className="py-1 min-w-sm">
-                  <Slider
-                    min={filters.priceRange?.minPrice}
-                    max={filters.priceRange?.maxPrice}
-                    step={100}
-                    value={[minPrice, maxPrice]}
-                    onValueChange={(value) => {
-                      setMinPrice(value[0]);
-                      setMaxPrice(value[1]);
-                    }}
-                  />
-                </div>
-                <div>Max: ₹{maxPrice}</div>
-              </div>
             </div>
             <div className="flex items-end justify-end">
               {hasFiltersSelected && (
@@ -266,7 +220,6 @@ export function ProductsTable() {
                 <TableHead>Name</TableHead>
                 <TableHead>Brand</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead className="text-right">Price</TableHead>
                 <TableHead>New Arrival</TableHead>
                 <TableHead>Featured</TableHead>
                 <TableHead className="w-16 text-center">Actions</TableHead>
@@ -329,7 +282,6 @@ export function ProductsTable() {
                       </TableCell>
                       <TableCell className="text-muted-foreground truncate w-20">{brandName}</TableCell>
                       <TableCell className="text-muted-foreground truncate w-20">{categoryName}</TableCell>
-                      <TableCell className="text-center font-semibold">₹{product.originalPrice}</TableCell>
                       <TableCell className="text-center font-semibold">
                         <Badge variant="outline" className="bg-background/40">
                           {product.isNewArrival ? "Yes" : "No"}

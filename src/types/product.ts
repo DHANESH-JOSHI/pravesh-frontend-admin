@@ -27,8 +27,6 @@ export const queryOptionsSchema = z.object({
   limit: z.number().int().positive().optional(),
   categoryId: z.string().optional(),
   brandId: z.string().optional(),
-  minPrice: z.number().nonnegative().optional(),
-  maxPrice: z.number().nonnegative().optional(),
 
   isFeatured: z.boolean().optional(),
   isNewArrival: z.boolean().optional(),
@@ -52,7 +50,6 @@ export const createProductSchema = z.object({
   thumbnail: z.instanceof(File).optional(),
   // images: z.array(z.instanceof(File)).optional(),
 
-  originalPrice: z.number().nonnegative().min(1, "Original price must be greater than 0"),
   // discountValue: z.number().nonnegative().optional(),
   // discountType: discountTypeSchema.optional(),
 
@@ -84,7 +81,6 @@ export type Product = {
   category: string | Partial<Category>,
   thumbnail: string,
   // images: string[],
-  originalPrice: number,
   // discountValue: number,
   // discountType: discountType,
   // finalPrice: number,
@@ -117,7 +113,6 @@ interface PaginatedProducts extends PaginatedData {
 interface ProductFilters {
   categories: { _id: string; title: string }[];
   brands: { _id: string; name: string }[];
-  priceRange: { minPrice: number; maxPrice: number };
   // colors: string[];
   // sizes: string[];
 };
