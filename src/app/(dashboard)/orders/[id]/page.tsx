@@ -95,9 +95,7 @@ export default function OrderDetailPage() {
 
   const shippingAddress = order.shippingAddress as Partial<Address>;
   const totalItems = order.items.reduce((acc, item) => acc + item.quantity, 0);
-  const totalAmount = order.items.reduce((acc, item) => {
-    return acc + (item.price || 0) * item.quantity;
-  }, 0);
+  const totalAmount = 0;
 
   const STATUS_COLORS: Record<string, string> = {
     received: "bg-orange-100 text-orange-800",
@@ -204,7 +202,6 @@ export default function OrderDetailPage() {
                 <TableHead>Product</TableHead>
                 <TableHead>Brand</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead className="text-right">Price</TableHead>
                 {/*<TableHead className="text-right">Final</TableHead>*/}
                 <TableHead className="text-right">Qty</TableHead>
                 <TableHead className="text-right">Line Total</TableHead>
@@ -222,7 +219,7 @@ export default function OrderDetailPage() {
                   const product = item.product as Partial<Product>;
                   const brand = product.brand as Partial<Brand> | undefined;
                   const category = product.category as Partial<Category>;
-                  const lineTotal = (item.price ?? 0) * item.quantity;
+                  const lineTotal = 0;
                   return (
                     <TableRow key={idx}>
                       <TableCell>
@@ -244,8 +241,6 @@ export default function OrderDetailPage() {
                       <TableCell>
                         <Link className="hover:underline" href={`/categories/${category._id}`}>{category.title || "N/A"}
                         </Link>
-                      </TableCell>
-                      <TableCell className="text-right text-muted-foreground">₹{(product.originalPrice ?? 0).toFixed(2)}
                       </TableCell>
                       {/*<TableCell className="text-right font-semibold">₹{(product.finalPrice ?? 0).toFixed(2)}
                       </TableCell>*/}

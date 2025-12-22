@@ -117,7 +117,6 @@ export function CartsTable() {
                         {cart.items.reduce((acc, item) => acc + item.quantity, 0)}
                       </TableCell>
                       <TableCell className="text-muted-foreground font-semibold">
-                        ₹{cart.items.reduce((acc, item) => acc + (item.product as Product).originalPrice, 0).toFixed(2)}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {new Date(cart.updatedAt).toLocaleDateString("en-GB", {

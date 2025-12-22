@@ -57,7 +57,6 @@ export function OrderFormDialog({
       items: initialData?.items?.map((item) => ({
         product: (item.product as Product)._id,
         quantity: item.quantity,
-        price: item.price,
       })),
     },
   });
@@ -208,7 +207,7 @@ export function OrderFormDialog({
                 variant="outline"
                 size="sm"
                 className="mt-2"
-                onClick={() => append({ product: "", quantity: 1, price: 0 })}
+                onClick={() => append({ product: "", quantity: 1 })}
               >
                 Add Item
               </Button>
