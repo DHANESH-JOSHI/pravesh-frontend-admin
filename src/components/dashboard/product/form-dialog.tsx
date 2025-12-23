@@ -61,8 +61,14 @@ export function ProductFormDialog({
 }: FormDialogProps<CreateProduct, Product>) {
   const isEditMode = !!initialData;
   const specsArraySchema = z.array(z.object({ key: z.string(), value: z.string() })).optional();
+  const unitsArraySchema = z.array(z.object({ 
+    unit: z.string().nonempty("Unit name is required"), 
+    conversionRate: z.number().positive("Conversion rate must be positive"),
+    isBase: z.boolean().optional()
+  })).optional();
   const formSchema = (isEditMode ? updateProductSchema : createProductSchema).extend({
     specifications: specsArraySchema,
+    units: unitsArraySchema,
   });
 
   const thumbnailRef = useRef<HTMLInputElement>(null);
@@ -94,6 +100,7 @@ export function ProductFormDialog({
       // features: initialData?.features || [],
       specifications: initialData?.specifications ? Object.entries(initialData.specifications).map(([key, value]) => ({ key, value })) : [],
       unit: initialData?.unit || "piece",
+      units: initialData?.units || [],
       // minStock: initialData?.minStock || 0,
       tags: initialData?.tags || [],
       isFeatured: initialData?.isFeatured || false,
@@ -118,6 +125,11 @@ export function ProductFormDialog({
     name: "specifications"
   });
 
+  const { fields: unitFields, append: appendUnit, remove: removeUnit } = useFieldArray({
+    control: form.control,
+    name: "units"
+  });
+
   useEffect(() => {
     if (initialData) {
       form.reset({
@@ -126,6 +138,7 @@ export function ProductFormDialog({
         categoryId: (initialData.category as Category)?._id || initialData.category,
         // features: initialData.features || [],
         specifications: initialData.specifications ? Object.entries(initialData.specifications).map(([key, value]) => ({ key, value })) : [],
+        units: initialData.units || [],
         tags: initialData.tags || [],
         thumbnail: undefined,
         // images: undefined,
@@ -148,10 +161,19 @@ export function ProductFormDialog({
       if (s?.key) acc[s.key] = s.value ?? "";
       return acc;
     }, {});
+    
+    // Process units array - filter out empty units and ensure at least one base unit
+    const unitsArr = Array.isArray(data.units) ? data.units.filter(u => u.unit && u.conversionRate > 0) : [];
+    // If no base unit is marked, mark the first one as base
+    if (unitsArr.length > 0 && !unitsArr.some(u => u.isBase)) {
+      unitsArr[0].isBase = true;
+    }
+    
     const transformedData = {
       ...data,
       // features: data.features ?? [],
       specifications: specsRecord,
+      units: unitsArr.length > 0 ? unitsArr : undefined,
     };
     onSubmit(transformedData);
   }
@@ -247,16 +269,24 @@ export function ProductFormDialog({
                     name="unit"
                     render={({ field }) => (
                       <FormItem className="space-y-2">
-                        <FormLabel>Unit</FormLabel>
+                        <FormLabel>Base Unit *</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Enter unit type..."
+                            placeholder="Enter base unit (e.g., kg, piece)..."
                             {...field}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
+                  />
+                  <UnitsFormArray 
+                    name="units" 
+                    title="Additional Units" 
+                    form={form} 
+                    fields={unitFields} 
+                    append={appendUnit} 
+                    remove={removeUnit} 
                   />
                   {/*<FormField
                     control={form.control}
@@ -785,6 +815,87 @@ function KeyValueFormArray({ name, title, form, fields, append, remove }: { name
         >
           <Plus className="h-4 w-4" />
           Add {title}
+        </Button>
+      </Card>
+    </FormItem>
+  )
+}
+
+function UnitsFormArray({ name, title, form, fields, append, remove }: { name: "units", title: string, form: any, fields: any[], append: any, remove: any }) {
+  return (
+    <FormItem>
+      <FormLabel>{title}</FormLabel>
+      <Card className="p-4 space-y-4">
+        <p className="text-sm text-muted-foreground">
+          Add additional units with conversion rates. The base unit is set above. For example, if base is "kg", you can add "g" with conversion rate 0.001.
+        </p>
+        {fields.map((field, index) => (
+          <div key={field.id} className="space-y-2 p-3 border rounded-lg">
+            <div className="flex items-center gap-4">
+              <FormField
+                control={form.control}
+                name={`${name}.${index}.unit`}
+                render={({ field }) => (
+                  <FormItem className="grow">
+                    <FormLabel className="text-xs">Unit Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., g, piece, packet" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`${name}.${index}.conversionRate`}
+                render={({ field }) => (
+                  <FormItem className="grow">
+                    <FormLabel className="text-xs">Conversion Rate</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        step="0.0001"
+                        placeholder="e.g., 0.001 for g to kg" 
+                        {...field}
+                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`${name}.${index}.isBase`}
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center space-x-3 space-y-0 pt-6">
+                    <FormControl>
+                      <Switch
+                        checked={field.value || false}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-xs">Base Unit</FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="mt-6">
+                <Trash className="h-4 w-4 text-destructive" />
+              </Button>
+            </div>
+          </div>
+        ))}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={() => append({ unit: "", conversionRate: 1, isBase: false })}
+        >
+          <Plus className="h-4 w-4" />
+          Add Unit
         </Button>
       </Card>
     </FormItem>

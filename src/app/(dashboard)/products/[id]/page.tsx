@@ -191,9 +191,27 @@ export default function ProductDetailPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium">Unit</label>
-                  <p>{product.unit}</p>
+                  <label className="text-sm font-medium">Base Unit</label>
+                  <p className="font-semibold">{product.unit}</p>
                 </div>
+                {product.units && product.units.length > 0 && (
+                  <div>
+                    <label className="text-sm font-medium">Additional Units</label>
+                    <div className="space-y-2 mt-2">
+                      {product.units.map((unit, index) => (
+                        <div key={index} className="flex items-center gap-2 p-2 border rounded">
+                          <span className="font-medium">{unit.unit}</span>
+                          <span className="text-xs text-muted-foreground">
+                            (Rate: {unit.conversionRate})
+                          </span>
+                          {unit.isBase && (
+                            <Badge variant="secondary" className="text-xs">Base</Badge>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {/*<div>
                   <label className="text-sm font-medium mr-3">Stock Status</label>
                   <Badge className={getStockStatusColor(product.stockStatus)}>

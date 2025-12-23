@@ -40,6 +40,12 @@ export const queryOptionsSchema = z.object({
 
 export type QueryOptions = z.infer<typeof queryOptionsSchema>;
 
+export const productUnitSchema = z.object({
+  unit: z.string().nonempty("Unit name is required"),
+  conversionRate: z.number().positive("Conversion rate must be positive"),
+  isBase: z.boolean().optional(),
+});
+
 export const createProductSchema = z.object({
   name: z.string().nonempty("Name is required"),
   // description: z.string().optional(),
@@ -55,6 +61,7 @@ export const createProductSchema = z.object({
 
   // stock: z.number().int().nonnegative(),
   unit: z.string().nonempty("Unit is required"),
+  units: z.array(productUnitSchema).optional(),
   // minStock: z.number().int().nonnegative().optional(),
 
   // features: z.array(z.string()).optional(),
@@ -69,6 +76,12 @@ export type CreateProduct = z.infer<typeof createProductSchema>;
 
 export const updateProductSchema = createProductSchema.partial();
 export type UpdateProduct = z.infer<typeof updateProductSchema>;
+
+export type ProductUnit = {
+  unit: string;
+  conversionRate: number;
+  isBase?: boolean;
+};
 
 export type Product = {
   _id: string;
@@ -87,6 +100,7 @@ export type Product = {
   // stock: number,
   // stockStatus: stockStatus,
   unit: string,
+  units?: ProductUnit[],
   // minStock: number,
   // features?: string[],
   specifications: Record<string, string>,

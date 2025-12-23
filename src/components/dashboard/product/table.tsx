@@ -233,6 +233,7 @@ export function ProductsTable() {
                 <TableHead>Name</TableHead>
                 <TableHead>Brand</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead>Unit</TableHead>
                 <TableHead>New Arrival</TableHead>
                 <TableHead>Featured</TableHead>
                 <TableHead className="w-16 text-center">Actions</TableHead>
@@ -249,6 +250,7 @@ export function ProductsTable() {
                     "h-5 w-24",
                     "h-5 w-24",
                     "h-5 w-20",
+                    "h-5 w-20",
                     "h-6 w-16",
                     "h-6 w-16",
                     "h-4 w-4 rounded",
@@ -256,7 +258,7 @@ export function ProductsTable() {
                 />
               ) : products.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="p-6">
+                  <TableCell colSpan={10} className="p-6">
                     <EmptyState
                       title="No products found"
                       description="Try a different search."
@@ -267,6 +269,10 @@ export function ProductsTable() {
                 products.map((product: Product) => {
                   const brandName = typeof product.brand === "string" ? product.brand : product.brand?.name ?? "N/A";
                   const categoryName = typeof product.category === "string" ? product.category : (product.category as Category)?.title ?? "N/A";
+                  const units = product.units || [];
+                  const unitDisplay = units.length > 0 
+                    ? `${product.unit} (+${units.length})`
+                    : product.unit;
                   return (
                     <TableRow
                       key={product._id}
@@ -295,6 +301,16 @@ export function ProductsTable() {
                       </TableCell>
                       <TableCell className="text-muted-foreground truncate w-20">{brandName}</TableCell>
                       <TableCell className="text-muted-foreground truncate w-20">{categoryName}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        <div className="flex flex-col">
+                          <span className="font-medium">{product.unit}</span>
+                          {units.length > 0 && (
+                            <span className="text-xs text-muted-foreground">
+                              +{units.length} more
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell className="text-center font-semibold">
                         <Badge variant="outline" className="bg-background/40">
                           {product.isNewArrival ? "Yes" : "No"}
