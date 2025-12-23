@@ -141,8 +141,31 @@ export default function CartDetailPage() {
                         )}
                       </TableCell>
                       <TableCell><Link className="hover:underline" href={`/products/${product._id}`}>{product.name || "N/A"}</Link></TableCell>
-                      <TableCell><Link className="hover:underline" href={`/brands/${brand._id}`}>{brand.name || "N/A"}</Link></TableCell>
-                      <TableCell><Link className="hover:underline" href={`/categories/${category._id}`}>{category.title || "N/A"}</Link>
+                      <TableCell>
+                        <Link 
+                          className="hover:underline" 
+                          href={brand?._id ? `/brands/${brand._id}` : "#"}
+                          onClick={(e) => {
+                            if (!brand?._id) {
+                              e.preventDefault();
+                            }
+                          }}
+                        >
+                          {brand?.name || "N/A"}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link 
+                          className="hover:underline" 
+                          href={category?._id ? `/categories/${category._id}` : "#"}
+                          onClick={(e) => {
+                            if (!category?._id) {
+                              e.preventDefault();
+                            }
+                          }}
+                        >
+                          {category?.title || "N/A"}
+                        </Link>
                       </TableCell>
                       {/*<TableCell className="text-right text-muted-foreground">₹{(product.finalPrice ?? 0).toFixed(2)}</TableCell>*/}
                       <TableCell className="text-right">{item.quantity}</TableCell>

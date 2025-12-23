@@ -129,7 +129,7 @@ export function CategoriesTable() {
             <div className="space-y-1">
               <label className="text-xs font-medium text-muted-foreground">Status</label>
               <Select
-                value={appliedFilters.isDeleted}
+                value={appliedFilters.isDeleted || ""}
                 onValueChange={(v) => setAppliedFilters((d) => ({ ...d, isDeleted: v }))}
               >
                 <SelectTrigger className="w-full">

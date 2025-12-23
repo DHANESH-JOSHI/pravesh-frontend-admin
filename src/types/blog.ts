@@ -19,6 +19,7 @@ export type Blog = {
   featuredImage: string | null;
   tags: string[] | null;
   isPublished: boolean;
+  isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
 };

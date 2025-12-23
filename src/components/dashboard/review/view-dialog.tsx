@@ -24,11 +24,11 @@ export function ReviewViewDialog({
 }: ReviewViewDialogProps) {
   if (!review) return null;
 
-  const userName = typeof review.user === 'object' ? review.user.name : review.user;
-  const userEmail = typeof review.user === 'object' ? review.user.email : '';
-  const productName = typeof review.product === 'object' ? review.product.name : review.product;
-  const productBrand = typeof review.product === 'object' && review.product.brand
-    ? (typeof review.product.brand === 'object' ? review.product.brand.name : review.product.brand)
+  const userName = typeof review.user === 'object' ? review.user?.name : review.user || "Unknown User";
+  const userEmail = typeof review.user === 'object' ? review.user?.email : '';
+  const productName = typeof review.product === 'object' ? review.product?.name : review.product || "Unknown Product";
+  const productBrand = typeof review.product === 'object' && review.product?.brand
+    ? (typeof review.product.brand === 'object' ? review.product.brand?.name : review.product.brand)
     : '';
 
   const renderStars = (rating: number) => {

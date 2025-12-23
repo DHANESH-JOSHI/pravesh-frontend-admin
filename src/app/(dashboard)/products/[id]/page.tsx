@@ -62,7 +62,9 @@ export default function ProductDetailPage() {
 
   const brandId = (product.brand as Brand)?._id || product.brand as string;
   const brandName = (product.brand as Brand)?.name || "N/A";
-  const category = product.category as Category;
+  const category = product.category as Category | null | undefined;
+  const categoryId = category?._id || null;
+  const categoryTitle = category?.title || "N/A";
 
   // const getStockStatusColor = (status: string) => {
   //   switch (status) {
@@ -170,9 +172,18 @@ export default function ProductDetailPage() {
                 </div>
                 <div className="space-x-2">
                   <label className="text-sm font-medium">Category</label>
-                  <Link href={`/categories/${category._id}`}>
-                    <Button variant="link" size="sm">
-                      {category.title}
+                  <Link href={categoryId ? `/categories/${categoryId}` : "#"}>
+                    <Button 
+                      variant={categoryId ? 'link' : 'ghost'} 
+                      size="sm"
+                      onClick={(e) => {
+                        if (!categoryId) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }
+                      }}
+                    >
+                      {categoryTitle}
                     </Button>
                   </Link>
                 </div>

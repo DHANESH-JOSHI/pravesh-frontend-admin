@@ -181,8 +181,8 @@ export default function OrderDetailPage() {
             <UserIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(order.user as User).name}</div>
-            <p className="text-xs text-muted-foreground">{(order.user as User).email || "N/A"}</p>
+            <div className="text-2xl font-bold">{(order.user as User)?.name || "Unknown User"}</div>
+            <p className="text-xs text-muted-foreground">{(order.user as User)?.email || "N/A"}</p>
           </CardContent>
         </Card>
 
@@ -203,7 +203,7 @@ export default function OrderDetailPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹{(order.user as User).wallet?.balance?.toFixed(2)}</div>
+            <div className="text-2xl font-bold">₹{((order.user as User)?.wallet?.balance ?? 0).toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">balance</p>
           </CardContent>
         </Card>
@@ -285,7 +285,16 @@ export default function OrderDetailPage() {
                         </Link>
                       </TableCell>
                       <TableCell>
-                        <Link className="hover:underline" href={`/categories/${category._id}`}>{category.title || "N/A"}
+                        <Link 
+                          className="hover:underline" 
+                          href={category?._id ? `/categories/${category._id}` : "#"}
+                          onClick={(e) => {
+                            if (!category?._id) {
+                              e.preventDefault();
+                            }
+                          }}
+                        >
+                          {category?.title || "N/A"}
                         </Link>
                       </TableCell>
                       {/*<TableCell className="text-right font-semibold">₹{(product.finalPrice ?? 0).toFixed(2)}

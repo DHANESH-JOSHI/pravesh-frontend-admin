@@ -133,7 +133,7 @@ export function BlogsTable() {
             <div className="space-y-1">
               <label className="text-xs font-medium text-muted-foreground">Status</label>
               <Select
-                value={appliedFilters.isDeleted}
+                value={appliedFilters.isDeleted || ""}
                 onValueChange={(v) => setAppliedFilters((d) => ({ ...d, isDeleted: v }))}
               >
                 <SelectTrigger className="w-full">
@@ -249,21 +249,23 @@ export function BlogsTable() {
                               <p>View</p>
                             </TooltipContent>
                           </Tooltip>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 rounded-lg hover:bg-muted/60 transition-colors"
-                                onClick={() => setEditingBlog(blog)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Edit</p>
-                            </TooltipContent>
-                          </Tooltip>
+                          {!blog.isDeleted && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 rounded-lg hover:bg-muted/60 transition-colors"
+                                  onClick={() => setEditingBlog(blog)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Edit</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button

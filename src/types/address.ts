@@ -47,5 +47,5 @@ export interface AddressQueryOptions {
   limit?: number;
   search?: string;
   user?: string;
-  isDeleted?: boolean;
+  isDeleted?: string;
 }

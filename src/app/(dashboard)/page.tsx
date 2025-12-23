@@ -741,11 +741,11 @@ export default function DashboardPage() {
                         className="border-b last:border-0 hover:bg-muted/40 transition-colors"
                       >
                         <td className="py-2 pr-4 font-medium text-foreground text-xs">
-                          {order.user.name}
+                          {order.user?.name || "Unknown User"}
                         </td>
 
                         <td className="py-2 pr-4 text-[11px] text-muted-foreground">
-                          {order.user.email}
+                          {order.user?.email || "N/A"}
                         </td>
 
                         <td className="py-2 pr-4">

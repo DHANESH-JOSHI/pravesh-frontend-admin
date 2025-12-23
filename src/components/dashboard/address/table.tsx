@@ -85,8 +85,8 @@ export function AddressesTable() {
             <div className="space-y-1">
               <label className="text-xs font-medium text-muted-foreground">Status</label>
               <Select
-                value={appliedFilters.isDeleted?.toString() || ""}
-                onValueChange={(v) => setAppliedFilters((d) => ({ ...d, isDeleted: v === "true", page: 1 }))}
+                value={appliedFilters.isDeleted || ""}
+                onValueChange={(v) => setAppliedFilters((d) => ({ ...d, isDeleted: v, page: 1 }))}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Active" />

@@ -173,10 +173,10 @@ export function ReviewsTable() {
                   {reviews.map((review: Review) => (
                     <TableRow key={review._id}>
                       <TableCell className="font-medium">
-                        {(review.user as User).name}
+                        {(review.user as User)?.name || "Unknown User"}
                       </TableCell>
                       <TableCell className="font-medium">
-                        {(review.product as Product).name}
+                        {(review.product as Product)?.name || "Unknown Product"}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {review.rating}/5

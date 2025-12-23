@@ -30,7 +30,7 @@ export const queryOptionsSchema = z.object({
 
   isFeatured: z.boolean().optional(),
   isNewArrival: z.boolean().optional(),
-  isDeleted: z.boolean().optional(),
+  isDeleted: z.string().optional(),
 
   colors: z.array(z.string()).optional(),
   sizes: z.array(z.string()).optional(),

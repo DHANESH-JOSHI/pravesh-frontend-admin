@@ -181,19 +181,21 @@ export default function ReviewDetailPage() {
               <div className="flex items-center gap-12 md:gap-20">
                 <div>
                   <label className="text-sm font-medium">ID</label>
-                  <p className="font-mono text-sm">{product._id || "N/A"}</p>
+                  <p className="font-mono text-sm">{product?._id || "N/A"}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium">Name</label>
-                  <p className="text-lg font-semibold">{product.name || "Unknown User"}</p>
+                  <p className="text-lg font-semibold">{product?.name || "Unknown Product"}</p>
                 </div>
               </div>
-              <Button asChild variant="outline">
-                <Link href={`/products/${product._id}`}>
-                  <Eye className="h-4 w-4 mr-2" />
-                  View Product
-                </Link>
-              </Button>
+              {product?._id && (
+                <Button asChild variant="outline">
+                  <Link href={`/products/${product._id}`}>
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Product
+                  </Link>
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
