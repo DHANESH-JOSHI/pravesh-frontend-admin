@@ -104,7 +104,7 @@ class ProductService {
     //     formData.append("images", image);
     //   });
     // }
-    formData.append('unit', data.unit);
+    if (data.units) formData.append('units', JSON.stringify(data.units));
     // if (data.minStock) formData.append('minStock', data.minStock.toString());
     if (data.thumbnail) formData.append('thumbnail', data.thumbnail);
     if (data.tags) formData.append('tags', JSON.stringify(data.tags));
@@ -135,7 +135,7 @@ class ProductService {
     //     formData.append(`images[${index}]`, image);
     //   });
     // }
-    if (data.unit) formData.append('unit', data.unit);
+    if (data.units) formData.append('units', JSON.stringify(data.units));
     // if (data.minStock) formData.append('minStock', data.minStock.toString());
     if (data.thumbnail) formData.append('thumbnail', data.thumbnail);
     if (data.tags) formData.append('tags', JSON.stringify(data.tags));

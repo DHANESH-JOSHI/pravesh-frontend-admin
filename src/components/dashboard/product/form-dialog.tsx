@@ -62,10 +62,8 @@ export function ProductFormDialog({
   const isEditMode = !!initialData;
   const specsArraySchema = z.array(z.object({ key: z.string(), value: z.string() })).optional();
   const unitsArraySchema = z.array(z.object({ 
-    unit: z.string().nonempty("Unit name is required"), 
-    conversionRate: z.number().positive("Conversion rate must be positive"),
-    isBase: z.boolean().optional()
-  })).optional();
+    unit: z.string().nonempty("Unit name is required")
+  })).min(1, "At least one unit is required");
   const formSchema = (isEditMode ? updateProductSchema : createProductSchema).extend({
     specifications: specsArraySchema,
     units: unitsArraySchema,
@@ -99,8 +97,7 @@ export function ProductFormDialog({
       // images: undefined,
       // features: initialData?.features || [],
       specifications: initialData?.specifications ? Object.entries(initialData.specifications).map(([key, value]) => ({ key, value })) : [],
-      unit: initialData?.unit || "piece",
-      units: initialData?.units || [],
+      units: initialData?.units && initialData.units.length > 0 ? initialData.units : [{ unit: "piece" }],
       // minStock: initialData?.minStock || 0,
       tags: initialData?.tags || [],
       isFeatured: initialData?.isFeatured || false,
@@ -162,18 +159,18 @@ export function ProductFormDialog({
       return acc;
     }, {});
     
-    // Process units array - filter out empty units and ensure at least one base unit
-    const unitsArr = Array.isArray(data.units) ? data.units.filter(u => u.unit && u.conversionRate > 0) : [];
-    // If no base unit is marked, mark the first one as base
-    if (unitsArr.length > 0 && !unitsArr.some(u => u.isBase)) {
-      unitsArr[0].isBase = true;
+    // Process units array - filter out empty units
+    const unitsArr = Array.isArray(data.units) ? data.units.filter(u => u.unit && u.unit.trim()) : [];
+    
+    if (unitsArr.length === 0) {
+      throw new Error('At least one unit is required');
     }
     
     const transformedData = {
       ...data,
       // features: data.features ?? [],
       specifications: specsRecord,
-      units: unitsArr.length > 0 ? unitsArr : undefined,
+      units: unitsArr,
     };
     onSubmit(transformedData);
   }
@@ -264,25 +261,9 @@ export function ProductFormDialog({
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="unit"
-                    render={({ field }) => (
-                      <FormItem className="space-y-2">
-                        <FormLabel>Base Unit *</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter base unit (e.g., kg, piece)..."
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                   <UnitsFormArray 
                     name="units" 
-                    title="Additional Units" 
+                    title="Available Units *" 
                     form={form} 
                     fields={unitFields} 
                     append={appendUnit} 

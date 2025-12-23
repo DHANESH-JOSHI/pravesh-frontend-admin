@@ -271,8 +271,8 @@ export function ProductsTable() {
                   const categoryName = typeof product.category === "string" ? product.category : (product.category as Category)?.title ?? "N/A";
                   const units = product.units || [];
                   const unitDisplay = units.length > 0 
-                    ? `${product.unit} (+${units.length})`
-                    : product.unit;
+                    ? units.map(u => u.unit).join(", ")
+                    : "No units";
                   return (
                     <TableRow
                       key={product._id}
@@ -303,11 +303,10 @@ export function ProductsTable() {
                       <TableCell className="text-muted-foreground truncate w-20">{categoryName}</TableCell>
                       <TableCell className="text-muted-foreground">
                         <div className="flex flex-col">
-                          <span className="font-medium">{product.unit}</span>
-                          {units.length > 0 && (
-                            <span className="text-xs text-muted-foreground">
-                              +{units.length} more
-                            </span>
+                          {units.length > 0 ? (
+                            <span className="font-medium">{units.map(u => u.unit).join(", ")}</span>
+                          ) : (
+                            <span className="text-muted-foreground">No units</span>
                           )}
                         </div>
                       </TableCell>
