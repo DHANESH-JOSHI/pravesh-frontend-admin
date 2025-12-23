@@ -59,7 +59,8 @@ export default function OrderDetailPage() {
       
       if (newStatus === 'delivered' && order?.items) {
         order.items.forEach((item) => {
-          const product = item.product as Partial<Product>;
+          const product = item.product as Partial<Product> | null | undefined;
+          if (!product) return; // Skip if product is deleted/missing
           if (product._id) productIds.push(product._id);
           if (product.category) {
             const categoryId = typeof product.category === 'string' ? product.category : product.category._id;
@@ -139,7 +140,7 @@ export default function OrderDetailPage() {
     );
   }
 
-  const shippingAddress = order.shippingAddress as Partial<Address>;
+  const shippingAddress = (order.shippingAddress as Partial<Address>) || {};
   const totalItems = order.items.reduce((acc, item) => acc + item.quantity, 0);
   const totalAmount = 0;
 
@@ -263,9 +264,35 @@ export default function OrderDetailPage() {
                 </TableRow>
               ) : (
                 order.items.map((item, idx) => {
-                  const product = item.product as Partial<Product>;
+                  const product = item.product as Partial<Product> | null | undefined;
+                  if (!product) {
+                    // Handle deleted/missing product
+                    return (
+                      <TableRow key={idx}>
+                        <TableCell>
+                          <div className="w-14 h-14 rounded flex items-center justify-center">
+                            <Package className="h-6 w-6" />
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-muted-foreground italic">Product deleted</span>
+                        </TableCell>
+                        <TableCell>N/A</TableCell>
+                        <TableCell>N/A</TableCell>
+                        <TableCell className="text-right">
+                          {item.unit || 'N/A'}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {item.quantity}
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          ₹0.00
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
                   const brand = product.brand as Partial<Brand> | undefined;
-                  const category = product.category as Partial<Category>;
+                  const category = product.category as Partial<Category> | undefined;
                   const lineTotal = 0;
                   return (
                     <TableRow key={idx}>
@@ -279,10 +306,23 @@ export default function OrderDetailPage() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <Link className="hover:underline" href={`/products/${product._id}`}>{product.name || "N/A"}</Link>
+                        {product._id ? (
+                          <Link className="hover:underline" href={`/products/${product._id}`}>{product.name || "N/A"}</Link>
+                        ) : (
+                          <span>{product.name || "N/A"}</span>
+                        )}
                       </TableCell>
                       <TableCell>
-                        <Link className="hover:underline" href={brand ? `/brands/${brand._id}` : "#"}>{brand?.name || "N/A"}
+                        <Link 
+                          className="hover:underline" 
+                          href={brand?._id ? `/brands/${brand._id}` : "#"}
+                          onClick={(e) => {
+                            if (!brand?._id) {
+                              e.preventDefault();
+                            }
+                          }}
+                        >
+                          {brand?.name || "N/A"}
                         </Link>
                       </TableCell>
                       <TableCell>
@@ -380,12 +420,18 @@ export default function OrderDetailPage() {
             <div className="flex items-start space-x-2">
               <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
               <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  {shippingAddress.line1}{shippingAddress.line2 ? `, ${shippingAddress.line2}` : ""}, {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postalCode}
-                </p>
-                <p className="text-sm text-muted-foreground">{shippingAddress.country}</p>
-                <p className="text-sm text-muted-foreground">{shippingAddress.phone}</p>
-                <p className="font-medium">{shippingAddress.fullname || "N/A"}</p>
+                {shippingAddress.line1 ? (
+                  <>
+                    <p className="text-sm text-muted-foreground">
+                      {shippingAddress.line1}{shippingAddress.line2 ? `, ${shippingAddress.line2}` : ""}, {shippingAddress.city || ""}, {shippingAddress.state || ""} {shippingAddress.postalCode || ""}
+                    </p>
+                    {shippingAddress.country && <p className="text-sm text-muted-foreground">{shippingAddress.country}</p>}
+                    {shippingAddress.phone && <p className="text-sm text-muted-foreground">{shippingAddress.phone}</p>}
+                    {shippingAddress.fullname && <p className="font-medium">{shippingAddress.fullname}</p>}
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">Shipping address not available</p>
+                )}
               </div>
             </div>
           </CardContent>

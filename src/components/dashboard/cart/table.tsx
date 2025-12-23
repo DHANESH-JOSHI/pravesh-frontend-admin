@@ -102,14 +102,16 @@ export function CartsTable() {
                 </TableRow>
               ) : (
                 <>
-                  {paginatedCarts.map((cart: Cart) => (
-                    <TableRow key={cart._id}>
-                      <TableCell className="font-medium font-mono text-sm">
-                        {(cart.user as User).name}
-                      </TableCell>
-                      <TableCell className="font-medium font-mono text-sm">
-                        {(cart.user as User).email}
-                      </TableCell>
+                  {paginatedCarts.map((cart: Cart) => {
+                    const user = cart.user as User | null | undefined;
+                    return (
+                      <TableRow key={cart._id}>
+                        <TableCell className="font-medium font-mono text-sm">
+                          {user?.name || "Unknown User"}
+                        </TableCell>
+                        <TableCell className="font-medium font-mono text-sm">
+                          {user?.email || "N/A"}
+                        </TableCell>
                       <TableCell className="text-muted-foreground max-w-xs">
                         {cart.items.length}
                       </TableCell>
@@ -118,27 +120,28 @@ export function CartsTable() {
                       </TableCell>
                       <TableCell className="text-muted-foreground font-semibold">
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {new Date(cart.updatedAt).toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        <Tooltip>
-                          <TooltipTrigger className="w-full flex justify-center">
-                            <Link href={`/carts/${cart._id}`}>
-                                <Eye className="h-4 w-4" />
-                            </Link>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            View
-                          </TooltipContent>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        <TableCell className="text-muted-foreground">
+                          {new Date(cart.updatedAt).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </TableCell>
+                        <TableCell>
+                          <Tooltip>
+                            <TooltipTrigger className="w-full flex justify-center">
+                              <Link href={`/carts/${cart._id}`}>
+                                  <Eye className="h-4 w-4" />
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              View
+                            </TooltipContent>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </>
               )}
             </TableBody>

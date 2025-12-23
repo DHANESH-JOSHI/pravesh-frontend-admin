@@ -52,7 +52,7 @@ export default function CartDetailPage() {
     );
   }
 
-  const user = cart.user as Partial<UserType>;
+  const user = (cart.user as Partial<UserType>) || {};
   const totalAmount = 0;
   const totalItems = cart.items.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -93,7 +93,7 @@ export default function CartDetailPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹{user.wallet?.balance?.toFixed(2)}</div>
+            <div className="text-2xl font-bold">₹{(user.wallet?.balance ?? 0).toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">balance</p>
           </CardContent>
         </Card>
@@ -126,9 +126,29 @@ export default function CartDetailPage() {
                 </TableRow>
               ) : (
                 cart.items.map((item, idx) => {
-                  const product = item.product as Partial<Product>;
-                  const brand = product.brand as Partial<Brand>;
-                  const category = product.category as Partial<Category>;
+                  const product = item.product as Partial<Product> | null | undefined;
+                  if (!product) {
+                    // Handle deleted/missing product
+                    return (
+                      <TableRow key={idx}>
+                        <TableCell>
+                          <div className="w-14 h-14 rounded flex items-center justify-center">
+                            <Package className="h-6 w-6" />
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-muted-foreground italic">Product deleted</span>
+                        </TableCell>
+                        <TableCell>N/A</TableCell>
+                        <TableCell>N/A</TableCell>
+                        <TableCell className="text-right">{item.unit || 'N/A'}</TableCell>
+                        <TableCell className="text-right">{item.quantity}</TableCell>
+                        <TableCell className="text-right font-medium">₹0.00</TableCell>
+                      </TableRow>
+                    );
+                  }
+                  const brand = product.brand as Partial<Brand> | undefined;
+                  const category = product.category as Partial<Category> | undefined;
                   const lineTotal = 0;
                   return (
                     <TableRow key={idx}>
@@ -141,7 +161,13 @@ export default function CartDetailPage() {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell><Link className="hover:underline" href={`/products/${product._id}`}>{product.name || "N/A"}</Link></TableCell>
+                      <TableCell>
+                        {product._id ? (
+                          <Link className="hover:underline" href={`/products/${product._id}`}>{product.name || "N/A"}</Link>
+                        ) : (
+                          <span>{product.name || "N/A"}</span>
+                        )}
+                      </TableCell>
                       <TableCell>
                         <Link 
                           className="hover:underline" 

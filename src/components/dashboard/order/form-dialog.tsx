@@ -54,11 +54,14 @@ export function OrderFormDialog({
     resolver: zodResolver(adminUpdateOrderSchema),
     defaultValues: {
       feedback: initialData?.feedback || "",
-      items: initialData?.items?.map((item) => ({
-        product: (item.product as Product)._id,
-        quantity: item.quantity,
-        unit: item.unit || '',
-      })),
+      items: initialData?.items?.map((item) => {
+        const product = item.product as Product | null | undefined;
+        return {
+          product: product?._id || '',
+          quantity: item.quantity,
+          unit: item.unit || '',
+        };
+      }).filter(item => item.product) || [],
     },
   });
   useEffect(() => {

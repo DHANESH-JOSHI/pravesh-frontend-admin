@@ -155,48 +155,51 @@ export function OrdersTable() {
                 </TableRow>
               ) : (
                 <>
-                  {orders.map((order: Order) => (
-                    <TableRow key={order._id}>
-                      <TableCell className="font-medium">
-                        {(order.user as User).name}
-                      </TableCell>
-                      <TableCell className="font-mono text-sm">
-                        <div className="flex items-center gap-2">
-                          {(order.user as User).email}
-                        </div>
-                      </TableCell>
+                  {orders.map((order: Order) => {
+                    const user = order.user as User | null | undefined;
+                    return (
+                      <TableRow key={order._id}>
+                        <TableCell className="font-medium">
+                          {user?.name || "Unknown User"}
+                        </TableCell>
+                        <TableCell className="font-mono text-sm">
+                          <div className="flex items-center gap-2">
+                            {user?.email || "N/A"}
+                          </div>
+                        </TableCell>
                       <TableCell className="text-muted-foreground">
                         ₹{order.totalAmount}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        <StatusBadge status={order.status} />
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-                          {order.isCustomOrder ? "Custom" : "Regular"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {new Date(order.updatedAt).toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        <Tooltip>
-                          <TooltipTrigger className="w-full flex justify-center">
-                            <Link href={`/orders/${order._id}`}>
-                              <Eye className="h-4 w-4" />
-                            </Link>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            View
-                          </TooltipContent>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        <TableCell className="text-muted-foreground">
+                          <StatusBadge status={order.status} />
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+                            {order.isCustomOrder ? "Custom" : "Regular"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {new Date(order.updatedAt).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </TableCell>
+                        <TableCell>
+                          <Tooltip>
+                            <TooltipTrigger className="w-full flex justify-center">
+                              <Link href={`/orders/${order._id}`}>
+                                <Eye className="h-4 w-4" />
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              View
+                            </TooltipContent>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </>
               )}
             </TableBody>
