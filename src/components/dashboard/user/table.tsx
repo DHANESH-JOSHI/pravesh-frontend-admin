@@ -55,7 +55,7 @@ export function UsersTable() {
     },
     onError: (error: any) => {
       setIsOpen(false);
-      toast.error(error.response.data.message ?? "Failed to delete user. Please try again.");
+      toast.error(error.response?.data?.message ?? "Failed to delete user. Please try again.");
     },
   });
 
@@ -66,7 +66,7 @@ export function UsersTable() {
       invalidateUserQueries(queryClient, createdUser?._id);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Failed to create user. Please try again.");
+      toast.error(error.response?.data?.message ?? "Failed to create user. Please try again.");
     },
   });
 

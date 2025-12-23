@@ -112,6 +112,7 @@ export default function CartDetailPage() {
                 <TableHead>Brand</TableHead>
                 <TableHead>Category</TableHead>
                 {/*<TableHead className="text-right">Final Price</TableHead>*/}
+                <TableHead className="text-right">Unit</TableHead>
                 <TableHead className="text-right">Qty</TableHead>
                 <TableHead className="text-right">Line Total</TableHead>
               </TableRow>
@@ -168,6 +169,7 @@ export default function CartDetailPage() {
                         </Link>
                       </TableCell>
                       {/*<TableCell className="text-right text-muted-foreground">₹{(product.finalPrice ?? 0).toFixed(2)}</TableCell>*/}
+                      <TableCell className="text-right">{item.unit || 'N/A'}</TableCell>
                       <TableCell className="text-right">{item.quantity}</TableCell>
                       <TableCell className="text-right font-medium">₹{lineTotal.toFixed(2)}</TableCell>
                     </TableRow>

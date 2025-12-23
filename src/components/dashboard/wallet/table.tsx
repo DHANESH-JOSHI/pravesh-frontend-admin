@@ -61,7 +61,7 @@ export function WalletsTable() {
       setViewOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Failed to add funds. Please try again.");
+      toast.error(error.response?.data?.message ?? "Failed to add funds. Please try again.");
     },
   });
 

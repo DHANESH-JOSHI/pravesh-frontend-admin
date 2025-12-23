@@ -48,7 +48,7 @@ export function InputOTPForm({ phoneOrEmail }: { phoneOrEmail: string }) {
       // Navigation will be handled by useEffect in login page when user state updates
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Invalid OTP. Please try again.")
+      toast.error(error.response?.data?.message ?? "Invalid OTP. Please try again.")
     },
   })
 

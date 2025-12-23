@@ -74,7 +74,7 @@ export default function CategoryDetailPage() {
     },
     onError: (error: any) => {
       setIsOpen(false);
-      toast.error(error.response.data.message ?? "Failed to delete category.");
+      toast.error(error.response?.data?.message ?? "Failed to delete category.");
       setPendingDeleteId(null);
     },
   });
@@ -101,7 +101,7 @@ export default function CategoryDetailPage() {
       setEditingCategory(null);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Failed to update category.");
+      toast.error(error.response?.data?.message ?? "Failed to update category.");
     },
   });
   const createMutation = useMutation({
@@ -126,7 +126,7 @@ export default function CategoryDetailPage() {
       setIsCreateDialogOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Failed to create category.");
+      toast.error(error.response?.data?.message ?? "Failed to create category.");
     },
   });
   if (isLoading || isProductsLoading) {

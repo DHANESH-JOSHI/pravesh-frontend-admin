@@ -4,6 +4,7 @@ import { PaginatedData, User } from ".";
 export type CartItem = {
   product: string | Partial<Product>;
   quantity: number;
+  unit: string; // required - unit selected for this cart item
 };
 
 export type Cart = {

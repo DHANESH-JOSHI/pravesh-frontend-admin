@@ -52,7 +52,7 @@ export function BannersTable() {
     },
     onError: (error: any) => {
       setIsOpen(false);
-      toast.error(error.response.data.message ?? "Failed to delete banner.");
+      toast.error(error.response?.data?.message ?? "Failed to delete banner.");
     },
   });
 
@@ -67,7 +67,7 @@ export function BannersTable() {
       setEditingBanner(null);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Failed to update banner.");
+      toast.error(error.response?.data?.message ?? "Failed to update banner.");
     },
   });
   const createMutation = useMutation({
@@ -81,7 +81,7 @@ export function BannersTable() {
       setIsCreateDialogOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Failed to create banner.");
+      toast.error(error.response?.data?.message ?? "Failed to create banner.");
     },
   });
 

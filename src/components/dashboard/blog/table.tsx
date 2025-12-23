@@ -83,7 +83,7 @@ export function BlogsTable() {
       setIsCreateDialogOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Failed to create blog. Please try again.");
+      toast.error(error.response?.data?.message ?? "Failed to create blog. Please try again.");
     },
   });
   function resetFilters() {

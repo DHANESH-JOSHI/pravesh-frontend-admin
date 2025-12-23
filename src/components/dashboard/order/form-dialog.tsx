@@ -57,6 +57,7 @@ export function OrderFormDialog({
       items: initialData?.items?.map((item) => ({
         product: (item.product as Product)._id,
         quantity: item.quantity,
+        unit: item.unit || '',
       })),
     },
   });
@@ -159,14 +160,49 @@ export function OrderFormDialog({
                             render={() => (
                               <FormItem className="flex flex-col grow">
                                 <ProductSearchableSelect
-                                  product={tempItems?.[index]?.product as Product ?? null}
-                                  onChange={(v) => {
+                                  product={(tempItems && tempItems[index]?.product) as Product ?? null}
+                                  onChange={(v, productData) => {
                                     form.setValue(`items.${index}.product`, v);
+                                    // Update tempItems with the selected product data
+                                    const currentItems = tempItems || [];
+                                    const updatedItems = [...currentItems];
+                                    updatedItems[index] = {
+                                      ...updatedItems[index],
+                                      product: productData || updatedItems[index]?.product,
+                                    };
+                                    setTempItems(updatedItems);
                                   }}
                                 />
                                 <FormMessage />
                               </FormItem>
                             )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name={`items.${index}.unit`}
+                            render={({ field }) => {
+                              const product = (tempItems && tempItems[index]?.product) as Product | undefined;
+                              const availableUnits = product?.units || [];
+                              return (
+                                <FormItem className="w-32">
+                                  <FormControl>
+                                    <select
+                                      {...field}
+                                      className="w-full rounded border px-3 py-2 text-sm"
+                                      disabled={!product || availableUnits.length === 0}
+                                    >
+                                      <option value="">Select unit</option>
+                                      {availableUnits.map((u) => (
+                                        <option key={u.unit} value={u.unit}>
+                                          {u.unit}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              );
+                            }}
                           />
                           <FormField
                             control={form.control}
@@ -191,7 +227,8 @@ export function OrderFormDialog({
                             size="icon"
                             onClick={() => {
                               remove(index)
-                              setTempItems(tempItems?.filter((_, i) => i !== index));
+                              const currentItems = tempItems || [];
+                              setTempItems(currentItems.filter((_, i) => i !== index));
                             }}
                           >
                             <Trash className="h-4 w-4 text-destructive" />
@@ -207,7 +244,7 @@ export function OrderFormDialog({
                 variant="outline"
                 size="sm"
                 className="mt-2"
-                onClick={() => append({ product: "", quantity: 1 })}
+                onClick={() => append({ product: "", quantity: 1, unit: "" })}
               >
                 Add Item
               </Button>
@@ -251,7 +288,7 @@ export function OrderFormDialog({
   );
 }
 
-function ProductSearchableSelect({ product, onChange }: { product: Partial<Product> | null; onChange: (value: string) => void }) {
+function ProductSearchableSelect({ product, onChange }: { product: Partial<Product> | null; onChange: (value: string, productData?: Product) => void }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string>(product?._id || "");
@@ -304,7 +341,8 @@ function ProductSearchableSelect({ product, onChange }: { product: Partial<Produ
                   key={p._id}
                   value={p._id}
                   onSelect={(p) => {
-                    onChange(p);
+                    const selectedProduct = products.find(prod => prod._id === p);
+                    onChange(p, selectedProduct);
                     setSelectedId(p)
                     setOpen(false);
                   }}

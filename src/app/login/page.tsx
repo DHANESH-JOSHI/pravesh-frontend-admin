@@ -52,7 +52,7 @@ export default function LoginPage() {
       setShowOTP(true);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Failed to send OTP.");
+      toast.error(error.response?.data?.message ?? "Failed to send OTP.");
     },
   });
 
@@ -68,7 +68,7 @@ export default function LoginPage() {
       // Navigation will be handled by useEffect when user state updates
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Failed to login. Check credentials and try again.");
+      toast.error(error.response?.data?.message ?? "Failed to login. Check credentials and try again.");
     },
   });
 

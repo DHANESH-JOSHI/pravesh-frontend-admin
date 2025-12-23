@@ -58,7 +58,7 @@ export function CategoriesTable() {
     },
     onError: (error: any) => {
       setIsOpen(false);
-      toast.error(error.response.data.message ?? "Failed to delete category. Please try again.");
+      toast.error(error.response?.data?.message ?? "Failed to delete category. Please try again.");
     },
   });
 
@@ -79,7 +79,7 @@ export function CategoriesTable() {
       setEditingCategory(null);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Failed to update category. Please try again.");
+      toast.error(error.response?.data?.message ?? "Failed to update category. Please try again.");
     },
   });
   const createMutation = useMutation({
@@ -99,7 +99,7 @@ export function CategoriesTable() {
       setIsCreateDialogOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Failed to create category. Please try again.");
+      toast.error(error.response?.data?.message ?? "Failed to create category. Please try again.");
     },
   });
 

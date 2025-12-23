@@ -58,7 +58,7 @@ export function BrandsTable() {
     },
     onError: (error: any) => {
       setIsOpen(false);
-      toast.error(error.response.data.message ?? "Failed to delete brand. Please try again.");
+      toast.error(error.response?.data?.message ?? "Failed to delete brand. Please try again.");
     },
   });
 
@@ -73,7 +73,7 @@ export function BrandsTable() {
       setEditingBrand(null);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Failed to update brand. Please try again.");
+      toast.error(error.response?.data?.message ?? "Failed to update brand. Please try again.");
     },
   });
   const createMutation = useMutation({
@@ -87,7 +87,7 @@ export function BrandsTable() {
       setIsCreateDialogOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.message ?? "Failed to create brand. Please try again.");
+      toast.error(error.response?.data?.message ?? "Failed to create brand. Please try again.");
     },
   });
 
