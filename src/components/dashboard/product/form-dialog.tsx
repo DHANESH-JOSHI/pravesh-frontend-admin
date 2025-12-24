@@ -31,7 +31,6 @@ import {
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn, generateSlug } from "@/lib/utils";
 import {
   type Product,
@@ -40,14 +39,12 @@ import {
   createProductSchema,
 } from "@/types/product";
 import { FormDialogProps } from "@/types";
-// import { Textarea } from "@/components/ui/textarea";
 import { useQuery } from "@tanstack/react-query";
 import { brandService } from "@/services/brand.service";
 import { Brand } from "@/types/brand";
 import { Category } from "@/types/category";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
-// import { unitSchema } from "@/types/product";
 import Image from "next/image";
 import z from "zod";
 import { CategoryTreeSingleSelect } from "@/components/category-tree-single-select";
@@ -69,7 +66,7 @@ export function ProductFormDialog({
   })).optional();
   const variantsArraySchema = z.array(z.object({ 
     key: z.string(), 
-    value: z.string() // Comma-separated values that will be converted to array
+    value: z.string()
   })).optional();
   const formSchema = (isEditMode ? updateProductSchema : createProductSchema).extend({
     specifications: specsArraySchema,
@@ -77,15 +74,9 @@ export function ProductFormDialog({
   });
 
   const thumbnailRef = useRef<HTMLInputElement>(null);
-  // const imagesRef = useRef<HTMLInputElement>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
     initialData?.thumbnail || null,
   );
-  // const [imagesPreviews, setImagesPreviews] = useState<string[]>(
-  //   initialData?.images || [],
-  // );
-  // const [imagesFiles, setImagesFiles] = useState<File[]>([]);
-  // const initialImagesCount = initialData?.images?.length || 0;
   const form = useForm<any>({
     resolver: zodResolver(
       formSchema
@@ -93,16 +84,9 @@ export function ProductFormDialog({
     defaultValues: {
       name: initialData?.name || "",
       slug: initialData?.slug || "",
-      // description: initialData?.description || "",
-      // shortDescription: initialData?.shortDescription || "",
       categoryId: initialData?.category as string || "",
       brandId: initialData?.brand as string || "",
-      // discountType: initialData?.discountType || undefined,
-      // discountValue: initialData?.discountValue || 0,
-      // stock: initialData?.stock || 0,
       thumbnail: undefined,
-      // images: undefined,
-      // features: initialData?.features || [],
       specifications: initialData?.specifications ? Object.entries(initialData.specifications).map(([key, value]) => ({ 
         key, 
         value: Array.isArray(value) ? value.join(', ') : value 
@@ -114,17 +98,11 @@ export function ProductFormDialog({
       units: initialData?.units && initialData.units.length > 0 
         ? initialData.units.map((u: any) => typeof u === 'object' && u !== null ? (u._id || u) : u)
         : [],
-      // minStock: initialData?.minStock || 0,
       tags: initialData?.tags || [],
       isFeatured: initialData?.isFeatured || false,
       isNewArrival: initialData?.isNewArrival || false,
     },
   });
-
-  // const { fields: featureFields, append: appendFeature, remove: removeFeature } = useFieldArray({
-  //   control: form.control,
-  //   name: "features" as any
-  // });
   useEffect(()=>{
     if(open){
       form.reset()
@@ -150,7 +128,6 @@ export function ProductFormDialog({
         ...initialData,
         brandId: (initialData.brand as Brand)?._id || initialData.brand,
         categoryId: (initialData.category as Category)?._id || initialData.category,
-        // features: initialData.features || [],
         specifications: initialData.specifications ? Object.entries(initialData.specifications).map(([key, value]) => ({ 
           key, 
           value: Array.isArray(value) ? value.join(', ') : value 
@@ -164,13 +141,10 @@ export function ProductFormDialog({
           : [],
         tags: initialData.tags || [],
         thumbnail: undefined,
-        // images: undefined,
       })
       if (initialData.thumbnail) {
         setThumbnailPreview(initialData.thumbnail)
       }
-      // setImagesPreviews(initialData.images || []);
-      // setImagesFiles([]);
     }
   }, [initialData, form])
 
@@ -182,11 +156,8 @@ export function ProductFormDialog({
         : [];
     const specsRecord = specsArr.reduce((acc: Record<string, string | string[]>, s) => {
       if (s?.key) {
-        // If value is a string, check if it contains commas (indicating array)
-        // If it contains commas, split it into an array, otherwise keep as string
         const value = s.value ?? "";
         if (typeof value === 'string' && value.includes(',')) {
-          // Split by comma and trim each value
           const arrayValue = value.split(',').map(v => v.trim()).filter(v => v.length > 0);
           acc[s.key] = arrayValue.length > 1 ? arrayValue : arrayValue[0] || "";
         } else if (Array.isArray(value)) {
@@ -198,7 +169,6 @@ export function ProductFormDialog({
       return acc;
     }, {});
 
-    // Process variants - always convert to arrays
     const variantsArr: { key: string; value: string }[] = Array.isArray(data.variants)
       ? data.variants
       : data.variants
@@ -207,7 +177,6 @@ export function ProductFormDialog({
     const variantsRecord = variantsArr.reduce((acc: Record<string, string[]>, v) => {
       if (v?.key) {
         const value = v.value ?? "";
-        // Variants are always arrays - split comma-separated values
         if (value.includes(',')) {
           const arrayValue = value.split(',').map(val => val.trim()).filter(val => val.length > 0);
           if (arrayValue.length > 0) {
@@ -220,7 +189,6 @@ export function ProductFormDialog({
       return acc;
     }, {});
     
-    // Process units array - ensure it's an array of unit IDs
     const unitsArr = Array.isArray(data.units) ? data.units.filter(u => u && String(u).trim()) : [];
     
     if (unitsArr.length === 0) {
@@ -229,10 +197,9 @@ export function ProductFormDialog({
     
     const transformedData = {
       ...data,
-      // features: data.features ?? [],
       specifications: specsRecord,
       variants: Object.keys(variantsRecord).length > 0 ? variantsRecord : undefined,
-      units: unitsArr.map(u => String(u)), // Ensure all are strings
+      units: unitsArr.map(u => String(u)),
     };
     onSubmit(transformedData);
   }
@@ -248,7 +215,6 @@ export function ProductFormDialog({
     return () => {
       if (thumbnailPreview?.startsWith("blob:"))
         URL.revokeObjectURL(thumbnailPreview);
-      // imagesPreviews.filter(p => p.startsWith("blob:")).forEach(URL.revokeObjectURL);
     };
   }, [thumbnailPreview]);
 
@@ -263,29 +229,6 @@ export function ProductFormDialog({
     }
   };
 
-  // const handleImagesChange = (files: FileList | null) => {
-  //   if (!files) return;
-  //   const newFiles = Array.from(files);
-  //   setImagesFiles(prev => [...prev, ...newFiles]);
-  //   const newPreviews = newFiles.map(f => URL.createObjectURL(f));
-  //   setImagesPreviews(prev => [...prev, ...newPreviews]);
-  //   form.setValue("images", [...imagesFiles, ...newFiles], { shouldDirty: true });
-  // };
-
-  // const removeImage = (index: number) => {
-  //   const newPreviews = [...imagesPreviews];
-  //   const newFiles = [...imagesFiles];
-  //   if (index < initialImagesCount) {
-  //     return;
-  //   }
-  //   const fileIndex = index - initialImagesCount;
-  //   if (newPreviews[index]?.startsWith("blob:")) URL.revokeObjectURL(newPreviews[index]);
-  //   newPreviews.splice(index, 1);
-  //   newFiles.splice(fileIndex, 1);
-  //   setImagesPreviews(newPreviews);
-  //   setImagesFiles(newFiles);
-  //   form.setValue("images", newFiles, { shouldDirty: true });
-  // };
   return (<>{open && <div className="fixed inset-0 bg-black/50 pointer-events-none z-40" />}
     <Dialog open={open} onOpenChange={onOpenChange} modal={false} >
       <DialogContent className="w-full min-w-[90%] xl:min-w-6xl mx-auto max-h-[90vh] overflow-y-auto z-50"
@@ -305,7 +248,6 @@ export function ProductFormDialog({
 
 
               <div className="flex flex-col gap-6 md:flex-row md:gap-8 w-full">
-                {/* Left: Fields */}
                 <div className="space-y-6 md:w-1/2">
                   <FormField
                     control={form.control}
@@ -432,10 +374,8 @@ export function ProductFormDialog({
                   
                   <KeyValueFormArray name="variants" title="Variants (e.g., Size, Color)" form={form} fields={variantFields} append={appendVariant} remove={removeVariant} isVariant={true} />
                 </div>
-                {/* Right: Additional Fields */}
                 <div className="space-y-6 md:w-1/2">
                   <KeyValueFormArray name="specifications" title="Specifications" form={form} fields={specFields} append={appendSpec} remove={removeSpec} />
-                  {/* Tags input (editable chips) */}
                   <FormField
                     control={form.control}
                     name="tags"
@@ -903,45 +843,6 @@ function UnitsMultiSelect({ value, onChange }: { value: string[]; onChange: (v: 
     </Popover>
   );
 }
-
-// function StringArrayFormArray({ name, title, form, fields, append, remove }: { name: "features", title: string, form: any, fields: any[], append: any, remove: any }) {
-//   return (
-//     <FormItem>
-//       <FormLabel>{title}</FormLabel>
-//       <Card className="p-4 space-y-4">
-//         {fields.map((field, index) => (
-//           <div key={field.id} className="flex items-center gap-4">
-//             <FormField
-//               control={form.control}
-//               name={`${name}.${index}`}
-//               render={({ field }) => (
-//                 <FormItem className="grow">
-//                   <FormControl>
-//                     <Input placeholder="Feature" {...field} />
-//                   </FormControl>
-//                   <FormMessage />
-//                 </FormItem>
-//               )}
-//             />
-//             <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
-//               <Trash className="h-4 w-4 text-destructive" />
-//             </Button>
-//           </div>
-//         ))}
-//         <Button
-//           type="button"
-//           variant="outline"
-//           size="sm"
-//           className="gap-2"
-//           onClick={() => append("")}
-//         >
-//           <Plus className="h-4 w-4" />
-//           Add {title}
-//         </Button>
-//       </Card>
-//     </FormItem>
-//   )
-// }
 
 function TagsInput({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
   const [input, setInput] = useState("");

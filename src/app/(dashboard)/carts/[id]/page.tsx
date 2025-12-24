@@ -6,7 +6,6 @@ import { Link } from "next-view-transitions"
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { cartService } from "@/services/cart.service";
 import { Cart } from "@/types/cart";
 import { Brand, Category, Product, User as UserType } from "@/types";

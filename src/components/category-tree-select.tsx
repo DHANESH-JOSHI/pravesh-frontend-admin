@@ -71,15 +71,11 @@ export function CategoryTreeSelect({
       return false;
     };
 
-    // visit every root node
     nodes.forEach((root) => visit(root));
 
     return Array.from(selectedSet);
   }, [collectLeafIds]);
 
-  // --------------------
-  // Utility: find parent node given child id (search)
-  // --------------------
   const findParent = useCallback((nodes: Node[], childId: string): Node | null => {
     for (const node of nodes) {
       if (node.children && node.children.some((c: Node) => c._id === childId)) {
@@ -144,8 +140,6 @@ export function CategoryTreeSelect({
     [value, tree, action, findParent, collectDescendantIds, collectLeafIds, normalizeSelection]
   );
 
-
-
   const toggleExpand = (id: string) => {
     setExpanded((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -167,18 +161,32 @@ export function CategoryTreeSelect({
     return walker(tree);
   }, [value, tree, collectLeafIds]);
 
+  const isPartiallySelected = useCallback((node: Node): boolean => {
+    if (!node.children || node.children.length === 0) return false;
+    if (value.includes(node._id)) return false;
+    
+    const allLeafIds = collectLeafIds(node);
+    if (allLeafIds.length === 0) return false;
+    
+    const selectedLeafIds = allLeafIds.filter(id => value.includes(id));
+    if (selectedLeafIds.length === allLeafIds.length) return false;
+    
+    return selectedLeafIds.length > 0 && selectedLeafIds.length < allLeafIds.length;
+  }, [value, collectLeafIds]);
+
   const renderTree = (nodes: Node[], parent: Node | null = null, depth = 0) => {
     return nodes.map((node) => {
       const hasChildren = node.children && node.children.length > 0;
       const isExpanded = expanded.includes(node._id);
       const visuallySelected = isVisuallySelected(node);
+      const partiallySelected = isPartiallySelected(node);
 
       return (
         <div key={node._id} className="select-none">
           <div
             className={cn(
               "flex items-center justify-between rounded hover:bg-accent/60 px-2 py-1.5 text-sm transition",
-              visuallySelected && "bg-accent/30"
+              (visuallySelected || partiallySelected) && "bg-accent/30"
             )}
           >
             <div
@@ -186,7 +194,7 @@ export function CategoryTreeSelect({
               style={{ paddingLeft: `${depth * 16}px` }}
             >
               <Checkbox
-                checked={visuallySelected}
+                checked={visuallySelected ? true : partiallySelected ? "indeterminate" : false}
                 onCheckedChange={() => toggleSelect(node, parent)}
                 className="h-4 w-4"
               />

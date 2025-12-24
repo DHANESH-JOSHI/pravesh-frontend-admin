@@ -38,7 +38,6 @@ import { useQuery } from "@tanstack/react-query";
 import { productService } from "@/services/product.service";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { CategoryTreeSingleSelect } from "@/components/category-tree-single-select";
 

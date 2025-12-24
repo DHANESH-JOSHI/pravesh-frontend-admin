@@ -41,7 +41,6 @@ import { useQuery } from "@tanstack/react-query";
 import { productService } from "@/services/product.service";
 import { Product } from "@/types/product";
 import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function OrderFormDialog({
   open,
@@ -68,7 +67,6 @@ export function OrderFormDialog({
   });
   useEffect(() => {
     if (open && initialData?.items) {
-      // Set form values first
       form.reset({
         feedback: initialData?.feedback || "",
         items: initialData.items.map((item) => {
@@ -82,7 +80,6 @@ export function OrderFormDialog({
         }).filter(item => item.product),
       });
       
-      // Fetch full product data with populated units for all items
       const fetchProducts = async () => {
         const itemsWithProducts = await Promise.all(
           initialData.items.map(async (item) => {
@@ -144,31 +141,6 @@ export function OrderFormDialog({
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-6 w-full"
           >
-            {/* <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem className="space-y-2">
-                  <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {orderStatusSchema.options.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
-
             {initialData?.isCustomOrder && <FormItem className="space-y-2">
               <FormLabel>Image</FormLabel>
               <div className="flex items-center gap-4">
@@ -213,19 +185,17 @@ export function OrderFormDialog({
                                   <FormItem className="flex flex-col flex-1 min-w-0 max-w-full">
                                     <ProductSearchableSelect
                                       product={(tempItems && tempItems[index]?.product) as Product ?? null}
-                                      onChange={(v, productData) => {
-                                        form.setValue(`items.${index}.product`, v);
-                                        // Clear variant selections when product changes
-                                        form.setValue(`items.${index}.variantSelections`, {});
-                                        // Update tempItems with the selected product data
-                                        const currentItems = tempItems || [];
-                                        const updatedItems = [...currentItems];
-                                        updatedItems[index] = {
-                                          ...updatedItems[index],
-                                          product: productData || updatedItems[index]?.product,
-                                        };
-                                        setTempItems(updatedItems);
-                                      }}
+                                  onChange={(v, productData) => {
+                                    form.setValue(`items.${index}.product`, v);
+                                    form.setValue(`items.${index}.variantSelections`, {});
+                                    const currentItems = tempItems || [];
+                                    const updatedItems = [...currentItems];
+                                    updatedItems[index] = {
+                                      ...updatedItems[index],
+                                      product: productData || updatedItems[index]?.product,
+                                    };
+                                    setTempItems(updatedItems);
+                                  }}
                                     />
                                     <FormMessage />
                                   </FormItem>
@@ -236,19 +206,15 @@ export function OrderFormDialog({
                                 name={`items.${index}.unit`}
                                 render={({ field }) => {
                                   const availableUnits = product?.units || [];
-                                  // Helper to get unit name from either string ID or Unit object
                                   const getUnitName = (unit: string | Partial<{ _id: string; name: string }>): string => {
                                     if (typeof unit === 'string') return unit;
                                     if (typeof unit === 'object' && unit !== null && unit.name) return unit.name;
                                     return '';
                                   };
-                                  // Helper to get unit value (name) for the option
                                   const getUnitValue = (unit: string | Partial<{ _id: string; name: string }>): string => {
                                     return getUnitName(unit);
                                   };
-                                  // Get current field value (unit name)
                                   const currentUnitValue = field.value || '';
-                                  // Check if current value exists in available units
                                   const unitNames = availableUnits.map(getUnitName).filter(Boolean);
                                   const isValidUnit = currentUnitValue && unitNames.includes(currentUnitValue);
                                   

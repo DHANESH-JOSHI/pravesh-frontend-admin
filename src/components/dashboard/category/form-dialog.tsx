@@ -2,10 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-// import {  useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-// import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -30,17 +28,12 @@ export function CategoryFormDialog({
   initialData,
   isLoading,
 }: FormDialogProps<CreateCategory, Category>) {
-  // const imageRef = useRef<HTMLInputElement>(null);
-  // const [imagePreview, setImagePreview] = useState<string | null>(
-  //   initialData?.image || null,
-  // );
   const form = useForm<CreateCategory>({
     resolver: zodResolver(
       createCategorySchema
     ),
     defaultValues: {
       title: initialData?.title || "",
-      // image: undefined,
     },
   });
   useEffect(()=>{
@@ -50,23 +43,6 @@ export function CategoryFormDialog({
 
   },[open,form])
 
-  // useEffect(() => {
-  //   return () => {
-  //     if (imagePreview?.startsWith("blob:"))
-  //       URL.revokeObjectURL(imagePreview);
-  //   };
-  // }, [imagePreview]);
-
-  // const handleFileChange = (file: File | undefined) => {
-  //   form.setValue("image", file as any, { shouldDirty: true });
-  //   if (imagePreview?.startsWith("blob:"))
-  //     URL.revokeObjectURL(imagePreview);
-  //   if (file) {
-  //     setImagePreview(URL.createObjectURL(file));
-  //   } else {
-  //     setImagePreview(null);
-  //   }
-  // };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>

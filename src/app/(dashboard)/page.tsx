@@ -35,6 +35,9 @@ interface IDashboardStats {
   newUsersThisWeek: number;
   newUsersThisMonth: number;
 
+  dailyOrdersCount: number;
+  dailyUsersCount: number;
+
   pendingOrders: number;
   processingOrders: number;
   shippedOrders: number;
@@ -265,7 +268,21 @@ export default function DashboardPage() {
         </section>
 
         {/* Secondary KPIs (spacious row of 2) */}
-        <section className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-6 md:grid-cols-2">
+        <section className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <MiniMetricCard
+            label="Daily Orders"
+            value={stats.dailyOrdersCount.toString()}
+            helper="Orders today"
+            color="bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
+            icon={ShoppingCart}
+          />
+          <MiniMetricCard
+            label="Daily Users"
+            value={stats.dailyUsersCount.toString()}
+            helper="Users today"
+            color="bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300"
+            icon={Users}
+          />
           <MiniMetricCard
             label="New Users This Month"
             value={stats.newUsersThisMonth.toString()}

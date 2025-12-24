@@ -1,12 +1,11 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Package, DollarSign, MapPin, Clock, UserIcon, Edit, IndianRupee } from "lucide-react";
+import { ArrowLeft, Package, MapPin, Clock, UserIcon, Edit, IndianRupee } from "lucide-react";
 import { Link, useTransitionRouter } from "next-view-transitions"
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { orderService } from "@/services/order.service";
 import { Product, Address, User, Brand, Category, OrderStatus, AdminUpdateOrder, ApiResponse, Order } from "@/types";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
@@ -52,7 +51,6 @@ export default function OrderDetailPage() {
       const userId = typeof order?.user === 'string' ? order.user : order?.user?._id;
       const oldStatus = order?.status;
       
-      // Extract product/category/brand IDs from order items for delivered status
       const productIds: string[] = [];
       const categoryIds: string[] = [];
       const brandIds: string[] = [];
@@ -60,7 +58,7 @@ export default function OrderDetailPage() {
       if (newStatus === 'delivered' && order?.items) {
         order.items.forEach((item) => {
           const product = item.product as Partial<Product> | null | undefined;
-          if (!product) return; // Skip if product is deleted/missing
+          if (!product) return;
           if (product._id) productIds.push(product._id);
           if (product.category) {
             const categoryId = typeof product.category === 'string' ? product.category : product.category._id;
@@ -73,16 +71,13 @@ export default function OrderDetailPage() {
         });
       }
       
-      // Determine if wallet is touched (confirmed, refunded status changes)
       const walletTouched = 
         (oldStatus === 'received' && newStatus === 'confirmed') ||
         (oldStatus === 'approved' && newStatus === 'confirmed') ||
         (oldStatus === 'cancelled' && newStatus === 'refunded');
       
-      // Determine if products are touched (on create or delivered)
       const productsTouched = newStatus === 'delivered';
       
-      // Invalidate orders list to ensure it reflects the status change
       invalidateOrderQueries(queryClient, { 
         orderId, 
         userId,
@@ -265,7 +260,6 @@ export default function OrderDetailPage() {
                 order.items.map((item, idx) => {
                   const product = item.product as Partial<Product> | null | undefined;
                   if (!product) {
-                    // Handle deleted/missing product
                     return (
                       <TableRow key={idx}>
                         <TableCell>
