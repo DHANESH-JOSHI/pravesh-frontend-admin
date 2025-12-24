@@ -30,6 +30,7 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   AdminUpdateOrder,
   type Order,
@@ -58,18 +59,60 @@ export function OrderFormDialog({
         const product = item.product as Product | null | undefined;
         return {
           product: product?._id || '',
-        quantity: item.quantity,
+          quantity: item.quantity,
           unit: item.unit || '',
+          variantSelections: item.variantSelections || {},
         };
       }).filter(item => item.product) || [],
     },
   });
   useEffect(() => {
-    if (open) {
-      form.reset()
-      setTempItems(initialData?.items || []);
+    if (open && initialData?.items) {
+      // Set form values first
+      form.reset({
+        feedback: initialData?.feedback || "",
+        items: initialData.items.map((item) => {
+          const product = item.product as Product | null | undefined;
+          return {
+            product: product?._id || '',
+            quantity: item.quantity,
+            unit: item.unit || '',
+            variantSelections: item.variantSelections || {},
+          };
+        }).filter(item => item.product),
+      });
+      
+      // Fetch full product data with populated units for all items
+      const fetchProducts = async () => {
+        const itemsWithProducts = await Promise.all(
+          initialData.items.map(async (item) => {
+            const productId = typeof item.product === 'string' ? item.product : item.product?._id;
+            if (productId) {
+              try {
+                const productResponse = await productService.getById(productId);
+                return {
+                  ...item,
+                  product: productResponse.data as Partial<Product>,
+                };
+              } catch (error) {
+                console.error(`Failed to fetch product ${productId}:`, error);
+                return item;
+              }
+            }
+            return item;
+          })
+        );
+        setTempItems(itemsWithProducts);
+      };
+      fetchProducts();
+    } else if (open) {
+      form.reset({
+        feedback: "",
+        items: [],
+      });
+      setTempItems([]);
     }
-  }, [open, form])
+  }, [open, initialData, form])
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -155,89 +198,166 @@ export function OrderFormDialog({
                     <div className="text-sm text-muted-foreground">No items</div>
                   ) : (
                     <div className="space-y-4">
-                      {fields.map((item, index) => (
-                        <div key={item.id} className="flex items-center space-x-4">
-                          <FormField
-                            control={form.control}
-                            name={`items.${index}.product`}
-                            render={() => (
-                              <FormItem className="flex flex-col grow">
-                                <ProductSearchableSelect
-                                  product={(tempItems && tempItems[index]?.product) as Product ?? null}
-                                  onChange={(v, productData) => {
-                                    form.setValue(`items.${index}.product`, v);
-                                    // Update tempItems with the selected product data
-                                    const currentItems = tempItems || [];
-                                    const updatedItems = [...currentItems];
-                                    updatedItems[index] = {
-                                      ...updatedItems[index],
-                                      product: productData || updatedItems[index]?.product,
-                                    };
-                                    setTempItems(updatedItems);
-                                  }}
-                                />
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name={`items.${index}.unit`}
-                            render={({ field }) => {
-                              const product = (tempItems && tempItems[index]?.product) as Product | undefined;
-                              const availableUnits = product?.units || [];
-                              return (
-                                <FormItem className="w-32">
-                                  <FormControl>
-                                    <select
-                                      {...field}
-                                      className="w-full rounded border px-3 py-2 text-sm"
-                                      disabled={!product || availableUnits.length === 0}
-                                    >
-                                      <option value="">Select unit</option>
-                                      {availableUnits.map((u) => (
-                                        <option key={u.unit} value={u.unit}>
-                                          {u.unit}
-                                        </option>
+                      {fields.map((item, index) => {
+                        const product = (tempItems && tempItems[index]?.product) as Product | undefined;
+                        const variants = product?.variants || {};
+                        const hasVariants = Object.keys(variants).length > 0;
+                        
+                        return (
+                          <div key={item.id} className="space-y-2 border rounded-lg p-3 overflow-hidden">
+                            <div className="flex items-center gap-2 min-w-0 w-full">
+                              <FormField
+                                control={form.control}
+                                name={`items.${index}.product`}
+                                render={() => (
+                                  <FormItem className="flex flex-col flex-1 min-w-0 max-w-full">
+                                    <ProductSearchableSelect
+                                      product={(tempItems && tempItems[index]?.product) as Product ?? null}
+                                      onChange={(v, productData) => {
+                                        form.setValue(`items.${index}.product`, v);
+                                        // Clear variant selections when product changes
+                                        form.setValue(`items.${index}.variantSelections`, {});
+                                        // Update tempItems with the selected product data
+                                        const currentItems = tempItems || [];
+                                        const updatedItems = [...currentItems];
+                                        updatedItems[index] = {
+                                          ...updatedItems[index],
+                                          product: productData || updatedItems[index]?.product,
+                                        };
+                                        setTempItems(updatedItems);
+                                      }}
+                                    />
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={form.control}
+                                name={`items.${index}.unit`}
+                                render={({ field }) => {
+                                  const availableUnits = product?.units || [];
+                                  // Helper to get unit name from either string ID or Unit object
+                                  const getUnitName = (unit: string | Partial<{ _id: string; name: string }>): string => {
+                                    if (typeof unit === 'string') return unit;
+                                    if (typeof unit === 'object' && unit !== null && unit.name) return unit.name;
+                                    return '';
+                                  };
+                                  // Helper to get unit value (name) for the option
+                                  const getUnitValue = (unit: string | Partial<{ _id: string; name: string }>): string => {
+                                    return getUnitName(unit);
+                                  };
+                                  // Get current field value (unit name)
+                                  const currentUnitValue = field.value || '';
+                                  // Check if current value exists in available units
+                                  const unitNames = availableUnits.map(getUnitName).filter(Boolean);
+                                  const isValidUnit = currentUnitValue && unitNames.includes(currentUnitValue);
+                                  
+                                  return (
+                                    <FormItem className="w-24 shrink-0">
+                                      <Select
+                                        value={isValidUnit ? currentUnitValue : ''}
+                                        onValueChange={field.onChange}
+                                        disabled={!product || availableUnits.length === 0}
+                                      >
+                                        <FormControl>
+                                          <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Unit" />
+                                          </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                          {availableUnits.map((u, idx) => {
+                                            const unitName = getUnitName(u);
+                                            const unitValue = getUnitValue(u);
+                                            if (!unitName) return null;
+                                            return (
+                                              <SelectItem key={typeof u === 'string' ? u : (u._id || idx)} value={unitValue}>
+                                                {unitName}
+                                              </SelectItem>
+                                            );
+                                          })}
+                                        </SelectContent>
+                                      </Select>
+                                      <FormMessage />
+                                    </FormItem>
+                                  );
+                                }}
+                              />
+                              <FormField
+                                control={form.control}
+                                name={`items.${index}.quantity`}
+                                render={({ field }) => (
+                                  <FormItem className="w-18 shrink-0">
+                                    <FormControl>
+                                      <Input
+                                        type="number"
+                                        placeholder="Qty"
+                                        {...field}
+                                        onChange={(e) => field.onChange(Number(e.target.value))}
+                                        className="w-full"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="shrink-0 h-9 w-9"
+                                onClick={() => {
+                                  remove(index)
+                                  const currentItems = tempItems || [];
+                                  setTempItems(currentItems.filter((_, i) => i !== index));
+                                }}
+                              >
+                                <Trash className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </div>
+                            {hasVariants && (
+                              <FormField
+                                control={form.control}
+                                name={`items.${index}.variantSelections`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <div className="space-y-2">
+                                      {Object.entries(variants).map(([variantKey, variantOptions]) => (
+                                        <div key={variantKey} className="flex items-center gap-2 min-w-0">
+                                          <label className="text-sm font-medium w-20 capitalize shrink-0">
+                                            {variantKey}:
+                                          </label>
+                                          <Select
+                                            value={field.value?.[variantKey] || ''}
+                                            onValueChange={(value) => {
+                                              const currentSelections = field.value || {};
+                                              field.onChange({
+                                                ...currentSelections,
+                                                [variantKey]: value,
+                                              });
+                                            }}
+                                          >
+                                            <SelectTrigger className="flex-1 min-w-0">
+                                              <SelectValue placeholder={`Select ${variantKey}`} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              {variantOptions.map((option) => (
+                                                <SelectItem key={option} value={option}>
+                                                  {option}
+                                                </SelectItem>
+                                              ))}
+                                            </SelectContent>
+                                          </Select>
+                                        </div>
                                       ))}
-                                    </select>
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              );
-                            }}
-                          />
-                          <FormField
-                            control={form.control}
-                            name={`items.${index}.quantity`}
-                            render={({ field }) => (
-                              <FormItem className="w-24">
-                                <FormControl>
-                                  <Input
-                                    type="number"
-                                    placeholder="Qty"
-                                    {...field}
-                                    onChange={(e) => field.onChange(Number(e.target.value))}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
+                                    </div>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
                             )}
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              remove(index)
-                              const currentItems = tempItems || [];
-                              setTempItems(currentItems.filter((_, i) => i !== index));
-                            }}
-                          >
-                            <Trash className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
-                      ))}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </CardContent>
@@ -321,65 +441,63 @@ function ProductSearchableSelect({ product, onChange }: { product: Partial<Produ
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className="w-full justify-between min-w-0"
         >
-          {selectedId ? selectedProduct?.name : "Select product..."}
+          <span className="truncate flex-1 text-left">
+            {selectedId ? selectedProduct?.name : "Select product..."}
+          </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-        <div className="flex flex-col">
-          <Command shouldFilter={false} className="max-h-[200px]">
-            <div className="flex items-center border-b px-3">
-              <CommandInput
-                placeholder="Search product..."
-                value={search}
-                onValueChange={setSearch}
-                className="flex-1 border-0"
-              />
-            </div>
-            <CommandEmpty>
-              {isLoadingProducts ? "Searching..." : "No product found."}
-            </CommandEmpty>
-            <CommandGroup>
-              <ScrollArea className="h-48">
-                {products.map((p) => (
-                  <CommandItem
-                    key={p._id}
-                    value={p._id}
-                    onSelect={(p) => {
-                      const selectedProduct = products.find(prod => prod._id === p);
-                      onChange(p, selectedProduct);
-                      setSelectedId(p)
-                      setOpen(false);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        product?._id === p._id ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    <div className="flex flex-col">
-                      <span>{p.name}</span>
-                      <span className="text-xs text-muted-foreground">SKU: {p.sku}</span>
-                    </div>
-                  </CommandItem>
-                ))}
-              </ScrollArea>
-            </CommandGroup>
-          </Command>
-          <div className="flex items-center justify-end border-t px-3 py-1.5 bg-background">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs"
-              onClick={() => setOpen(false)}
-            >
-              OK
-            </Button>
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 flex flex-col max-h-[300px]">
+        <Command shouldFilter={false} className="flex-1 min-h-0 flex flex-col">
+          <div className="flex items-center border-b px-3 shrink-0">
+            <CommandInput
+              placeholder="Search product..."
+              value={search}
+              onValueChange={setSearch}
+              className="flex-1 border-0"
+            />
           </div>
+          <CommandEmpty className="py-4">
+            {isLoadingProducts ? "Searching..." : "No product found."}
+          </CommandEmpty>
+          <CommandGroup className="flex-1 overflow-y-auto min-h-0">
+            {products.map((p) => (
+              <CommandItem
+                key={p._id}
+                value={p._id}
+                onSelect={(p) => {
+                  const selectedProduct = products.find(prod => prod._id === p);
+                  onChange(p, selectedProduct);
+                  setSelectedId(p)
+                  setOpen(false);
+                }}
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    product?._id === p._id ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                <div className="flex flex-col">
+                  <span>{p.name}</span>
+                  <span className="text-xs text-muted-foreground">SKU: {p.sku}</span>
+                </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </Command>
+        <div className="flex items-center justify-end border-t px-3 py-1.5 bg-background shrink-0">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={() => setOpen(false)}
+          >
+            OK
+          </Button>
         </div>
       </PopoverContent>
     </Popover>

@@ -20,11 +20,13 @@ export const orderUpdateItemSchema = z.object({
   product: z.string(),
   quantity: z.number().min(1, "Quantity must be at least 1"),
   unit: z.string().min(1, "Unit is required"),
+  variantSelections: z.record(z.string(), z.string()).optional(),
 });
 type OrderItem = {
   product: string | Partial<Product>;
   quantity: number;
   unit: string; // required - unit selected when order was placed
+  variantSelections?: Record<string, string>; // Selected variants when order was placed
 }
 
 type OrderHistoryItem = {

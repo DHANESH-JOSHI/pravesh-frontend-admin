@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Package, DollarSign, MapPin, Clock, UserIcon, Edit } from "lucide-react";
+import { ArrowLeft, Package, DollarSign, MapPin, Clock, UserIcon, Edit, IndianRupee } from "lucide-react";
 import { Link, useTransitionRouter } from "next-view-transitions"
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -200,7 +200,7 @@ export default function OrderDetailPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Wallet</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <IndianRupee className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">₹{((order.user as User)?.wallet?.balance ?? 0).toFixed(2)}</div>
@@ -248,6 +248,7 @@ export default function OrderDetailPage() {
                 <TableHead>Product</TableHead>
                 <TableHead>Brand</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead>Variant</TableHead>
                 {/*<TableHead className="text-right">Final</TableHead>*/}
                 <TableHead className="text-right">Unit</TableHead>
                 <TableHead className="text-right">Qty</TableHead>
@@ -277,6 +278,7 @@ export default function OrderDetailPage() {
                         </TableCell>
                         <TableCell>N/A</TableCell>
                         <TableCell>N/A</TableCell>
+                        <TableCell>N/A</TableCell>
                         <TableCell className="text-right">
                           {item.unit || 'N/A'}
                         </TableCell>
@@ -288,6 +290,9 @@ export default function OrderDetailPage() {
                   }
                   const brand = product.brand as Partial<Brand> | undefined;
                   const category = product.category as Partial<Category> | undefined;
+                  const variantSelections = item.variantSelections || {};
+                  const hasVariants = Object.keys(variantSelections).length > 0;
+                  
                   return (
                     <TableRow key={idx}>
                       <TableCell>
@@ -331,6 +336,19 @@ export default function OrderDetailPage() {
                         >
                           {category?.title || "N/A"}
                         </Link>
+                      </TableCell>
+                      <TableCell>
+                        {hasVariants ? (
+                          <div className="flex flex-wrap gap-1">
+                            {Object.entries(variantSelections).map(([key, value]) => (
+                              <Badge key={key} variant="secondary" className="text-xs">
+                                {key}: {value}
+                              </Badge>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">No variants</span>
+                        )}
                       </TableCell>
                       {/*<TableCell className="text-right font-semibold">₹{(product.finalPrice ?? 0).toFixed(2)}
                       </TableCell>*/}

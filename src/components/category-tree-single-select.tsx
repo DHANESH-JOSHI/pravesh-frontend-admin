@@ -151,7 +151,7 @@ export function CategoryTreeSingleSelect({
             </p>
           )}
         </ScrollArea>
-        <div className="flex items-center justify-end border-t px-3 py-1.5">
+        <div className="flex items-center justify-end border-t px-3 py-1.5 shrink-0 bg-background">
           <Button
             type="button"
             variant="ghost"

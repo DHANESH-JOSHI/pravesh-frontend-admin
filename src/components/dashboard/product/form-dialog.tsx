@@ -709,35 +709,31 @@ export function BrandSearchableSelect({ value, action }: { value: string; action
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 min-w-sm">
-        <div className="flex flex-col">
-          <Command shouldFilter={false} className="max-h-[200px]">
-            <div className="flex items-center border-b px-3">
-              <CommandInput placeholder="Search brand..." value={inputValue} onValueChange={setInputValue} className="flex-1 border-0" />
-            </div>
-            <CommandEmpty>{isLoadingBrands ? "Searching..." : "No brand found."}</CommandEmpty>
-            <CommandGroup>
-              <ScrollArea className="h-48">
-                {brands.map((brand) => (
-                  <CommandItem key={brand._id} value={brand._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
-                    <Check className={cn("mr-2 h-4 w-4", value === brand._id ? "opacity-100" : "opacity-0")} />
-                    {brand.name}
-                  </CommandItem>
-                ))}
-              </ScrollArea>
-            </CommandGroup>
-          </Command>
-          <div className="flex items-center justify-end border-t px-3 py-1.5 bg-background">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs"
-              onClick={() => setOpen(false)}
-            >
-              OK
-            </Button>
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 min-w-sm flex flex-col max-h-[300px]">
+        <Command shouldFilter={false} className="flex-1 min-h-0 flex flex-col">
+          <div className="flex items-center border-b px-3 shrink-0">
+            <CommandInput placeholder="Search brand..." value={inputValue} onValueChange={setInputValue} className="flex-1 border-0" />
           </div>
+          <CommandEmpty className="py-4">{isLoadingBrands ? "Searching..." : "No brand found."}</CommandEmpty>
+          <CommandGroup className="flex-1 overflow-y-auto min-h-0">
+            {brands.map((brand) => (
+              <CommandItem key={brand._id} value={brand._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
+                <Check className={cn("mr-2 h-4 w-4", value === brand._id ? "opacity-100" : "opacity-0")} />
+                {brand.name}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </Command>
+        <div className="flex items-center justify-end border-t px-3 py-1.5 bg-background shrink-0">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={() => setOpen(false)}
+          >
+            OK
+          </Button>
         </div>
       </PopoverContent>
     </Popover>
@@ -842,50 +838,46 @@ function UnitsMultiSelect({ value, onChange }: { value: string[]; onChange: (v: 
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0" align="start">
-        <div className="flex flex-col">
-          <Command className="max-h-[280px]">
-            <div className="flex items-center border-b px-3">
-              <CommandInput placeholder="Search units..." className="flex-1 border-0" />
-            </div>
-            <CommandEmpty>
-              {isLoading ? "Loading units..." : "No units found."}
-            </CommandEmpty>
-            <CommandGroup>
-              <ScrollArea className="h-64">
-                {units.map((unit) => (
-                  <CommandItem
-                    key={unit._id}
-                    value={unit.name}
-                    onSelect={() => {
-                      toggleUnit(unit._id);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedUnitIds.includes(unit._id)
-                          ? "opacity-100"
-                          : "opacity-0"
-                      )}
-                    />
-                    {unit.name}
-                  </CommandItem>
-                ))}
-              </ScrollArea>
-            </CommandGroup>
-          </Command>
-          <div className="flex items-center justify-end border-t px-3 py-1.5 bg-background">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs"
-              onClick={() => setOpen(false)}
-            >
-              OK
-            </Button>
+      <PopoverContent className="w-full p-0 flex flex-col max-h-[300px]" align="start">
+        <Command className="flex-1 min-h-0 flex flex-col">
+          <div className="flex items-center border-b px-3 shrink-0">
+            <CommandInput placeholder="Search units..." className="flex-1 border-0" />
           </div>
+          <CommandEmpty className="py-4">
+            {isLoading ? "Loading units..." : "No units found."}
+          </CommandEmpty>
+          <CommandGroup className="flex-1 overflow-y-auto min-h-0">
+            {units.map((unit) => (
+              <CommandItem
+                key={unit._id}
+                value={unit.name}
+                onSelect={() => {
+                  toggleUnit(unit._id);
+                }}
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    selectedUnitIds.includes(unit._id)
+                      ? "opacity-100"
+                      : "opacity-0"
+                  )}
+                />
+                {unit.name}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </Command>
+        <div className="flex items-center justify-end border-t px-3 py-1.5 bg-background shrink-0">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={() => setOpen(false)}
+          >
+            OK
+          </Button>
         </div>
       </PopoverContent>
       {selectedUnits.length > 0 && (
