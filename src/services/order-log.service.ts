@@ -54,7 +54,7 @@ export interface UserLogAnalytics {
 export const orderLogService = {
   async getOrderLogs(orderId: string, limit = 50) {
     const response = await instance.get<ApiResponse<OrderLog[]>>(
-      `/orders/${orderId}/logs`,
+      `/order-logs/order/${orderId}`,
       { params: { limit } }
     );
     return response.data;

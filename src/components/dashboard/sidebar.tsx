@@ -26,7 +26,6 @@ import {
   Settings,
   Ruler,
   History,
-  BarChart3,
 } from "lucide-react"
 import { NavUser } from "./nav-user"
 import { Link } from "next-view-transitions"

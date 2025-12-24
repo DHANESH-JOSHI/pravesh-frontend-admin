@@ -22,7 +22,6 @@ import { CustomAlertDialog } from "../common/custom-alert-dialog";
 import { ProductFormDialog } from "./form-dialog";
 import { productService } from "@/services/product.service";
 import { Product, CreateProduct, UpdateProduct, QueryOptions } from "@/types/product";
-import { Slider } from "@/components/ui/slider";
 import {
   Select,
   SelectTrigger,
@@ -33,7 +32,6 @@ import {
 import { Category } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { isFiltersSelected } from "@/lib/utils";
-import { useDebounce } from "use-debounce";
 import { Link } from "next-view-transitions";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { invalidateProductQueries } from "@/lib/invalidate-queries";

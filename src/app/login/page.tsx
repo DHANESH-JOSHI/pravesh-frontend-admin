@@ -23,7 +23,6 @@ import { useTransitionRouter } from "next-view-transitions";
 import { Login, loginSchema } from "@/types";
 import { authService } from "@/services/auth.service";
 import { userService } from "@/services/user.service";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 export default function LoginPage() {
   const { login } = useAuth();

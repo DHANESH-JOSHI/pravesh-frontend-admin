@@ -25,7 +25,6 @@ import * as React from 'react';
 import { Link } from "next-view-transitions";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from '@/hooks/use-mobile';
-import { OrderLogsPanel } from '@/components/dashboard/order/order-logs-panel';
 import { useAuth } from '@/providers/auth';
 import { useTransitionRouter } from 'next-view-transitions';
 
@@ -861,11 +860,6 @@ export default function DashboardPage() {
               </table>
             </div>
           </div>
-        </section>
-
-        {/* Order Logs Panel */}
-        <section className="grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8">
-          <OrderLogsPanel />
         </section>
       </div>
     </div>

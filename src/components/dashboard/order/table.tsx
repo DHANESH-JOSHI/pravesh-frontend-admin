@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Eye, Palette } from "lucide-react";
+import { Eye } from "lucide-react";
 import { useState } from "react";
 import { Link } from "next-view-transitions"
 import TableLoadingRows from "@/components/dashboard/common/table-loading-rows";

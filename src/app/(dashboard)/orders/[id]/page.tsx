@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Package, MapPin, Clock, UserIcon, Edit, IndianRupee } from "lucide-react";
+import { ArrowLeft, Package, MapPin, Clock, UserIcon, Edit, IndianRupee, FileText } from "lucide-react";
 import { Link, useTransitionRouter } from "next-view-transitions"
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +18,8 @@ import { useState } from "react";
 import Loader from "@/components/ui/loader";
 import { invalidateOrderQueries } from "@/lib/invalidate-queries";
 import { orderLogService } from "@/services/order-log.service";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { LogItem } from "@/components/dashboard/logs/log-item";
 import { formatDistanceToNow } from "date-fns";
 
 
@@ -166,7 +167,6 @@ export default function OrderDetailPage() {
 
   const getStatusColor = (status: string) =>
     STATUS_COLORS[status.toLowerCase()] ?? "bg-gray-100 text-gray-800";
-
 
   return (
     <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
@@ -451,80 +451,170 @@ export default function OrderDetailPage() {
         </Card>
       </div>
 
-      {/* Order Logs */}
-      {logsData?.data && logsData.data.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Order Activity Log</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[400px]">
-              <div className="space-y-3">
-                {logsData.data.map((log) => (
-                  <div
-                    key={log._id}
-                    className="p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
+      {/* Order Timeline - Status Changes from Order History */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Order Timeline</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {(() => {
+            // Use order history instead of logs
+            const history = order?.history || [];
+            const sortedHistory = [...history].sort(
+              (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+            );
+            
+            const hasHistory = sortedHistory.length > 0;
+            const currentStatusInHistory = sortedHistory.some(
+              (item) => item.status.toLowerCase() === order.status.toLowerCase()
+            );
+            
+            // Always show at least current status
+            if (!hasHistory && order.status) {
+              return (
+                <div className="relative">
+                  <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
+                  <div className="space-y-4">
+                    <div className="relative flex items-start gap-4">
+                      <div className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background">
+                        <div className="h-2 w-2 rounded-full bg-primary" />
+                      </div>
+                      <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <Badge 
-                            variant="outline" 
-                            className={`text-xs ${
-                              log.action === "view" ? "bg-amber-50 text-amber-700 border-amber-200" :
-                              log.action === "view_list" ? "bg-cyan-50 text-cyan-700 border-cyan-200" :
-                              log.action === "status_update" ? "bg-blue-50 text-blue-700 border-blue-200" :
-                              log.action === "items_updated" ? "bg-purple-50 text-purple-700 border-purple-200" :
-                              log.action === "feedback_updated" ? "bg-green-50 text-green-700 border-green-200" :
-                              ""
-                            }`}
-                          >
-                            {log.action.replace(/_/g, " ")}
+                          <Badge className={getStatusColor(order.status)}>
+                            {order.status.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
                           </Badge>
-                          {log.field && (
-                            <span className="text-xs text-muted-foreground">
-                              {log.field}
-                            </span>
-                          )}
+                          <span className="text-xs text-muted-foreground">Current Status</span>
                         </div>
-                        <p className="text-sm font-medium mb-1">{log.description}</p>
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <UserIcon className="w-3 h-3" />
-                            <span>
-                              {typeof log.admin === "object"
-                                ? log.admin.name
-                                : "Unknown"}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            <span>
-                              {formatDistanceToNow(new Date(log.createdAt), {
-                                addSuffix: true,
-                              })}
-                            </span>
-                          </div>
-                          {log.metadata?.cached && (
-                            <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
-                              <span className="text-[10px] bg-amber-100 dark:bg-amber-950/40 px-1.5 py-0.5 rounded">
-                                Cached
-                              </span>
-                            </div>
-                          )}
+                        <div className="text-xs text-muted-foreground mt-2">
+                          No status changes recorded yet
                         </div>
-                        {log.oldValue !== undefined && log.newValue !== undefined && (
-                          <div className="mt-2 text-xs text-muted-foreground">
-                            <span className="line-through">{String(log.oldValue)}</span>
-                            {" → "}
-                            <span className="font-medium">{String(log.newValue)}</span>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
+                </div>
+              );
+            }
+            
+            return (
+              <div className="relative">
+                {/* Timeline line */}
+                {(hasHistory || !currentStatusInHistory) && (
+                  <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
+                )}
+                
+                <div className="space-y-4">
+                  {sortedHistory.map((item, index) => {
+                    const updatedBy = item.updatedBy;
+                    const adminName = typeof updatedBy === "object" && updatedBy !== null
+                      ? updatedBy.name
+                      : updatedBy
+                      ? "System"
+                      : "System";
+                    const adminEmail = typeof updatedBy === "object" && updatedBy !== null
+                      ? updatedBy.email
+                      : undefined;
+                    const isLast = index === sortedHistory.length - 1;
+                    const isCurrentStatus = item.status.toLowerCase() === order.status.toLowerCase();
+                    const prevItem = index > 0 ? sortedHistory[index - 1] : null;
+                    
+                    return (
+                      <div key={`${item.status}-${item.timestamp}-${index}`} className="relative flex items-start gap-4">
+                        {/* Timeline dot */}
+                        <div className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 bg-background ${
+                          isLast || isCurrentStatus ? "border-primary" : "border-muted"
+                        }`}>
+                          <div className={`h-2 w-2 rounded-full ${
+                            isLast || isCurrentStatus ? "bg-primary" : "bg-muted-foreground"
+                          }`} />
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="flex-1 pb-4">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge className={getStatusColor(item.status)}>
+                              {item.status.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
+                            </Badge>
+                            {prevItem && (
+                              <>
+                                <span className="text-xs text-muted-foreground">from</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {prevItem.status.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
+                                </Badge>
+                              </>
+                            )}
+                            {isCurrentStatus && (
+                              <span className="text-xs text-muted-foreground">(Current)</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
+                            <div className="flex items-center gap-1">
+                              <UserIcon className="w-3 h-3" />
+                              <span className="font-medium">{adminName}</span>
+                              {adminEmail && (
+                                <span className="text-[10px]">({adminEmail})</span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              <span>
+                                {formatDistanceToNow(new Date(item.timestamp), {
+                                  addSuffix: true,
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  
+                  {/* Current status (if not in history) */}
+                  {!currentStatusInHistory && order.status && (
+                    <div className="relative flex items-start gap-4">
+                      <div className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background">
+                        <div className="h-2 w-2 rounded-full bg-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge className={getStatusColor(order.status)}>
+                            {order.status.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">Current Status</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-2">
+                          Order created with this status
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+        </CardContent>
+      </Card>
+
+      {/* Order Logs */}
+      {logsData?.data && logsData.data.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <FileText className="w-4 h-4" />
+                Order Activity Log
+              </CardTitle>
+              <Badge variant="outline" className="text-xs">{logsData.data.length}</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <ScrollArea className="h-[400px] w-full">
+              <div className="space-y-1.5 pr-2">
+                {logsData.data.map((log) => (
+                  <LogItem key={log._id} log={log} currentOrderId={orderId} />
                 ))}
               </div>
+              <ScrollBar orientation="vertical" />
             </ScrollArea>
           </CardContent>
         </Card>
