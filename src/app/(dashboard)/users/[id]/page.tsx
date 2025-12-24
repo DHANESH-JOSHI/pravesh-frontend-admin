@@ -21,6 +21,7 @@ import { userService } from "@/services/user.service";
 import { User as UserType } from "@/types/user";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import Loader from "@/components/ui/loader";
+import { StaffLogsPanel } from "@/components/dashboard/user/staff-logs-panel";
 
 export default function UserDetailPage() {
   const params = useParams();
@@ -528,8 +529,13 @@ export default function UserDetailPage() {
         </Card>
       )}
 
+      {/* Staff Recent Logs */}
+      {user.role === "staff" && (
+        <StaffLogsPanel staffId={user._id} />
+      )}
+
       {/* No Relations Message */}
-      {!user.wallet && !user.cart && (!user.addresses || user.addresses.length === 0) && !user.wishlist && (!user.orders || user.orders.length === 0) && (!user.reviews || user.reviews.length === 0) && (
+      {!user.wallet && !user.cart && (!user.addresses || user.addresses.length === 0) && !user.wishlist && (!user.orders || user.orders.length === 0) && (!user.reviews || user.reviews.length === 0) && user.role !== "staff" && (
         <Card>
           <CardHeader>
             <CardTitle>Related Data</CardTitle>

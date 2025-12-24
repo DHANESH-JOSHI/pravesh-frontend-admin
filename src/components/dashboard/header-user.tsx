@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/providers/auth";
+import { Link } from "next-view-transitions";
 
 export function HeaderUser() {
     const { user, logout } = useAuth();
@@ -28,7 +29,7 @@ export function HeaderUser() {
                 >
                     <Avatar className="h-8 w-8">
                         <AvatarImage
-                            src={"https://i.pravatar.cc/150?img=3"}
+                            src={user.img || "https://i.pravatar.cc/150?img=3"}
                             alt={user.name || "User"}
                         />
                         <AvatarFallback>{initials}</AvatarFallback>
@@ -44,7 +45,7 @@ export function HeaderUser() {
                     <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
                             <AvatarImage
-                                src={"https://i.pravatar.cc/150?img=3"}
+                                src={user.img || "https://i.pravatar.cc/150?img=3"}
                                 alt={user.name || "User"}
                             />
                             <AvatarFallback>{initials}</AvatarFallback>
@@ -59,6 +60,13 @@ export function HeaderUser() {
                         </div>
                     </div>
                 </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                    <Link href="/profile" className="flex items-center">
+                        <User className="mr-2 h-4 w-4" />
+                        Profile
+                    </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout}>
                     <LogOut className="mr-2 h-4 w-4" />

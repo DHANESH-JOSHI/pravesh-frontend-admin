@@ -33,6 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       try {
         const res = await userService.getMe();
+        // Only allow admin or staff roles in dashboard
         if (res.data?.role === "user") {
           await logout();
         }

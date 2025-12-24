@@ -32,6 +32,7 @@ type OrderItem = {
 type OrderHistoryItem = {
   status: OrderStatus;
   timestamp: Date;
+  updatedBy?: string | { _id: string; name: string; email?: string; role: string };
 }
 
 export type Order = {

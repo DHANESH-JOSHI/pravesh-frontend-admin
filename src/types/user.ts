@@ -28,6 +28,7 @@ export const registerSchema = z.object({
     .optional(),
   password: z.string().min(6, "Password must be at least 6 characters long"),
   phone: z.string().min(10, "Phone number must be at least 10 characters long").max(10, "Phone number must be at most 10 characters long"),
+  role: z.enum(["user", "staff"]),
   img: z.string().optional(),
 })
 

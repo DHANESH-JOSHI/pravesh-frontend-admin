@@ -11,8 +11,7 @@ class UserService {
   async getAll(options?: UserQueryOptions): Promise<ApiResponse<PaginatedUsers>> {
     const response = await instance.get<ApiResponse<PaginatedUsers>>("/users", {
       params: {
-        ...options,
-        role: options?.role || "user"
+        ...options
       }
     });
     return response.data;
@@ -42,10 +41,27 @@ class UserService {
     return response.data;
   }
 
-  async update(data: Partial<User>): Promise<ApiResponse<User>> {
+  async update(data: Partial<User> & { image?: File }): Promise<ApiResponse<User>> {
     if (!data || Object.keys(data).length === 0) {
       throw new Error("Update data is required");
     }
+    
+    // If there's an image file, use FormData
+    if (data.image instanceof File) {
+      const formData = new FormData();
+      if (data.name) formData.append('name', data.name);
+      if (data.email !== undefined) formData.append('email', data.email || '');
+      formData.append('image', data.image);
+      
+      const response = await instance.patch<ApiResponse<User>>(`/users`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    }
+    
+    // Otherwise, send as JSON
     const response = await instance.patch<ApiResponse<User>>(`/users`, data);
     return response.data;
   }
@@ -66,6 +82,17 @@ class UserService {
 
   async createVerifiedUser(data: Register) {
     const response = await instance.post<ApiResponse<User>>("/users", data);
+    return response.data;
+  }
+
+  async resetPassword(otp: string, newPassword: string): Promise<ApiResponse> {
+    if (!otp || !newPassword) {
+      throw new Error("OTP and new password are required");
+    }
+    const response = await instance.post<ApiResponse>(`/users/password/reset`, {
+      otp,
+      newPassword
+    });
     return response.data;
   }
 }

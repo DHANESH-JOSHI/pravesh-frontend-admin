@@ -25,6 +25,9 @@ import * as React from 'react';
 import { Link } from "next-view-transitions";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from '@/hooks/use-mobile';
+import { OrderLogsPanel } from '@/components/dashboard/order/order-logs-panel';
+import { useAuth } from '@/providers/auth';
+import { useTransitionRouter } from 'next-view-transitions';
 
 interface IDashboardStats {
   totalUsers: number;
@@ -101,6 +104,9 @@ const PIE_COLORS = [
 
 export default function DashboardPage() {
   const isMobile = useIsMobile();
+  const { user, loading: authLoading } = useAuth();
+  const router = useTransitionRouter();
+  
   const {
     data: stats,
     isLoading,
@@ -114,6 +120,20 @@ export default function DashboardPage() {
       return response.data.data;
     },
   });
+
+  React.useEffect(() => {
+    if (!authLoading && user?.role === "staff") {
+      router.replace("/orders");
+    }
+  }, [user, authLoading, router]);
+
+  if (authLoading) {
+    return <Loader text="Loading..." />;
+  }
+
+  if (user?.role === "staff") {
+    return null;
+  }
 
   if (isLoading) {
     return <Loader />;
@@ -841,6 +861,11 @@ export default function DashboardPage() {
               </table>
             </div>
           </div>
+        </section>
+
+        {/* Order Logs Panel */}
+        <section className="grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8">
+          <OrderLogsPanel />
         </section>
       </div>
     </div>

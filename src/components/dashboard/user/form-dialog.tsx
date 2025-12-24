@@ -20,6 +20,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 import {
   type User,
   type Register,
@@ -43,15 +45,21 @@ export function UserFormDialog({
       email: "",
       password: "",
       phone: "",
-      img: "",
+      role: "user" as const,
     },
   });
-  useEffect(()=>{
-    if(open){
-      form.reset()
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        name: "",
+        email: "",
+        password: "",
+        phone: "",
+        role: "user" as const,
+      })
     }
 
-  },[open,form])
+  }, [open, form])
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -65,6 +73,42 @@ export function UserFormDialog({
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-6 w-full"
           >
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem className="flex items-center space-x-2">
+                  <FormLabel>Role :</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center gap-3">
+                      <span className={cn(
+                        "text-sm font-medium transition-colors",
+                        field.value === "user" ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground"
+                      )}>
+                        User
+                      </span>
+                      <Switch
+                        checked={field.value === "staff"}
+                        onCheckedChange={(checked) => {
+                          field.onChange(checked ? "staff" : "user");
+                        }}
+                        className={cn(
+                          "data-[state=checked]:bg-purple-600 data-[state=unchecked]:bg-blue-500",
+                          "dark:data-[state=checked]:bg-purple-500 dark:data-[state=unchecked]:bg-blue-400"
+                        )}
+                      />
+                      <span className={cn(
+                        "text-sm font-medium transition-colors",
+                        field.value === "staff" ? "text-purple-600 dark:text-purple-400" : "text-muted-foreground"
+                      )}>
+                        Staff
+                      </span>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="name"
@@ -123,7 +167,7 @@ export function UserFormDialog({
                   <FormLabel>Password *</FormLabel>
                   <FormControl>
                     <Input
-                    type="password"
+                      type="password"
                       placeholder="Enter password..."
                       {...field}
                     />
@@ -132,7 +176,7 @@ export function UserFormDialog({
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="img"
               render={({ field }) => (
@@ -176,7 +220,7 @@ export function UserFormDialog({
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <div className="flex justify-end gap-3 pt-4 border-t">
               <Button

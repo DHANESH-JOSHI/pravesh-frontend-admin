@@ -74,12 +74,14 @@ export function OrdersTable() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="processing">Processing</SelectItem>
+                  <SelectItem value="received">Received</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="confirmed">Confirmed</SelectItem>
                   <SelectItem value="shipped">Shipped</SelectItem>
+                  <SelectItem value="out_for_delivery">Out for Delivery</SelectItem>
                   <SelectItem value="delivered">Delivered</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>
-                  <SelectItem value="awaiting_confirmation">Awaiting Confirmation</SelectItem>
-                  <SelectItem value="awaiting_payment">Awaiting Payment</SelectItem>
+                  <SelectItem value="refunded">Refunded</SelectItem>
                 </SelectContent>
               </Select>
             </div>

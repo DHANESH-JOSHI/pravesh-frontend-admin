@@ -17,6 +17,9 @@ import { OrderFormDialog } from "@/components/dashboard/order/form-dialog";
 import { useState } from "react";
 import Loader from "@/components/ui/loader";
 import { invalidateOrderQueries } from "@/lib/invalidate-queries";
+import { orderLogService } from "@/services/order-log.service";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { formatDistanceToNow } from "date-fns";
 
 
 export default function OrderDetailPage() {
@@ -29,6 +32,18 @@ export default function OrderDetailPage() {
     queryKey: ["order", orderId],
     queryFn: async () => await orderService.getById(orderId),
     enabled: !!orderId,
+  });
+
+  const { data: logsData } = useQuery({
+    queryKey: ["order-logs", orderId],
+    queryFn: async () => await orderLogService.getOrderLogs(orderId),
+    enabled: !!orderId,
+    refetchInterval: () => {
+      if (typeof window !== "undefined" && document.visibilityState === "visible") {
+        return 5000;
+      }
+      return false;
+    },
   });
 
 
@@ -435,6 +450,86 @@ export default function OrderDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Order Logs */}
+      {logsData?.data && logsData.data.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Order Activity Log</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[400px]">
+              <div className="space-y-3">
+                {logsData.data.map((log) => (
+                  <div
+                    key={log._id}
+                    className="p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge 
+                            variant="outline" 
+                            className={`text-xs ${
+                              log.action === "view" ? "bg-amber-50 text-amber-700 border-amber-200" :
+                              log.action === "view_list" ? "bg-cyan-50 text-cyan-700 border-cyan-200" :
+                              log.action === "status_update" ? "bg-blue-50 text-blue-700 border-blue-200" :
+                              log.action === "items_updated" ? "bg-purple-50 text-purple-700 border-purple-200" :
+                              log.action === "feedback_updated" ? "bg-green-50 text-green-700 border-green-200" :
+                              ""
+                            }`}
+                          >
+                            {log.action.replace(/_/g, " ")}
+                          </Badge>
+                          {log.field && (
+                            <span className="text-xs text-muted-foreground">
+                              {log.field}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm font-medium mb-1">{log.description}</p>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <UserIcon className="w-3 h-3" />
+                            <span>
+                              {typeof log.admin === "object"
+                                ? log.admin.name
+                                : "Unknown"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            <span>
+                              {formatDistanceToNow(new Date(log.createdAt), {
+                                addSuffix: true,
+                              })}
+                            </span>
+                          </div>
+                          {log.metadata?.cached && (
+                            <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                              <span className="text-[10px] bg-amber-100 dark:bg-amber-950/40 px-1.5 py-0.5 rounded">
+                                Cached
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        {log.oldValue !== undefined && log.newValue !== undefined && (
+                          <div className="mt-2 text-xs text-muted-foreground">
+                            <span className="line-through">{String(log.oldValue)}</span>
+                            {" → "}
+                            <span className="font-medium">{String(log.newValue)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      )}
+
       <OrderFormDialog
         isLoading={updatemutation.isPending}
         open={!!open}

@@ -64,6 +64,7 @@ export function UsersTable() {
     onSuccess: ({ message, data: createdUser }) => {
       toast.success(message ?? "User created successfully");
       invalidateUserQueries(queryClient, createdUser?._id);
+      setCreateDialogOpen(false);
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message ?? "Failed to create user. Please try again.");
@@ -109,7 +110,7 @@ export function UsersTable() {
                 <SelectContent>
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="staff">Staff</SelectItem>
                 </SelectContent>
               </Select>
             </div>

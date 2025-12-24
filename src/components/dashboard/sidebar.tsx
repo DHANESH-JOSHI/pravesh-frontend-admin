@@ -25,42 +25,52 @@ import {
   MessageSquare,
   Settings,
   Ruler,
+  History,
+  BarChart3,
 } from "lucide-react"
 import { NavUser } from "./nav-user"
 import { Link } from "next-view-transitions"
 import { usePathname } from "next/navigation"
 import { User } from "@/types"
 
-const items = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Categories", url: "/categories", icon: FolderOpen },
-  { title: "Brands", url: "/brands", icon: Building2 },
-  { title: "Units", url: "/units", icon: Ruler },
-  { title: "Products", url: "/products", icon: Box },
-  { title: "Banners", url: "/banners", icon: Image },
-  { title: "Blogs", url: "/blogs", icon: FileText },
-  { title: "Orders", url: "/orders", icon: Receipt },
-  { title: "Reviews", url: "/reviews", icon: Star },
-  { title: "Users", url: "/users", icon: Users },
-  { title: "Wallets", url: "/wallets", icon: Wallet },
-  { title: "Addresses", url: "/addresses", icon: MapPin },
-  { title: "Messages", url: "/messages", icon: MessageSquare },
-  { title: "Settings", url: "/settings", icon: Settings },
+const allItems = [
+  { title: "Dashboard", url: "/", icon: LayoutDashboard, roles: ["admin"] },
+  { title: "Activities", url: "/activities", icon: History, roles: ["admin"] },
+  { title: "Categories", url: "/categories", icon: FolderOpen, roles: ["admin"] },
+  { title: "Brands", url: "/brands", icon: Building2, roles: ["admin"] },
+  { title: "Units", url: "/units", icon: Ruler, roles: ["admin"] },
+  { title: "Products", url: "/products", icon: Box, roles: ["admin"] },
+  { title: "Banners", url: "/banners", icon: Image, roles: ["admin"] },
+  { title: "Blogs", url: "/blogs", icon: FileText, roles: ["admin"] },
+  { title: "Orders", url: "/orders", icon: Receipt, roles: ["admin", "staff"] },
+  { title: "Reviews", url: "/reviews", icon: Star, roles: ["admin"] },
+  { title: "Users", url: "/users", icon: Users, roles: ["admin"] },
+  { title: "Wallets", url: "/wallets", icon: Wallet, roles: ["admin"] },
+  { title: "Addresses", url: "/addresses", icon: MapPin, roles: ["admin"] },
+  { title: "Messages", url: "/messages", icon: MessageSquare, roles: ["admin"] },
+  { title: "Settings", url: "/settings", icon: Settings, roles: ["admin"] },
 ]
 
 export const AppSidebar = ({ user }: { user: User }) => {
   const pathname = usePathname()
+  
+  const items = allItems.filter(item => {
+    if (!item.roles) return true;
+    return item.roles.includes(user.role || "user");
+  });
 
   return (
     <Sidebar className="border-r border-sidebar-border bg-background/90">
       <SidebarHeader className="border-b border-sidebar-border px-3 py-4">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href={user.role === "staff" ? "/orders" : "/"} className="flex items-center gap-3">
           <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
             <LayoutDashboard className="size-5" />
           </div>
           <div className="grid flex-1 text-left leading-tight">
             <span className="truncate font-semibold text-[17px]">Pravesh</span>
-            <span className="truncate text-xs opacity-60">Admin Dashboard</span>
+            <span className="truncate text-xs opacity-60">
+              {user.role === "staff" ? "Orders Dashboard" : "Admin Dashboard"}
+            </span>
           </div>
         </Link>
       </SidebarHeader>
