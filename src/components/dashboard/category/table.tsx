@@ -160,17 +160,18 @@ export function CategoriesTable() {
         <div className="relative rounded border bg-background/50  overflow-hidden">
 
           <CommonOverlaySpinner show={isFetching && !isLoading} />
-          <Table>
+          <div className="overflow-x-auto">
+          <Table className="w-full">
             <TableHeader className="bg-primary/5">
               <TableRow className="[&>th]:py-3">
-                <TableHead>Image</TableHead>
+                <TableHead className="w-16 sm:w-20">Image</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Subcategories</TableHead>
-                <TableHead>Brands</TableHead>
-                <TableHead>Products</TableHead>
+                <TableHead className="text-center">Subcategories</TableHead>
+                <TableHead className="text-center">Brands</TableHead>
+                <TableHead className="text-center">Products</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead>Updated</TableHead>
-                {!appliedFilters?.isDeleted && <TableHead className="w-16 text-center">Actions</TableHead>}
+                {!appliedFilters?.isDeleted && <TableHead className="w-20 text-center">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -201,7 +202,7 @@ export function CategoriesTable() {
                 <>
                   {categories.map((category) => (
                     <TableRow key={category._id}>
-                      <TableCell>
+                      <TableCell className="w-16 sm:w-20">
                         {category.image ? (
                           <img
                             src={category.image}
@@ -214,35 +215,35 @@ export function CategoriesTable() {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="font-medium max-w-xs">
+                      <TableCell className="font-medium">
                         <div className="truncate" title={category.title}>
                           {category.title}
                         </div>
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-center text-muted-foreground">
                         {category.childCount}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-center text-muted-foreground">
                         {category.brandCount}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-center text-muted-foreground">
                         {category.productCount}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-muted-foreground text-sm">
                         {new Date(category.createdAt).toLocaleDateString("en-GB", {
                           day: "2-digit",
                           month: "short",
                           year: "numeric",
                         })}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-muted-foreground text-sm">
                         {new Date(category.updatedAt).toLocaleDateString("en-GB", {
                           day: "2-digit",
                           month: "short",
                           year: "numeric",
                         })}
                       </TableCell>
-                      {!category.isDeleted && <TableCell className="px-4 text-center">
+                      {!category.isDeleted && <TableCell className="w-20 px-2 text-center">
                         <div className="flex items-center gap-2">
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -295,6 +296,7 @@ export function CategoriesTable() {
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
         <PaginationControls
         total={total}

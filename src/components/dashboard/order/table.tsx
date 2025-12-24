@@ -115,19 +115,18 @@ export function OrdersTable() {
         </div>
       </div>
       <div>
-        <div className="relative rounded border bg-background/50  overflow-hidden">
-
+        <div className="relative rounded border bg-background/50 overflow-hidden">
           <CommonOverlaySpinner show={isFetching && !isLoading} />
-          <Table>
+          <div className="overflow-x-auto">
+          <Table className="w-full table-auto">
             <TableHeader className="bg-primary/5">
               <TableRow className="[&>th]:py-3">
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Updated</TableHead>
-                <TableHead className="w-16 text-center">Actions</TableHead>
+                <TableHead className="min-w-[120px]">Name</TableHead>
+                <TableHead className="min-w-[150px]">Email</TableHead>
+                <TableHead className="whitespace-nowrap">Status</TableHead>
+                <TableHead className="text-center whitespace-nowrap">Type</TableHead>
+                <TableHead className="whitespace-nowrap">Updated</TableHead>
+                <TableHead className="w-20 text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -137,7 +136,6 @@ export function OrdersTable() {
                   columns={[
                     "h-5 w-32",
                     "h-5 w-40",
-                    "h-5 w-24",
                     "h-6 w-20",
                     "h-6 w-20",
                     "h-5 w-24",
@@ -146,7 +144,7 @@ export function OrdersTable() {
                 />
               ) : orders.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="p-6">
+                  <TableCell colSpan={6} className="p-6">
                     <EmptyState
                       title="No orders found"
                       description="Try a different search."
@@ -158,52 +156,52 @@ export function OrdersTable() {
                   {orders.map((order: Order) => {
                     const user = order.user as User | null | undefined;
                     return (
-                      <TableRow key={order._id}>
-                        <TableCell className="font-medium">
+                    <TableRow key={order._id}>
+                      <TableCell className="min-w-0 font-medium">
+                        <div className="truncate" title={user?.name || "Unknown User"}>
                           {user?.name || "Unknown User"}
-                        </TableCell>
-                        <TableCell className="font-mono text-sm">
-                          <div className="flex items-center gap-2">
-                            {user?.email || "N/A"}
-                          </div>
-                        </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        ₹{order.totalAmount}
+                        </div>
                       </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          <StatusBadge status={order.status} />
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-                            {order.isCustomOrder ? "Custom" : "Regular"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {new Date(order.updatedAt).toLocaleDateString("en-GB", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip>
-                            <TooltipTrigger className="w-full flex justify-center">
-                              <Link href={`/orders/${order._id}`}>
-                                <Eye className="h-4 w-4" />
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              View
-                            </TooltipContent>
-                          </Tooltip>
-                        </TableCell>
-                      </TableRow>
+                      <TableCell className="min-w-0 font-mono text-sm">
+                        <div className="truncate" title={user?.email || "N/A"}>
+                          {user?.email || "N/A"}
+                        </div>
+                      </TableCell>
+                      <TableCell className="min-w-0 whitespace-nowrap">
+                        <StatusBadge status={order.status} />
+                      </TableCell>
+                      <TableCell className="min-w-0 text-center whitespace-nowrap">
+                        <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+                          {order.isCustomOrder ? "Custom" : "Regular"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="min-w-0 text-muted-foreground text-sm whitespace-nowrap">
+                        {new Date(order.updatedAt).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </TableCell>
+                      <TableCell className="w-20 px-2 text-center">
+                        <Tooltip>
+                          <TooltipTrigger className="w-full flex justify-center">
+                            <Link href={`/orders/${order._id}`}>
+                              <Eye className="h-4 w-4" />
+                            </Link>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            View
+                          </TooltipContent>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
                     );
                   })}
                 </>
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
         <PaginationControls
           limit={appliedFilters.limit || 8}

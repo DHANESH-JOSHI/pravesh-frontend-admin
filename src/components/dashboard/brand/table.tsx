@@ -146,16 +146,17 @@ export function BrandsTable() {
         <div className="relative rounded border bg-background/50  overflow-hidden">
 
           <CommonOverlaySpinner show={isFetching && !isLoading} />
-          <Table>
+          <div className="overflow-x-auto">
+          <Table className="w-full">
             <TableHeader className="bg-primary/5">
               <TableRow className="[&>th]:py-3">
-                <TableHead>Image</TableHead>
+                <TableHead className="w-16 sm:w-20">Image</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Categories</TableHead>
-                <TableHead>Products</TableHead>
+                <TableHead className="text-center">Categories</TableHead>
+                <TableHead className="text-center">Products</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead>Updated</TableHead>
-                <TableHead className="w-16 text-center">Actions</TableHead>
+                <TableHead className="w-20 text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -185,7 +186,7 @@ export function BrandsTable() {
                 <>
                   {brands.map((brand: Brand) => (
                     <TableRow key={brand._id}>
-                      <TableCell>
+                      <TableCell className="w-16 sm:w-20">
                         {brand.image ? (
                           <img
                             src={brand.image}
@@ -198,34 +199,32 @@ export function BrandsTable() {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="font-medium max-w-xs">
+                      <TableCell className="font-medium">
                         <div className="truncate" title={brand.name}>
                           {brand.name}
                         </div>
                       </TableCell>
-                      <TableCell className="font-medium max-w-xs">
-                        <div className="truncate" title={brand.name}>
-                          {brand.categories.length}
-                        </div>
+                      <TableCell className="text-center font-medium">
+                        {brand.categories.length}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-center text-muted-foreground">
                         {brand.productCount}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-muted-foreground text-sm">
                         {new Date(brand.createdAt).toLocaleDateString("en-GB", {
                           day: "2-digit",
                           month: "short",
                           year: "numeric",
                         })}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-muted-foreground text-sm">
                         {new Date(brand.updatedAt).toLocaleDateString("en-GB", {
                           day: "2-digit",
                           month: "short",
                           year: "numeric",
                         })}
                       </TableCell>
-                      <TableCell className="px-4 text-center">
+                      <TableCell className="w-20 px-2 text-center">
                         <div className="flex items-center gap-2">
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -280,6 +279,7 @@ export function BrandsTable() {
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
         <PaginationControls
           total={total}

@@ -220,7 +220,9 @@ export function BlogsTable() {
                         </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground font-mono text-sm">
-                        {blog.slug}
+                        <div className="truncate" title={blog.slug}>
+                          {blog.slug}
+                        </div>
                       </TableCell>
                       <TableCell className="font-semibold"><Badge variant="outline">{blog.isPublished ? 'Yes' : 'No'}</Badge></TableCell>
                       <TableCell className="text-muted-foreground">

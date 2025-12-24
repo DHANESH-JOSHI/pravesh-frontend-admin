@@ -342,20 +342,35 @@ export function ProductSearchableSelect({ value, action }: { value: string; acti
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0 min-w-sm">
-        <Command shouldFilter={false}>
-          <CommandInput placeholder="Search product..." value={inputValue} onValueChange={setInputValue} />
-          <CommandEmpty>{isLoadingProducts ? "Searching..." : "No product found."}</CommandEmpty>
-          <CommandGroup>
-            <ScrollArea className="h-48">
-              {products.map((product) => (
-                <CommandItem key={product._id} value={product._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
-                  <Check className={cn("mr-2 h-4 w-4", value === product._id ? "opacity-100" : "opacity-0")} />
-                  {product.name}
-                </CommandItem>
-              ))}
-            </ScrollArea>
-          </CommandGroup>
-        </Command>
+        <div className="flex flex-col">
+          <Command shouldFilter={false} className="max-h-[200px]">
+            <div className="flex items-center border-b px-3">
+              <CommandInput placeholder="Search product..." value={inputValue} onValueChange={setInputValue} className="flex-1 border-0" />
+            </div>
+            <CommandEmpty>{isLoadingProducts ? "Searching..." : "No product found."}</CommandEmpty>
+            <CommandGroup>
+              <ScrollArea className="h-48">
+                {products.map((product) => (
+                  <CommandItem key={product._id} value={product._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
+                    <Check className={cn("mr-2 h-4 w-4", value === product._id ? "opacity-100" : "opacity-0")} />
+                    {product.name}
+                  </CommandItem>
+                ))}
+              </ScrollArea>
+            </CommandGroup>
+          </Command>
+          <div className="flex items-center justify-end border-t px-3 py-1.5 bg-background">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => setOpen(false)}
+            >
+              OK
+            </Button>
+          </div>
+        </div>
       </PopoverContent>
     </Popover>
   );

@@ -58,7 +58,7 @@ export function OrderFormDialog({
         const product = item.product as Product | null | undefined;
         return {
           product: product?._id || '',
-          quantity: item.quantity,
+        quantity: item.quantity,
           unit: item.unit || '',
         };
       }).filter(item => item.product) || [],
@@ -328,43 +328,59 @@ function ProductSearchableSelect({ product, onChange }: { product: Partial<Produ
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-        <Command shouldFilter={false}>
-          <CommandInput
-            placeholder="Search product..."
-            value={search}
-            onValueChange={setSearch}
-          />
-          <CommandEmpty>
-            {isLoadingProducts ? "Searching..." : "No product found."}
-          </CommandEmpty>
-          <CommandGroup>
-            <ScrollArea className="h-48">
-              {products.map((p) => (
-                <CommandItem
-                  key={p._id}
-                  value={p._id}
-                  onSelect={(p) => {
-                    const selectedProduct = products.find(prod => prod._id === p);
-                    onChange(p, selectedProduct);
-                    setSelectedId(p)
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      product?._id === p._id ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  <div className="flex flex-col">
-                    <span>{p.name}</span>
-                    <span className="text-xs text-muted-foreground">SKU: {p.sku}</span>
-                  </div>
-                </CommandItem>
-              ))}
-            </ScrollArea>
-          </CommandGroup>
-        </Command>
+        <div className="flex flex-col">
+          <Command shouldFilter={false} className="max-h-[200px]">
+            <div className="flex items-center border-b px-3">
+              <CommandInput
+                placeholder="Search product..."
+                value={search}
+                onValueChange={setSearch}
+                className="flex-1 border-0"
+              />
+            </div>
+            <CommandEmpty>
+              {isLoadingProducts ? "Searching..." : "No product found."}
+            </CommandEmpty>
+            <CommandGroup>
+              <ScrollArea className="h-48">
+                {products.map((p) => (
+                  <CommandItem
+                    key={p._id}
+                    value={p._id}
+                    onSelect={(p) => {
+                      const selectedProduct = products.find(prod => prod._id === p);
+                      onChange(p, selectedProduct);
+                      setSelectedId(p)
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        product?._id === p._id ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    <div className="flex flex-col">
+                      <span>{p.name}</span>
+                      <span className="text-xs text-muted-foreground">SKU: {p.sku}</span>
+                    </div>
+                  </CommandItem>
+                ))}
+              </ScrollArea>
+            </CommandGroup>
+          </Command>
+          <div className="flex items-center justify-end border-t px-3 py-1.5 bg-background">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => setOpen(false)}
+            >
+              OK
+            </Button>
+          </div>
+        </div>
       </PopoverContent>
     </Popover>
   );

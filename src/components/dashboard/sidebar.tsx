@@ -24,6 +24,7 @@ import {
   LayoutDashboard,
   MessageSquare,
   Settings,
+  Ruler,
 } from "lucide-react"
 import { NavUser } from "./nav-user"
 import { Link } from "next-view-transitions"
@@ -34,6 +35,7 @@ const items = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Categories", url: "/categories", icon: FolderOpen },
   { title: "Brands", url: "/brands", icon: Building2 },
+  { title: "Units", url: "/units", icon: Ruler },
   { title: "Products", url: "/products", icon: Box },
   { title: "Banners", url: "/banners", icon: Image },
   { title: "Blogs", url: "/blogs", icon: FileText },

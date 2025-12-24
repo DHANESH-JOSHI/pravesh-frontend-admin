@@ -40,10 +40,6 @@ export const queryOptionsSchema = z.object({
 
 export type QueryOptions = z.infer<typeof queryOptionsSchema>;
 
-export const productUnitSchema = z.object({
-  unit: z.string().nonempty("Unit name is required"),
-});
-
 export const createProductSchema = z.object({
   name: z.string().nonempty("Name is required"),
   // description: z.string().optional(),
@@ -58,11 +54,18 @@ export const createProductSchema = z.object({
   // discountType: discountTypeSchema.optional(),
 
   // stock: z.number().int().nonnegative(),
-  units: z.array(productUnitSchema).min(1, "At least one unit is required"),
+  units: z.array(z.string()).min(1, "At least one unit is required"),
   // minStock: z.number().int().nonnegative().optional(),
 
   // features: z.array(z.string()).optional(),
-  specifications: z.record(z.string(), z.string()).optional(),
+  variants: z.record(
+    z.string(), 
+    z.array(z.string())
+  ).optional(), // User-selectable variants (e.g., { size: ["S", "M", "L"], color: ["Red", "Blue"] })
+  specifications: z.record(
+    z.string(), 
+    z.union([z.string(), z.array(z.string())])
+  ).optional(),
 
   tags: z.array(z.string()).optional(),
 
@@ -74,9 +77,7 @@ export type CreateProduct = z.infer<typeof createProductSchema>;
 export const updateProductSchema = createProductSchema.partial();
 export type UpdateProduct = z.infer<typeof updateProductSchema>;
 
-export type ProductUnit = {
-  unit: string; // e.g., "kg", "packet", "piece", "box", "litre", "metre", "inch"
-};
+import { Unit } from "./unit";
 
 export type Product = {
   _id: string;
@@ -94,10 +95,11 @@ export type Product = {
   // finalPrice: number,
   // stock: number,
   // stockStatus: stockStatus,
-  units: ProductUnit[], // Array of available unit types (at least one required)
+  units: (string | Partial<Unit>)[], // Array of unit IDs or populated unit objects
   // minStock: number,
   // features?: string[],
-  specifications: Record<string, string>,
+  variants?: Record<string, string[]>; // User-selectable variants (e.g., { size: ["S", "M", "L"], color: ["Red", "Blue"] })
+  specifications: Record<string, string | string[]>,
   tags: string[],
   isFeatured: boolean,
   isNewArrival: boolean,

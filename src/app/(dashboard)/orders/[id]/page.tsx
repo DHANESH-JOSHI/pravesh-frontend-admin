@@ -142,7 +142,6 @@ export default function OrderDetailPage() {
 
   const shippingAddress = (order.shippingAddress as Partial<Address>) || {};
   const totalItems = order.items.reduce((acc, item) => acc + item.quantity, 0);
-  const totalAmount = 0;
 
   const STATUS_COLORS: Record<string, string> = {
     received: "bg-orange-100 text-orange-800",
@@ -252,7 +251,6 @@ export default function OrderDetailPage() {
                 {/*<TableHead className="text-right">Final</TableHead>*/}
                 <TableHead className="text-right">Unit</TableHead>
                 <TableHead className="text-right">Qty</TableHead>
-                <TableHead className="text-right">Line Total</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -285,15 +283,11 @@ export default function OrderDetailPage() {
                         <TableCell className="text-right">
                           {item.quantity}
                         </TableCell>
-                        <TableCell className="text-right font-medium">
-                          ₹0.00
-                        </TableCell>
                       </TableRow>
                     );
                   }
                   const brand = product.brand as Partial<Brand> | undefined;
                   const category = product.category as Partial<Category> | undefined;
-                  const lineTotal = 0;
                   return (
                     <TableRow key={idx}>
                       <TableCell>
@@ -307,7 +301,7 @@ export default function OrderDetailPage() {
                       </TableCell>
                       <TableCell>
                         {product._id ? (
-                          <Link className="hover:underline" href={`/products/${product._id}`}>{product.name || "N/A"}</Link>
+                        <Link className="hover:underline" href={`/products/${product._id}`}>{product.name || "N/A"}</Link>
                         ) : (
                           <span>{product.name || "N/A"}</span>
                         )}
@@ -346,20 +340,12 @@ export default function OrderDetailPage() {
                       <TableCell className="text-right">
                         {item.quantity}
                       </TableCell>
-                      <TableCell className="text-right font-medium">
-                        ₹{lineTotal.toFixed(2)}
-                      </TableCell>
                     </TableRow>
                   );
                 })
               )}
             </TableBody>
           </Table>
-          <Separator className="my-4" />
-          <div className="flex justify-between items-center">
-            <span className="text-lg font-semibold">Total:</span>
-            <span className="text-lg font-bold">₹{totalAmount.toFixed(2)}</span>
-          </div>
         </CardContent>
       </Card>
 
@@ -422,9 +408,9 @@ export default function OrderDetailPage() {
               <div className="space-y-2">
                 {shippingAddress.line1 ? (
                   <>
-                    <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                       {shippingAddress.line1}{shippingAddress.line2 ? `, ${shippingAddress.line2}` : ""}, {shippingAddress.city || ""}, {shippingAddress.state || ""} {shippingAddress.postalCode || ""}
-                    </p>
+                </p>
                     {shippingAddress.country && <p className="text-sm text-muted-foreground">{shippingAddress.country}</p>}
                     {shippingAddress.phone && <p className="text-sm text-muted-foreground">{shippingAddress.phone}</p>}
                     {shippingAddress.fullname && <p className="font-medium">{shippingAddress.fullname}</p>}

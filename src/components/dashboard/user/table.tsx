@@ -203,16 +203,24 @@ export function UsersTable() {
                   {users.map((user: User) => (
                     <TableRow key={user._id}>
                       <TableCell className="font-medium">
-                        {user.name}
+                        <div className="truncate" title={user.name}>
+                          {user.name}
+                        </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {user.phone}
+                        <div className="truncate" title={user.phone}>
+                          {user.phone}
+                        </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {user.email || "N/A"}
+                        <div className="truncate" title={user.email || "N/A"}>
+                          {user.email || "N/A"}
+                        </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {user.role}
+                        <div className="truncate" title={user.role}>
+                          {user.role}
+                        </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {new Date(user.createdAt).toLocaleDateString("en-GB", {

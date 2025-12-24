@@ -238,8 +238,8 @@ export function CategoryTreeSelect({
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-1.5 h-[330px] shadow-md rounded min-w-md">
-        <ScrollArea className="h-full pr-1.5">
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 h-[330px] shadow-md rounded min-w-md flex flex-col">
+        <ScrollArea className="flex-1 pr-1.5 p-1.5">
           {isLoading ? (
             <p className="text-center text-muted-foreground text-sm py-6">
               Loading categories...
@@ -252,6 +252,17 @@ export function CategoryTreeSelect({
             </p>
           )}
         </ScrollArea>
+        <div className="flex items-center justify-end border-t px-3 py-1.5">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={() => setOpen(false)}
+          >
+            OK
+          </Button>
+        </div>
       </PopoverContent>
     </Popover>
   );

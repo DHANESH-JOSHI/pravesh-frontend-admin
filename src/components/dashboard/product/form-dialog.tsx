@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronsUpDown, ImageIcon, Loader2, Plus, Trash, Upload } from "lucide-react";
+import { Check, ChevronsUpDown, ImageIcon, Loader2, Plus, Trash, Upload, X } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
@@ -30,6 +30,7 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn, generateSlug } from "@/lib/utils";
 import {
@@ -51,6 +52,8 @@ import Image from "next/image";
 import z from "zod";
 import { CategoryTreeSingleSelect } from "@/components/category-tree-single-select";
 import { BrandSingleSelect } from "@/components/brand-select";
+import { unitService } from "@/services/unit.service";
+import { Unit } from "@/types/unit";
 
 export function ProductFormDialog({
   open,
@@ -60,13 +63,17 @@ export function ProductFormDialog({
   isLoading,
 }: FormDialogProps<CreateProduct, Product>) {
   const isEditMode = !!initialData;
-  const specsArraySchema = z.array(z.object({ key: z.string(), value: z.string() })).optional();
-  const unitsArraySchema = z.array(z.object({ 
-    unit: z.string().nonempty("Unit name is required")
-  })).min(1, "At least one unit is required");
+  const specsArraySchema = z.array(z.object({ 
+    key: z.string(), 
+    value: z.union([z.string(), z.array(z.string())])
+  })).optional();
+  const variantsArraySchema = z.array(z.object({ 
+    key: z.string(), 
+    value: z.string() // Comma-separated values that will be converted to array
+  })).optional();
   const formSchema = (isEditMode ? updateProductSchema : createProductSchema).extend({
     specifications: specsArraySchema,
-    units: unitsArraySchema,
+    variants: variantsArraySchema,
   });
 
   const thumbnailRef = useRef<HTMLInputElement>(null);
@@ -96,8 +103,17 @@ export function ProductFormDialog({
       thumbnail: undefined,
       // images: undefined,
       // features: initialData?.features || [],
-      specifications: initialData?.specifications ? Object.entries(initialData.specifications).map(([key, value]) => ({ key, value })) : [],
-      units: initialData?.units && initialData.units.length > 0 ? initialData.units : [],
+      specifications: initialData?.specifications ? Object.entries(initialData.specifications).map(([key, value]) => ({ 
+        key, 
+        value: Array.isArray(value) ? value.join(', ') : value 
+      })) : [],
+      variants: initialData?.variants ? Object.entries(initialData.variants).map(([key, value]) => ({ 
+        key, 
+        value: Array.isArray(value) ? value.join(', ') : value 
+      })) : [],
+      units: initialData?.units && initialData.units.length > 0 
+        ? initialData.units.map((u: any) => typeof u === 'object' && u !== null ? (u._id || u) : u)
+        : [],
       // minStock: initialData?.minStock || 0,
       tags: initialData?.tags || [],
       isFeatured: initialData?.isFeatured || false,
@@ -122,6 +138,11 @@ export function ProductFormDialog({
     name: "specifications"
   });
 
+  const { fields: variantFields, append: appendVariant, remove: removeVariant } = useFieldArray({
+    control: form.control,
+    name: "variants"
+  });
+
 
   useEffect(() => {
     if (initialData) {
@@ -130,8 +151,17 @@ export function ProductFormDialog({
         brandId: (initialData.brand as Brand)?._id || initialData.brand,
         categoryId: (initialData.category as Category)?._id || initialData.category,
         // features: initialData.features || [],
-        specifications: initialData.specifications ? Object.entries(initialData.specifications).map(([key, value]) => ({ key, value })) : [],
-        units: initialData.units || [],
+        specifications: initialData.specifications ? Object.entries(initialData.specifications).map(([key, value]) => ({ 
+          key, 
+          value: Array.isArray(value) ? value.join(', ') : value 
+        })) : [],
+        variants: initialData.variants ? Object.entries(initialData.variants).map(([key, value]) => ({ 
+          key, 
+          value: Array.isArray(value) ? value.join(', ') : value 
+        })) : [],
+        units: initialData.units 
+          ? initialData.units.map((u: any) => typeof u === 'object' && u !== null ? (u._id || u) : u)
+          : [],
         tags: initialData.tags || [],
         thumbnail: undefined,
         // images: undefined,
@@ -145,18 +175,53 @@ export function ProductFormDialog({
   }, [initialData, form])
 
   const handleSubmit = (data: CreateProduct) => {
-    const specsArr: { key: string; value: string }[] = Array.isArray(data.specifications)
+    const specsArr: { key: string; value: string | string[] }[] = Array.isArray(data.specifications)
       ? data.specifications
       : data.specifications
         ? Object.entries(data.specifications).map(([key, value]) => ({ key, value }))
         : [];
-    const specsRecord = specsArr.reduce((acc: Record<string, string>, s) => {
-      if (s?.key) acc[s.key] = s.value ?? "";
+    const specsRecord = specsArr.reduce((acc: Record<string, string | string[]>, s) => {
+      if (s?.key) {
+        // If value is a string, check if it contains commas (indicating array)
+        // If it contains commas, split it into an array, otherwise keep as string
+        const value = s.value ?? "";
+        if (typeof value === 'string' && value.includes(',')) {
+          // Split by comma and trim each value
+          const arrayValue = value.split(',').map(v => v.trim()).filter(v => v.length > 0);
+          acc[s.key] = arrayValue.length > 1 ? arrayValue : arrayValue[0] || "";
+        } else if (Array.isArray(value)) {
+          acc[s.key] = value;
+        } else {
+          acc[s.key] = value;
+        }
+      }
+      return acc;
+    }, {});
+
+    // Process variants - always convert to arrays
+    const variantsArr: { key: string; value: string }[] = Array.isArray(data.variants)
+      ? data.variants
+      : data.variants
+        ? Object.entries(data.variants).map(([key, value]) => ({ key, value: Array.isArray(value) ? value.join(', ') : value }))
+        : [];
+    const variantsRecord = variantsArr.reduce((acc: Record<string, string[]>, v) => {
+      if (v?.key) {
+        const value = v.value ?? "";
+        // Variants are always arrays - split comma-separated values
+        if (value.includes(',')) {
+          const arrayValue = value.split(',').map(val => val.trim()).filter(val => val.length > 0);
+          if (arrayValue.length > 0) {
+            acc[v.key] = arrayValue;
+          }
+        } else if (value.trim()) {
+          acc[v.key] = [value.trim()];
+        }
+      }
       return acc;
     }, {});
     
-    // Process units array - filter out empty units
-    const unitsArr = Array.isArray(data.units) ? data.units.filter(u => u.unit && u.unit.trim()) : [];
+    // Process units array - ensure it's an array of unit IDs
+    const unitsArr = Array.isArray(data.units) ? data.units.filter(u => u && String(u).trim()) : [];
     
     if (unitsArr.length === 0) {
       throw new Error('At least one unit is required');
@@ -166,7 +231,8 @@ export function ProductFormDialog({
       ...data,
       // features: data.features ?? [],
       specifications: specsRecord,
-      units: unitsArr,
+      variants: Object.keys(variantsRecord).length > 0 ? variantsRecord : undefined,
+      units: unitsArr.map(u => String(u)), // Ensure all are strings
     };
     onSubmit(transformedData);
   }
@@ -257,22 +323,7 @@ export function ProductFormDialog({
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="units"
-                    render={({ field }) => (
-                      <FormItem className="space-y-2">
-                        <FormLabel>Available Units *</FormLabel>
-                        <FormControl>
-                          <UnitsInput 
-                            value={field.value || []} 
-                            onChange={(units) => field.onChange(units)} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  
                   {/*<FormField
                     control={form.control}
                     name="minStock"
@@ -309,6 +360,22 @@ export function ProductFormDialog({
                           value={field.value || null}
                           action={(val) => field.onChange(val)}
                         />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="units"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Available Units *</FormLabel>
+                        <FormControl>
+                          <UnitsMultiSelect 
+                            value={field.value || []} 
+                            onChange={(unitIds) => field.onChange(unitIds)} 
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -362,6 +429,27 @@ export function ProductFormDialog({
                       </FormItem>
                     )}
                   />*/}
+                  
+                  <KeyValueFormArray name="variants" title="Variants (e.g., Size, Color)" form={form} fields={variantFields} append={appendVariant} remove={removeVariant} isVariant={true} />
+                </div>
+                {/* Right: Additional Fields */}
+                <div className="space-y-6 md:w-1/2">
+                  <KeyValueFormArray name="specifications" title="Specifications" form={form} fields={specFields} append={appendSpec} remove={removeSpec} />
+                  {/* Tags input (editable chips) */}
+                  <FormField
+                    control={form.control}
+                    name="tags"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Tags</FormLabel>
+                        <FormControl>
+                          <TagsInput value={field.value || []} onChange={field.onChange} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
                   <Card className="p-4 space-y-4">
                     <h3 className="text-lg font-medium">Flags</h3>
                     <div className="flex flex-wrap gap-6">
@@ -397,24 +485,6 @@ export function ProductFormDialog({
                       />
                     </div>
                   </Card>
-                </div>
-                {/* Right: Additional Fields */}
-                <div className="space-y-6 md:w-1/2">
-                  <KeyValueFormArray name="specifications" title="Specifications" form={form} fields={specFields} append={appendSpec} remove={removeSpec} />
-                  {/* Tags input (editable chips) */}
-                  <FormField
-                    control={form.control}
-                    name="tags"
-                    render={({ field }) => (
-                      <FormItem className="space-y-2">
-                        <FormLabel>Tags</FormLabel>
-                        <FormControl>
-                          <TagsInput value={field.value || []} onChange={field.onChange} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                   <FormField
                     control={form.control}
                     name="thumbnail"
@@ -640,86 +710,41 @@ export function BrandSearchableSelect({ value, action }: { value: string; action
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0 min-w-sm">
-        <Command shouldFilter={false}>
-          <CommandInput placeholder="Search brand..." value={inputValue} onValueChange={setInputValue} />
-          <CommandEmpty>{isLoadingBrands ? "Searching..." : "No brand found."}</CommandEmpty>
-          <CommandGroup>
-            <ScrollArea className="h-48">
-              {brands.map((brand) => (
-                <CommandItem key={brand._id} value={brand._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
-                  <Check className={cn("mr-2 h-4 w-4", value === brand._id ? "opacity-100" : "opacity-0")} />
-                  {brand.name}
-                </CommandItem>
-              ))}
-            </ScrollArea>
-          </CommandGroup>
-        </Command>
+        <div className="flex flex-col">
+          <Command shouldFilter={false} className="max-h-[200px]">
+            <div className="flex items-center border-b px-3">
+              <CommandInput placeholder="Search brand..." value={inputValue} onValueChange={setInputValue} className="flex-1 border-0" />
+            </div>
+            <CommandEmpty>{isLoadingBrands ? "Searching..." : "No brand found."}</CommandEmpty>
+            <CommandGroup>
+              <ScrollArea className="h-48">
+                {brands.map((brand) => (
+                  <CommandItem key={brand._id} value={brand._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
+                    <Check className={cn("mr-2 h-4 w-4", value === brand._id ? "opacity-100" : "opacity-0")} />
+                    {brand.name}
+                  </CommandItem>
+                ))}
+              </ScrollArea>
+            </CommandGroup>
+          </Command>
+          <div className="flex items-center justify-end border-t px-3 py-1.5 bg-background">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => setOpen(false)}
+            >
+              OK
+            </Button>
+          </div>
+        </div>
       </PopoverContent>
     </Popover>
   );
 }
 
-// export function CategorySearchableSelect({ value, action }: { value: string; action: (value: string) => void }) {
-//   const [open, setOpen] = useState(false);
-//   const [inputValue, setInputValue] = useState("");
-//   const [search, setSearch] = useState("");
-
-//   const debouncedSetSearch = useDebouncedCallback((value: string) => {
-//     setSearch(value);
-//   }, 300);
-
-//   useEffect(() => {
-//     debouncedSetSearch(inputValue);
-//   }, [inputValue, debouncedSetSearch]);
-
-//   const { data: categoriesData, isLoading: isLoadingCategories } = useQuery({
-//     queryKey: ["categories", "search", search],
-//     queryFn: () => categoryService.getAll({
-//       page: 1,
-//       limit: 20,
-//       search,
-//     }),
-//     enabled: open,
-//   });
-
-//   const { data: selectedCategoryData } = useQuery({
-//     queryKey: ["categories", value],
-//     queryFn: () => categoryService.getById(value),
-//     enabled: !!value && !open,
-//   });
-
-//   const categories: Category[] = categoriesData?.data?.categories ?? [];
-//   const selectedCategory = categories.find((p) => p._id === value) ?? selectedCategoryData?.data;
-
-//   return (
-//     <Popover open={open} onOpenChange={setOpen}>
-//       <PopoverTrigger asChild>
-//         <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between text-left" >
-//           {value ? selectedCategory?.title ?? "Select category..." : "Select category..."}
-//           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-//         </Button>
-//       </PopoverTrigger>
-//       <PopoverContent className="w-[--radix-popover-trigger-width] p-0 min-w-sm">
-//         <Command shouldFilter={false}>
-//           <CommandInput placeholder="Search category..." value={inputValue} onValueChange={setInputValue} />
-//           <CommandEmpty>{isLoadingCategories ? "Searching..." : "No category found."}</CommandEmpty>
-//           <CommandGroup>
-//             <ScrollArea className="h-48">
-//               {categories.map((category) => (
-//                 <CommandItem key={category._id} value={category._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
-//                   <Check className={cn("mr-2 h-4 w-4", value === category._id ? "opacity-100" : "opacity-0")} />
-//                   {category.title}
-//                 </CommandItem>
-//               ))}
-//             </ScrollArea>
-//           </CommandGroup>
-//         </Command>
-//       </PopoverContent>
-//     </Popover>
-//   );
-// }
-
-function KeyValueFormArray({ name, title, form, fields, append, remove }: { name: "specifications", title: string, form: any, fields: any[], append: any, remove: any }) {
+function KeyValueFormArray({ name, title, form, fields, append, remove, isVariant = false }: { name: "specifications" | "variants", title: string, form: any, fields: any[], append: any, remove: any, isVariant?: boolean }) {
   return (
     <FormItem>
       <FormLabel>{title}</FormLabel>
@@ -732,7 +757,7 @@ function KeyValueFormArray({ name, title, form, fields, append, remove }: { name
               render={({ field }) => (
                 <FormItem className="grow">
                   <FormControl>
-                    <Input placeholder="Key" {...field} />
+                    <Input placeholder={isVariant ? "Variant Name (e.g., Color, Size)" : "Key"} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -744,7 +769,15 @@ function KeyValueFormArray({ name, title, form, fields, append, remove }: { name
               render={({ field }) => (
                 <FormItem className="grow">
                   <FormControl>
-                    <Input placeholder="Value" {...field} />
+                    <Input 
+                      placeholder={isVariant ? "Values (comma-separated, e.g., S, M, L)" : "Value (use comma to separate multiple values)"}
+                      {...field}
+                      value={Array.isArray(field.value) ? field.value.join(', ') : field.value || ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        field.onChange(val);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -770,55 +803,112 @@ function KeyValueFormArray({ name, title, form, fields, append, remove }: { name
   )
 }
 
-function UnitsInput({ value, onChange }: { value: { unit: string }[]; onChange: (v: { unit: string }[]) => void }) {
-  const [input, setInput] = useState("");
-  const units = Array.isArray(value) ? value : [];
+function UnitsMultiSelect({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  const [open, setOpen] = useState(false);
+  const selectedUnitIds = Array.isArray(value) ? value : [];
 
-  function addUnitFromInput() {
-    const unitName = input.trim();
-    if (!unitName) return;
-    // Check if unit already exists (case-insensitive)
-    const unitExists = units.some(u => u.unit.toLowerCase() === unitName.toLowerCase());
-    if (!unitExists) {
-      onChange([...units, { unit: unitName }]);
-    }
-    setInput("");
-  }
+  const { data: unitsData, isLoading } = useQuery({
+    queryKey: ["units"],
+    queryFn: async () => {
+      const response = await unitService.getAll({ limit: 1000, isDeleted: "false" });
+      return response.data?.units || [];
+    },
+  });
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      addUnitFromInput();
-    } else if (e.key === "Backspace" && input === "" && units.length) {
-      // remove last unit on backspace when input empty
-      onChange(units.slice(0, -1));
+  const units: Unit[] = unitsData || [];
+
+  const selectedUnits = units.filter(u => selectedUnitIds.includes(u._id));
+
+  const toggleUnit = (unitId: string) => {
+    if (selectedUnitIds.includes(unitId)) {
+      onChange(selectedUnitIds.filter(id => id !== unitId));
+    } else {
+      onChange([...selectedUnitIds, unitId]);
     }
-  }
+  };
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-2 mb-2">
-        {units.map((u, i) => (
-          <span key={i} className="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-muted/10 text-sm">
-            <span>{u.unit}</span>
-            <button
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between"
+        >
+          {selectedUnits.length > 0
+            ? `${selectedUnits.length} unit(s) selected`
+            : "Select units..."}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-full p-0" align="start">
+        <div className="flex flex-col">
+          <Command className="max-h-[280px]">
+            <div className="flex items-center border-b px-3">
+              <CommandInput placeholder="Search units..." className="flex-1 border-0" />
+            </div>
+            <CommandEmpty>
+              {isLoading ? "Loading units..." : "No units found."}
+            </CommandEmpty>
+            <CommandGroup>
+              <ScrollArea className="h-64">
+                {units.map((unit) => (
+                  <CommandItem
+                    key={unit._id}
+                    value={unit.name}
+                    onSelect={() => {
+                      toggleUnit(unit._id);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        selectedUnitIds.includes(unit._id)
+                          ? "opacity-100"
+                          : "opacity-0"
+                      )}
+                    />
+                    {unit.name}
+                  </CommandItem>
+                ))}
+              </ScrollArea>
+            </CommandGroup>
+          </Command>
+          <div className="flex items-center justify-end border-t px-3 py-1.5 bg-background">
+            <Button
               type="button"
-              className="text-destructive text-xs"
-              onClick={() => onChange(units.filter((x, idx) => idx !== i))}
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => setOpen(false)}
             >
-              ×
-            </button>
-          </span>
-        ))}
-      </div>
-      <Input
-        placeholder="Type unit (e.g., kg, packet, piece) and press Enter"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onBlur={() => addUnitFromInput()}
-      />
-    </div>
+              OK
+            </Button>
+          </div>
+        </div>
+      </PopoverContent>
+      {selectedUnits.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {selectedUnits.map((unit) => (
+            <Badge
+              key={unit._id}
+              variant={"secondary"}
+              className="inline-flex items-center gap-1.5 pr-1"
+            >
+              <span>{unit.name}</span>
+              <button
+                type="button"
+                className="ml-0.5 rounded-full hover:bg-destructive/20 p-0.5 transition-colors"
+                onClick={() => toggleUnit(unit._id)}
+              >
+                <X className="h-3 w-3 text-destructive" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
+    </Popover>
   );
 }
 
@@ -888,16 +978,16 @@ function TagsInput({ value, onChange }: { value: string[]; onChange: (v: string[
     <div>
       <div className="flex flex-wrap gap-2 mb-2">
         {tags.map((t, i) => (
-          <span key={i} className="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-muted/10 text-sm">
+          <Badge key={i} variant="secondary" className="inline-flex items-center gap-1.5 pr-1">
             <span>{t}</span>
             <button
               type="button"
-              className="text-destructive text-xs"
+              className="ml-0.5 rounded-full hover:bg-destructive/20 p-0.5 transition-colors"
               onClick={() => onChange(tags.filter((x) => x !== t))}
             >
-              ×
+              <X className="h-3 w-3 text-destructive" />
             </button>
-          </span>
+          </Badge>
         ))}
       </div>
       <Input

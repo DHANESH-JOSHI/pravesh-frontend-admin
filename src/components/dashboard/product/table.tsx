@@ -223,20 +223,21 @@ export function ProductsTable() {
       </div>
 
       <div>
-        <div className="relative rounded border bg-background/50  overflow-hidden">
+        <div className="relative rounded border bg-background/50 overflow-hidden">
           <CommonOverlaySpinner show={isFetching && !isLoading} />
-          <Table>
+          <div className="overflow-x-auto">
+          <Table className="w-full">
             <TableHeader className="bg-primary/5">
               <TableRow className="[&>th]:py-3">
-                <TableHead className="w-24">Thumbnail</TableHead>
+                <TableHead className="w-16 sm:w-20">Thumbnail</TableHead>
                 <TableHead>SKU</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Brand</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Unit</TableHead>
-                <TableHead>New Arrival</TableHead>
-                <TableHead>Featured</TableHead>
-                <TableHead className="w-16 text-center">Actions</TableHead>
+                <TableHead className="text-center">New Arrival</TableHead>
+                <TableHead className="text-center">Featured</TableHead>
+                <TableHead className="w-20 text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -270,15 +271,22 @@ export function ProductsTable() {
                   const brandName = typeof product.brand === "string" ? product.brand : product.brand?.name ?? "N/A";
                   const categoryName = typeof product.category === "string" ? product.category : (product.category as Category)?.title ?? "N/A";
                   const units = product.units || [];
-                  const unitDisplay = units.length > 0 
-                    ? units.map(u => u.unit).join(", ")
+                  // Helper function to get unit name from either ID or populated object
+                  const getUnitName = (unit: any): string => {
+                    if (typeof unit === 'string') return unit; // It's an ID
+                    if (typeof unit === 'object' && unit !== null && unit.name) return unit.name;
+                    return '';
+                  };
+                  const unitNames = units.map(getUnitName).filter(name => name);
+                  const unitDisplay = unitNames.length > 0 
+                    ? unitNames.join(", ")
                     : "No units";
                   return (
                     <TableRow
                       key={product._id}
                       className="group transition-colors hover:bg-muted/40"
                     >
-                      <TableCell>
+                      <TableCell className="w-16 sm:w-20">
                         {product.thumbnail ? (
                           <img
                             src={product.thumbnail || "/placeholder.svg"}
@@ -293,34 +301,46 @@ export function ProductsTable() {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="text-left">{product.sku}</TableCell>
-                      <TableCell className="font-medium max-w-[256px] text-left">
+                      <TableCell className="font-mono text-sm">
+                        <div className="truncate" title={product.sku}>
+                          {product.sku}
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-medium">
                         <div className="truncate" title={product.name}>
                           {product.name}
                         </div>
                       </TableCell>
-                      <TableCell className="text-muted-foreground truncate w-20">{brandName}</TableCell>
-                      <TableCell className="text-muted-foreground truncate w-20">{categoryName}</TableCell>
                       <TableCell className="text-muted-foreground">
-                        <div className="flex flex-col">
-                          {units.length > 0 ? (
-                            <span className="font-medium">{units.map(u => u.unit).join(", ")}</span>
+                        <div className="truncate" title={brandName}>
+                          {brandName}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        <div className="truncate" title={categoryName}>
+                          {categoryName}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        <div className="truncate" title={unitNames.join(", ")}>
+                          {unitNames.length > 0 ? (
+                            <span className="font-medium text-xs sm:text-sm">{unitNames.join(", ")}</span>
                           ) : (
-                            <span className="text-muted-foreground">No units</span>
+                            <span className="text-muted-foreground text-xs">No units</span>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="text-center font-semibold">
-                        <Badge variant="outline" className="bg-background/40">
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className="bg-background/40 text-xs">
                           {product.isNewArrival ? "Yes" : "No"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-center font-semibold">
-                        <Badge variant="outline" className="bg-background/40">
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className="bg-background/40 text-xs">
                           {product.isFeatured ? "Yes" : "No"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="px-4 text-center">
+                      <TableCell className="w-20 px-2 text-center">
                         <div className="flex items-center gap-2">
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -375,6 +395,7 @@ export function ProductsTable() {
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
 
         <PaginationControls

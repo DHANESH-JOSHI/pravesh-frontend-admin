@@ -53,7 +53,6 @@ export default function CartDetailPage() {
   }
 
   const user = (cart.user as Partial<UserType>) || {};
-  const totalAmount = 0;
   const totalItems = cart.items.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
@@ -114,7 +113,6 @@ export default function CartDetailPage() {
                 {/*<TableHead className="text-right">Final Price</TableHead>*/}
                 <TableHead className="text-right">Unit</TableHead>
                 <TableHead className="text-right">Qty</TableHead>
-                <TableHead className="text-right">Line Total</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -143,13 +141,11 @@ export default function CartDetailPage() {
                         <TableCell>N/A</TableCell>
                         <TableCell className="text-right">{item.unit || 'N/A'}</TableCell>
                         <TableCell className="text-right">{item.quantity}</TableCell>
-                        <TableCell className="text-right font-medium">₹0.00</TableCell>
                       </TableRow>
                     );
                   }
                   const brand = product.brand as Partial<Brand> | undefined;
                   const category = product.category as Partial<Category> | undefined;
-                  const lineTotal = 0;
                   return (
                     <TableRow key={idx}>
                       <TableCell>
@@ -197,18 +193,12 @@ export default function CartDetailPage() {
                       {/*<TableCell className="text-right text-muted-foreground">₹{(product.finalPrice ?? 0).toFixed(2)}</TableCell>*/}
                       <TableCell className="text-right">{item.unit || 'N/A'}</TableCell>
                       <TableCell className="text-right">{item.quantity}</TableCell>
-                      <TableCell className="text-right font-medium">₹{lineTotal.toFixed(2)}</TableCell>
                     </TableRow>
                   );
                 })
               )}
             </TableBody>
           </Table>
-          <Separator className="my-4" />
-          <div className="flex justify-between items-center">
-            <span className="text-lg font-semibold">Total:</span>
-            <span className="text-lg font-bold">₹{totalAmount.toFixed(2)}</span>
-          </div>
         </CardContent>
       </Card>
 

@@ -194,11 +194,19 @@ export default function ProductDetailPage() {
                   <label className="text-sm font-medium">Available Units</label>
                   {product.units && product.units.length > 0 ? (
                     <div className="flex flex-wrap gap-2 mt-2">
-                      {product.units.map((unit, index) => (
-                        <Badge key={index} variant="secondary" className="text-sm">
-                          {unit.unit}
-                        </Badge>
-                      ))}
+                      {product.units.map((unit: any, index: number) => {
+                        // Handle both populated objects and IDs
+                        const unitName = typeof unit === 'object' && unit !== null && unit.name 
+                          ? unit.name 
+                          : typeof unit === 'string' 
+                          ? unit 
+                          : 'Unknown';
+                        return (
+                          <Badge key={index} variant="secondary" className="text-sm">
+                            {unitName}
+                          </Badge>
+                        );
+                      })}
                     </div>
                   ) : (
                     <p className="text-muted-foreground mt-2">No units defined</p>
@@ -376,6 +384,42 @@ export default function ProductDetailPage() {
         )}
       </div>*/}
 
+      {/* Variants */}
+      {
+        product.variants && 
+        typeof product.variants === 'object' && 
+        !Array.isArray(product.variants) &&
+        Object.keys(product.variants).length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Available Options</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <dl className="space-y-3">
+                {Object.entries(product.variants as Record<string, string[]>).map(([key, values]) => (
+                  <div key={key} className="py-2 border-b border-border/40 last:border-0">
+                    <dt className="font-medium text-sm capitalize mb-2">{key}:</dt>
+                    <dd className="flex flex-wrap gap-2">
+                      {Array.isArray(values) ? (
+                        values.map((value, index) => (
+                          <Badge key={index} variant="secondary" className="text-sm">
+                            {value}
+                          </Badge>
+                        ))
+                      ) : (
+                        <Badge variant="secondary" className="text-sm">
+                          {String(values)}
+                        </Badge>
+                      )}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </CardContent>
+          </Card>
+        )
+      }
+
       {/* Specifications */}
       {
         product.specifications && Object.keys(product.specifications).length > 0 && (
@@ -392,7 +436,9 @@ export default function ProductDetailPage() {
                       }`}
                   >
                     <span className="font-medium text-sm">{key}</span>
-                    <span className="text-sm text-muted-foreground font-mono">{value}</span>
+                    <span className="text-sm text-muted-foreground font-mono">
+                      {Array.isArray(value) ? value.join(', ') : value}
+                    </span>
                   </div>
                 ))}
               </div>

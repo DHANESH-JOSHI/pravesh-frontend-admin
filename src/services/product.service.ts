@@ -109,6 +109,7 @@ class ProductService {
     if (data.thumbnail) formData.append('thumbnail', data.thumbnail);
     if (data.tags) formData.append('tags', JSON.stringify(data.tags));
     // if (data.features) formData.append('features', JSON.stringify(data.features));
+    if (data.variants) formData.append('variants', JSON.stringify(data.variants));
     if (data.specifications) formData.append('specifications', JSON.stringify(data.specifications));
     if (data.isFeatured) formData.append('isFeatured', data.isFeatured.toString());
     if (data.isNewArrival) formData.append('isNewArrival', data.isNewArrival.toString());
@@ -140,6 +141,7 @@ class ProductService {
     if (data.thumbnail) formData.append('thumbnail', data.thumbnail);
     if (data.tags) formData.append('tags', JSON.stringify(data.tags));
     // if (data.features) formData.append('features', JSON.stringify(data.features));
+    if (data.variants) formData.append('variants', JSON.stringify(data.variants));
     if (data.specifications) formData.append('specifications', JSON.stringify(data.specifications));
     if (data.isFeatured) formData.append('isFeatured', data.isFeatured.toString());
     if (data.isNewArrival) formData.append('isNewArrival', data.isNewArrival.toString());
