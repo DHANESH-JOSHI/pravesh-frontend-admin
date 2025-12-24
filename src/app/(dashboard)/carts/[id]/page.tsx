@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, User, Package, DollarSign } from "lucide-react";
+import { ArrowLeft, User, Package, DollarSign, Loader } from "lucide-react";
 import { Link } from "next-view-transitions"
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,14 +24,7 @@ export default function CartDetailPage() {
 
   const cart = data?.data as Cart;
   if (isLoading) {
-    return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-        <div className="animate-pulse">
-          <div className="h-8 rounded w-1/4 mb-4"></div>
-          <div className="h-64 rounded"></div>
-        </div>
-      </div>
-    );
+    return <Loader />
   }
 
   if (error || !cart) {

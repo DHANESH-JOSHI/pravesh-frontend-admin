@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft, Calendar, Loader } from "lucide-react";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import { useParams } from "next/navigation";
 import Image from "next/image";
@@ -27,15 +27,7 @@ export default function BlogDetailPage() {
   const blog: Blog | undefined = data?.data;
 
   if (isLoading) {
-    return (
-      <div className="p-4 max-w-6xl mx-auto space-y-6">
-        <div className="animate-pulse h-8 w-1/3 bg-muted rounded" />
-        <div className="grid grid-cols-1 gap-6">
-          <div className="h-64 bg-muted rounded" />
-          <div className="h-40 bg-muted rounded" />
-        </div>
-      </div>
-    );
+    return <Loader />
   }
 
   if (isError || !blog) {
