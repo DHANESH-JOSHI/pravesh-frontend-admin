@@ -35,7 +35,7 @@ import { User } from "@/types"
 const allItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard, roles: ["admin"] },
   { title: "Activities", url: "/activities", icon: History, roles: ["admin"] },
-  { title: "Logs", url: "/logs", icon: ScrollText, roles: ["admin", "staff"] },
+  { title: "Logs", url: "/logs", icon: ScrollText, roles: ["admin"] },
   { title: "Categories", url: "/categories", icon: FolderOpen, roles: ["admin"] },
   { title: "Brands", url: "/brands", icon: Building2, roles: ["admin"] },
   { title: "Units", url: "/units", icon: Ruler, roles: ["admin"] },
@@ -52,7 +52,7 @@ const allItems = [
 
 export const AppSidebar = ({ user }: { user: User }) => {
   const pathname = usePathname()
-  
+
   const items = allItems.filter(item => {
     if (!item.roles) return true;
     return item.roles.includes(user.role || "user");
