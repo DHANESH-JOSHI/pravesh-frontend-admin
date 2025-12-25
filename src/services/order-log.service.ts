@@ -3,7 +3,7 @@ import { ApiResponse } from "@/types";
 
 export interface OrderLog {
   _id: string;
-  order: string | { _id: string; status: string; user: string };
+  order: string | { _id: string; status: string; orderNumber?: string; user: string };
   admin: {
     _id: string;
     name: string;
@@ -20,74 +20,44 @@ export interface OrderLog {
   updatedAt: string;
 }
 
-export interface UserLogAnalytics {
-  summary: {
-    totalActions: number;
-    views: number;
-    statusUpdates: number;
-    itemUpdates: number;
-    feedbackUpdates: number;
-    listViews: number;
-  };
-  actionBreakdown: Array<{
-    action: string;
-    count: number;
-  }>;
-  dailyActivity: Array<{
-    date: string;
-    count: number;
-    views: number;
-    updates: number;
-  }>;
-  hourlyActivity: Array<{
-    hour: number;
-    count: number;
-  }>;
-  mostViewedOrders: Array<{
-    orderId: string;
-    viewCount: number;
-    lastViewed: string;
-  }>;
-  period: number;
+export interface OrderLogQueryOptions {
+  page?: number;
+  limit?: number;
+  orderId?: string;
+  staffId?: string;
+  action?: string;
+  field?: string;
+  search?: string;
+}
+
+export interface OrderLogsResponse {
+  logs: OrderLog[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 export const orderLogService = {
+  async getAll(filters: OrderLogQueryOptions) {
+    const response = await instance.get<ApiResponse<OrderLogsResponse>>(
+      "/order-logs",
+      { params: filters }
+    );
+    return response.data;
+  },
+
+  async getById(logId: string) {
+    const response = await instance.get<ApiResponse<OrderLog>>(
+      `/order-logs/${logId}`
+    );
+    return response.data;
+  },
+
   async getOrderLogs(orderId: string, limit = 50) {
-    const response = await instance.get<ApiResponse<OrderLog[]>>(
-      `/order-logs/order/${orderId}`,
-      { params: { limit } }
-    );
-    return response.data;
-  },
-
-  async getRecentLogs(limit = 50, page = 1) {
-    const response = await instance.get<ApiResponse<{
-      logs: OrderLog[];
-      hasMore: boolean;
-      total: number;
-    }>>(
-      "/order-logs/recent",
-      { params: { limit, page } }
-    );
-    return response.data;
-  },
-
-  async getLogsByStaff(staffId: string, limit = 50, page = 1) {
-    const response = await instance.get<ApiResponse<{
-      logs: OrderLog[];
-      hasMore: boolean;
-      total: number;
-    }>>(
-      `/order-logs/staff/${staffId}`,
-      { params: { limit, page } }
-    );
-    return response.data;
-  },
-
-  async getUserLogAnalytics(staffId: string, days = 30) {
-    const response = await instance.get<ApiResponse<UserLogAnalytics>>(
-      `/order-logs/staff/${staffId}/analytics`,
-      { params: { days } }
+    const response = await instance.get<ApiResponse<OrderLogsResponse>>(
+      `/order-logs`,
+      { params: { orderId, limit, page: 1 } }
     );
     return response.data;
   },

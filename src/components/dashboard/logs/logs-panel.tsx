@@ -24,11 +24,14 @@ export function OrderLogsPanel() {
   } = useInfiniteQuery({
     queryKey: ["recent-order-logs"],
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await orderLogService.getRecentLogs(50, pageParam as number);
+      const response = await orderLogService.getAll({
+        page: pageParam as number,
+        limit: 50,
+      });
       return response.data;
     },
     getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage || !lastPage.hasMore) return undefined;
+      if (!lastPage || lastPage.page >= lastPage.totalPages) return undefined;
       return allPages.length + 1;
     },
     initialPageParam: 1,

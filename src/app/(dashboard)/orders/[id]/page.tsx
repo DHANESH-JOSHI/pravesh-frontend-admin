@@ -18,8 +18,7 @@ import { useState } from "react";
 import Loader from "@/components/ui/loader";
 import { invalidateOrderQueries } from "@/lib/invalidate-queries";
 import { orderLogService } from "@/services/order-log.service";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { LogItem } from "@/components/dashboard/logs/log-item";
+import { OrderLogsTable } from "@/components/dashboard/logs/logs-table";
 import { formatDistanceToNow } from "date-fns";
 import { DetailPageHeader } from "@/components/dashboard/common/detail-page-header";
 
@@ -150,6 +149,7 @@ export default function OrderDetailPage() {
 
   const STATUS_COLORS: Record<string, string> = {
     received: "bg-orange-100 text-orange-800",
+    accepted: "bg-amber-100 text-amber-800",
     approved: "bg-purple-100 text-purple-800",
     confirmed: "bg-yellow-100 text-yellow-800",
     shipped: "bg-blue-100 text-blue-800",
@@ -175,7 +175,7 @@ export default function OrderDetailPage() {
         }
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">User</CardTitle>
@@ -213,6 +213,7 @@ export default function OrderDetailPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="received"><Badge className={getStatusColor("received")}>Received</Badge></SelectItem>
+                <SelectItem value="accepted"><Badge className={getStatusColor("accepted")}>Accepted</Badge></SelectItem>
                 <SelectItem value="approved"><Badge className={getStatusColor("approved")}>Approved</Badge></SelectItem>
                 <SelectItem value="confirmed"><Badge className={getStatusColor("confirmed")}>Confirmed</Badge></SelectItem>
                 <SelectItem value="cancelled"><Badge className={getStatusColor("cancelled")}>Cancelled</Badge></SelectItem>
@@ -492,7 +493,6 @@ export default function OrderDetailPage() {
                       : undefined;
                     const isLast = index === sortedHistory.length - 1;
                     const isCurrentStatus = item.status.toLowerCase() === order.status.toLowerCase();
-                    const prevItem = index > 0 ? sortedHistory[index - 1] : null;
                     
                     return (
                       <div key={`${item.status}-${item.timestamp}-${index}`} className="relative flex items-start gap-4">
@@ -511,17 +511,6 @@ export default function OrderDetailPage() {
                             <Badge className={getStatusColor(item.status)}>
                               {item.status.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
                             </Badge>
-                            {prevItem && (
-                              <>
-                                <span className="text-xs text-muted-foreground">from</span>
-                                <Badge variant="outline" className="text-xs">
-                                  {prevItem.status.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
-                                </Badge>
-                              </>
-                            )}
-                            {isCurrentStatus && (
-                              <span className="text-xs text-muted-foreground">(Current)</span>
-                            )}
                           </div>
                           <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
                             <div className="flex items-center gap-1">
@@ -572,28 +561,8 @@ export default function OrderDetailPage() {
       </Card>
 
       {/* Order Logs */}
-      {logsData?.data && logsData.data.length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <FileText className="w-4 h-4" />
-                Order Activity Log
-              </CardTitle>
-              <Badge variant="outline" className="text-xs">{logsData.data.length}</Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <ScrollArea className="h-[400px] w-full">
-              <div className="space-y-1.5 pr-2">
-                {logsData.data.map((log) => (
-                  <LogItem key={log._id} log={log} currentOrderId={orderId} />
-                ))}
-              </div>
-              <ScrollBar orientation="vertical" />
-            </ScrollArea>
-          </CardContent>
-        </Card>
+      {logsData?.data?.logs && logsData.data.logs.length > 0 && (
+        <OrderLogsTable orderId={orderId} showFilters={true} />
       )}
 
       <OrderFormDialog

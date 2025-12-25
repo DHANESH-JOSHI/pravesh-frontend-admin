@@ -25,6 +25,7 @@ import {
   Settings,
   Ruler,
   History,
+  ScrollText,
 } from "lucide-react"
 import { NavUser } from "./nav-user"
 import { Link } from "next-view-transitions"
@@ -34,6 +35,7 @@ import { User } from "@/types"
 const allItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard, roles: ["admin"] },
   { title: "Activities", url: "/activities", icon: History, roles: ["admin"] },
+  { title: "Logs", url: "/logs", icon: ScrollText, roles: ["admin", "staff"] },
   { title: "Categories", url: "/categories", icon: FolderOpen, roles: ["admin"] },
   { title: "Brands", url: "/brands", icon: Building2, roles: ["admin"] },
   { title: "Units", url: "/units", icon: Ruler, roles: ["admin"] },

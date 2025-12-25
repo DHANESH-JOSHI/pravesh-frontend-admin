@@ -21,7 +21,7 @@ import { userService } from "@/services/user.service";
 import { User as UserType } from "@/types/user";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import Loader from "@/components/ui/loader";
-import { StaffLogsPanel } from "@/components/dashboard/user/staff-logs-panel";
+import { OrderLogsTable } from "@/components/dashboard/logs/logs-table";
 import { DetailPageHeader } from "@/components/dashboard/common/detail-page-header";
 
 export default function UserDetailPage() {
@@ -447,7 +447,7 @@ export default function UserDetailPage() {
 
       {/* Staff Recent Logs */}
       {user.role === "staff" && (
-        <StaffLogsPanel staffId={user._id} />
+        <OrderLogsTable staffId={user._id} showFilters={true} />
       )}
 
       {/* No Relations Message */}

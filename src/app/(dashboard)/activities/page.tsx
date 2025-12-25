@@ -1,7 +1,7 @@
 "use client";
 
 import { PageHeader } from "@/components/dashboard/common/page-header";
-import { OrderLogsPanel } from "@/components/dashboard/order/order-logs-panel";
+import { OrderLogsPanel } from "@/components/dashboard/logs/logs-panel";
 import { useQuery } from "@tanstack/react-query";
 import instance from "@/lib/axios";
 import { ApiResponse } from "@/types";
@@ -72,20 +72,17 @@ export default function OrderLogsPage() {
   const [days, setDays] = useState("7");
   const [dailyDays, setDailyDays] = useState("30");
 
-  // Single unified API call instead of 5 separate calls
-  // Auto-refresh every 30 seconds (analytics don't need real-time updates like activity logs)
   const { data: analytics, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["order-logs-analytics", "all", days, dailyDays],
     queryFn: async () => {
       const response = await instance.get<ApiResponse<AllAnalytics>>(
-        `/order-logs/analytics/all`,
+        `/order-logs/analytics`,
         { params: { days, dailyDays } }
       );
       return response.data.data;
     },
   });
 
-  // Extract data from unified response
   const staffActivity = analytics?.staffActivity;
   const actionBreakdown = analytics?.actionBreakdown;
   const hourlyActivity = analytics?.hourlyActivity;
@@ -133,14 +130,6 @@ export default function OrderLogsPage() {
   };
 
   const actionBreakdownOption = {
-    // title: {
-    //   text: "Action Distribution",
-    //   left: "5%",
-    //   top: "2%",
-    //   textStyle: { fontSize: 14, fontWeight: 800 },
-    //   textAlign: "left",
-    //   padding: [0, 0, 15, 0],
-    // },
     tooltip: {
       trigger: "item",
       formatter: "{b}: {c} ({d}%)",

@@ -75,6 +75,7 @@ export function OrdersTable() {
                 <SelectContent>
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="received">Received</SelectItem>
+                  <SelectItem value="accepted">Accepted</SelectItem>
                   <SelectItem value="approved">Approved</SelectItem>
                   <SelectItem value="confirmed">Confirmed</SelectItem>
                   <SelectItem value="shipped">Shipped</SelectItem>

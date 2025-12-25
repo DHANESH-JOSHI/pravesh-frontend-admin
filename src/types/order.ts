@@ -5,6 +5,7 @@ import { PaginatedData, User } from ".";
 
 export const orderStatusSchema = z.enum([
   "received",
+  "accepted",
   "approved",
   "cancelled",
   "confirmed",
@@ -46,6 +47,7 @@ export type Order = {
   image?: string;
   feedback?: string;
   orderNumber?: string; // Display number in format ORD-YYYY-MM-DD-NNNNNN
+  acceptedBy?: string | Partial<User>;
   createdAt: string;
   updatedAt: string;
 }

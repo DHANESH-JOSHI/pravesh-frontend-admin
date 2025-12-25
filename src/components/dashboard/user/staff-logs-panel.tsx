@@ -25,11 +25,15 @@ export function StaffLogsPanel({ staffId }: StaffLogsPanelProps) {
   } = useInfiniteQuery({
     queryKey: ["staff-logs", staffId],
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await orderLogService.getLogsByStaff(staffId, 50, pageParam as number);
+      const response = await orderLogService.getAll({
+        page: pageParam as number,
+        limit: 50,
+        staffId: staffId,
+      });
       return response.data;
     },
     getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage || !lastPage.hasMore) return undefined;
+      if (!lastPage || lastPage.page >= lastPage.totalPages) return undefined;
       return allPages.length + 1;
     },
     initialPageParam: 1,
