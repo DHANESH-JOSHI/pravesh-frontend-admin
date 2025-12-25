@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { CustomAlertDialog } from "@/components/dashboard/common/custom-alert-dialog";
 import { useState } from "react";
 import { invalidateMessageQueries } from "@/lib/invalidate-queries";
+import { DetailPageHeader } from "@/components/dashboard/common/detail-page-header";
 
 export default function MessageDetailPage() {
   const router = useTransitionRouter();
@@ -63,7 +64,7 @@ export default function MessageDetailPage() {
 
   if (error || !message) {
     return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
+      <div className="flex flex-1 flex-col gap-4 sm:gap-6 sm:max-w-6xl mx-auto w-full p-3 sm:p-4 lg:p-6 min-w-0 overflow-x-hidden">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600">Message not found</h1>
           <p className="text-muted-foreground">The message you're looking for doesn't exist.</p>
@@ -79,41 +80,39 @@ export default function MessageDetailPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={() => router.back()}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <h1 className="text-xl font-bold">{message.subject || "Message Details"}</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant={message.status === "resolved" ? "default" : "secondary"}>
-            {message.status === "resolved" ? "Resolved" : "Open"}
-          </Badge>
-          {message.status === "open" && (
+    <div className="flex flex-1 flex-col gap-4 sm:gap-6 sm:max-w-6xl mx-auto w-full p-3 sm:p-4 lg:p-6 min-w-0 overflow-x-hidden">
+      <DetailPageHeader
+        title={message.subject}
+        moduleName="Message"
+        badge={{
+          label: message.status === "resolved" ? "Resolved" : "Open",
+          variant: message.status === "resolved" ? "default" : "secondary",
+        }}
+        actions={
+          <>
+            {message.status === "open" && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => resolveMutation.mutate(message._id)}
+                disabled={resolveMutation.isPending}
+              >
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                Mark as Resolved
+              </Button>
+            )}
             <Button
-              variant="outline"
+              variant="destructive"
               size="sm"
-              onClick={() => resolveMutation.mutate(message._id)}
-              disabled={resolveMutation.isPending}
+              onClick={() => setDeleteDialogOpen(true)}
+              disabled={deleteMutation.isPending}
             >
-              <CheckCircle2 className="h-4 w-4 mr-2" />
-              Mark as Resolved
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
             </Button>
-          )}
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => setDeleteDialogOpen(true)}
-            disabled={deleteMutation.isPending}
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
-          </Button>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* Message Details */}
       <Card>

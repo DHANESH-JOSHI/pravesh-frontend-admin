@@ -26,6 +26,7 @@ import { addressService } from "@/services/address.service";
 import { Order } from "@/types/order";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import Loader from "@/components/ui/loader";
+import { DetailPageHeader } from "@/components/dashboard/common/detail-page-header";
 
 export default function AddressDetailPage() {
   const router = useTransitionRouter()
@@ -54,7 +55,7 @@ export default function AddressDetailPage() {
 
   if (error || !address) {
     return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
+      <div className="flex flex-1 flex-col gap-4 sm:gap-6 sm:max-w-6xl mx-auto w-full p-3 sm:p-4 lg:p-6 min-w-0 overflow-x-hidden">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600">Address not found</h1>
           <p className="text-muted-foreground">The address you're looking for doesn't exist.</p>
@@ -70,19 +71,14 @@ export default function AddressDetailPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={() => router.back()} >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <h1 className="text-xl font-bold">Address Details</h1>
-        </div>
-        <Badge variant={address.isDeleted ? "destructive" : "secondary"}>
-          {address.isDeleted ? "Deleted" : "Active"}
-        </Badge>
-      </div>
+    <div className="flex flex-1 flex-col gap-4 sm:gap-6 sm:max-w-6xl mx-auto w-full p-3 sm:p-4 lg:p-6 min-w-0 overflow-x-hidden">
+      <DetailPageHeader
+        moduleName="Address"
+        badge={{
+          label: address.isDeleted ? "Deleted" : "Active",
+          variant: address.isDeleted ? "destructive" : "secondary",
+        }}
+      />
 
       {/* Address Details */}
       <Card>
@@ -93,7 +89,7 @@ export default function AddressDetailPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium">Full Name</label>

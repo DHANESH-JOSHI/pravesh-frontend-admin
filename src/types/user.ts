@@ -1,5 +1,5 @@
 import z from "zod";
-import { Address, Cart, Order, PaginatedData, Review, Wishlist } from ".";
+import { Address, Order, PaginatedData, Review } from ".";
 
 export type User = {
   _id: string;
@@ -13,9 +13,7 @@ export type User = {
   createdAt: string;
   updatedAt: string;
   // relations
-  cart?: Partial<Cart>;
   addresses?: Partial<Address>[];
-  wishlist?: Partial<Wishlist>;
   orders?: Partial<Order>[];
   reviews?: Partial<Review>[];
 }

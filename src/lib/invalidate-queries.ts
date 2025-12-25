@@ -407,43 +407,6 @@ export function invalidateReviewQueries(
   queryClient.invalidateQueries({ queryKey: ["reviews"], exact: false });
 }
 
-/**
- * Cart-related invalidation
- * Matches backend: CART_BY_ID, CART_BY_USER_ANY, CART_SUMMARY_BY_USER, USER_ANY
- */
-export function invalidateCartQueries(
-  queryClient: QueryClient,
-  params: {
-    cartId?: MaybeString;
-    userId?: MaybeString;
-  } = {}
-) {
-  const { cartId, userId } = params;
-  
-  // Invalidate specific cart (matches: cart:id:${cartId})
-  if (cartId) {
-    queryClient.invalidateQueries({ queryKey: ["cart", "id", cartId] });
-  }
-  
-  // Invalidate user-specific carts (matches: cart:user:${userId}*)
-  if (userId) {
-    queryClient.invalidateQueries({ queryKey: ["cart", "user", userId], exact: false });
-  }
-  
-  // Invalidate cart summary (matches: cart:summary:${userId})
-  if (userId) {
-    queryClient.invalidateQueries({ queryKey: ["cart", "summary", userId] });
-  }
-  
-  // Invalidate all cart list variations (matches: carts*)
-  queryClient.invalidateQueries({ queryKey: ["carts"], exact: false });
-  
-  // Invalidate user cache (matches: user:${userId}*)
-  if (userId) {
-    queryClient.invalidateQueries({ queryKey: ["user", userId], exact: false });
-    queryClient.invalidateQueries({ queryKey: ["user"], exact: false });
-  }
-}
 
 
 /**
@@ -486,23 +449,3 @@ export function invalidateUserQueries(
   queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
 }
 
-/**
- * Wishlist-related invalidation
- * Matches backend: WISHLIST_BY_USER_ANY, USER_ANY
- */
-export function invalidateWishlistQueries(
-  queryClient: QueryClient,
-  userId?: MaybeString
-) {
-  // Invalidate user-specific wishlist (matches: wishlist:user:${userId}*)
-  if (userId) {
-    queryClient.invalidateQueries({ queryKey: ["wishlist", "user", userId], exact: false });
-    queryClient.invalidateQueries({ queryKey: ["wishlist"], exact: false });
-  }
-  
-  // Invalidate user cache (matches: user:${userId}*)
-  if (userId) {
-    queryClient.invalidateQueries({ queryKey: ["user", userId], exact: false });
-    queryClient.invalidateQueries({ queryKey: ["user"], exact: false });
-  }
-}

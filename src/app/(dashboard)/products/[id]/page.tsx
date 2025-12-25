@@ -21,6 +21,7 @@ import { productService } from "@/services/product.service";
 import { Product } from "@/types/product";
 import { Brand, Category, User } from "@/types";
 import Loader from "@/components/ui/loader";
+import { DetailPageHeader } from "@/components/dashboard/common/detail-page-header";
 
 export default function ProductDetailPage() {
   const router = useTransitionRouter()
@@ -45,7 +46,7 @@ export default function ProductDetailPage() {
 
   if (error || !product) {
     return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
+      <div className="flex flex-1 flex-col gap-4 sm:gap-6 sm:max-w-6xl mx-auto w-full p-3 sm:p-4 lg:p-6 min-w-0 overflow-x-hidden">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600">Product not found</h1>
           <p className="text-muted-foreground">The product you're looking for doesn't exist.</p>
@@ -78,20 +79,16 @@ export default function ProductDetailPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={() => router.back()} >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <h1 className="text-xl font-bold">{product.name || "Product Details"}</h1>
-        </div>
-        <Badge variant={product.isDeleted ? "destructive" : "secondary"}>
-          {product.isDeleted ? "Deleted" : "Active"}
-        </Badge>
-      </div>
+      <DetailPageHeader
+        title={product.slug || product.name}
+        moduleName="Product"
+        badge={{
+          label: product.isDeleted ? "Deleted" : "Active",
+          variant: product.isDeleted ? "destructive" : "secondary",
+        }}
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Product Images */}
         <Card className="lg:col-span-1">
           <CardHeader>
@@ -134,7 +131,7 @@ export default function ProductDetailPage() {
             <CardTitle>Basic Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium">Product Name</label>
@@ -244,7 +241,7 @@ export default function ProductDetailPage() {
           <CardTitle>Pricing & Sale Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6 items-center">
             <div>
               <label className="text-sm font-medium">Total Sold</label>
               <p className="text-2xl">{product.totalSold}</p>
@@ -284,7 +281,7 @@ export default function ProductDetailPage() {
           <CardTitle>Sale Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6">
             <div>
               <label className="text-sm font-medium">Current Stock</label>
               <p className="text-2xl font-bold">{product.stock}</p>

@@ -11,6 +11,7 @@ import { reviewService } from "@/services/review.service";
 import { Review } from "@/types/review";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import Loader from "@/components/ui/loader";
+import { DetailPageHeader } from "@/components/dashboard/common/detail-page-header";
 
 export default function ReviewDetailPage() {
   const router = useTransitionRouter()
@@ -31,7 +32,7 @@ export default function ReviewDetailPage() {
 
   if (error || !review) {
     return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
+      <div className="flex flex-1 flex-col gap-4 sm:gap-6 sm:max-w-6xl mx-auto w-full p-3 sm:p-4 lg:p-6 min-w-0 overflow-x-hidden">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600">Review not found</h1>
           <p className="text-muted-foreground">The review you're looking for doesn't exist.</p>
@@ -60,13 +61,8 @@ export default function ReviewDetailPage() {
   };
 
   return (
-    <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-      <div className="flex items-center gap-4">
-        <Button variant="outline" size="sm" onClick={() => router.back()} >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button><h1 className="text-xl font-bold">Review Details</h1>
-      </div>
+    <div className="flex flex-1 flex-col gap-4 sm:gap-6 sm:max-w-6xl mx-auto w-full p-3 sm:p-4 lg:p-6 min-w-0 overflow-x-hidden">
+      <DetailPageHeader moduleName="Review" />
 
 
       {/* Review Details */}

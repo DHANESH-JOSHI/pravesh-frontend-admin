@@ -21,6 +21,7 @@ import { orderLogService } from "@/services/order-log.service";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { LogItem } from "@/components/dashboard/logs/log-item";
 import { formatDistanceToNow } from "date-fns";
+import { DetailPageHeader } from "@/components/dashboard/common/detail-page-header";
 
 
 export default function OrderDetailPage() {
@@ -129,7 +130,7 @@ export default function OrderDetailPage() {
 
   if (error || !order) {
     return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
+      <div className="flex flex-1 flex-col gap-4 sm:gap-6 sm:max-w-6xl mx-auto w-full p-3 sm:p-4 lg:p-6 min-w-0 overflow-x-hidden min-w-0 overflow-x-hidden">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600">Order not found</h1>
           <p className="text-muted-foreground">The order you're looking for doesn't exist.</p>
@@ -162,22 +163,19 @@ export default function OrderDetailPage() {
     STATUS_COLORS[status.toLowerCase()] ?? "bg-gray-100 text-gray-800";
 
   return (
-    <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={() => router.back()} >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+    <div className="flex flex-1 flex-col gap-4 sm:gap-6 sm:max-w-6xl mx-auto w-full p-3 sm:p-4 lg:p-6 min-w-0 overflow-x-hidden min-w-0 overflow-x-hidden">
+      <DetailPageHeader
+        title={order.orderNumber}
+        moduleName="Order"
+        actions={
+          <Button size="sm" onClick={() => setOpen(true)} disabled={order.status !== 'received'}>
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
           </Button>
-          <h1 className="text-xl font-bold">{order.orderNumber || "Order Details"}</h1>
-        </div>
-        <Button size="sm" onClick={() => setOpen(true)} disabled={order.status !== 'received'}>
-          <Edit className="h-4 w-4 mr-2" />
-          Edit
-        </Button>
-      </div>
+        }
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">User</CardTitle>
@@ -234,7 +232,7 @@ export default function OrderDetailPage() {
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader>
+              <TableHeader>
               <TableRow>
                 <TableHead>Thumbnail</TableHead>
                 <TableHead>Product</TableHead>

@@ -28,6 +28,7 @@ import { productService } from "@/services/product.service";
 import Image from "next/image";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { invalidateCategoryQueries } from "@/lib/invalidate-queries";
+import { DetailPageHeader } from "@/components/dashboard/common/detail-page-header";
 
 export default function CategoryDetailPage() {
   const queryClient = useQueryClient();
@@ -135,7 +136,7 @@ export default function CategoryDetailPage() {
 
   if (error || !category) {
     return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
+      <div className="flex flex-1 flex-col gap-4 sm:gap-6 sm:max-w-6xl mx-auto w-full p-3 sm:p-4 lg:p-6 min-w-0 overflow-x-hidden">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600">Category not found</h1>
           <p className="text-muted-foreground">The category you're looking for doesn't exist.</p>
@@ -151,20 +152,15 @@ export default function CategoryDetailPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={() => router.back()} >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <h1 className="text-xl font-bold">{category.title || "Category Details"}</h1>
-        </div>
-        <Badge variant={category.isDeleted ? "destructive" : "secondary"}>
-          {category.isDeleted ? "Deleted" : "Active"}
-        </Badge>
-      </div>
+    <div className="flex flex-1 flex-col gap-4 sm:gap-6 sm:max-w-6xl mx-auto w-full p-3 sm:p-4 lg:p-6 min-w-0 overflow-x-hidden">
+      <DetailPageHeader
+        title={category.title}
+        moduleName="Category"
+        badge={{
+          label: category.isDeleted ? "Deleted" : "Active",
+          variant: category.isDeleted ? "destructive" : "secondary",
+        }}
+      />
 
       {/* Parent Category */}
       {
@@ -211,7 +207,7 @@ export default function CategoryDetailPage() {
       }
 
       {/* Category Overview */}
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6">
         {/* Category Image */}
         {/*<Card>
           <CardHeader>

@@ -3,14 +3,13 @@
  * for non-technical admins
  */
 
-type IdType = "order" | "user" | "product" | "address" | "cart" | "blog" | "banner" | "category" | "brand" | "generic";
+type IdType = "order" | "user" | "product" | "address" | "blog" | "banner" | "category" | "brand" | "generic";
 
 const ID_PREFIXES: Record<IdType, string> = {
   order: "ORD",
   user: "USR",
   product: "PRD",
   address: "ADD",
-  cart: "CRT",
   blog: "BLG",
   banner: "BNR",
   category: "CAT",

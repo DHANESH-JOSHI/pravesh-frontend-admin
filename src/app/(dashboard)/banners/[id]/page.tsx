@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { bannerService } from "@/services/banner.service";
 import { Banner } from "@/types/banner";
 import { Badge } from "@/components/ui/badge";
+import { DetailPageHeader } from "@/components/dashboard/common/detail-page-header";
 
 export default function BannerDetailPage() {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
@@ -33,7 +34,7 @@ export default function BannerDetailPage() {
 
   if (isError || !banner) {
     return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
+      <div className="flex flex-1 flex-col gap-4 sm:gap-6 sm:max-w-6xl mx-auto w-full p-3 sm:p-4 lg:p-6 min-w-0 overflow-x-hidden">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600">Banner not found</h1>
           <p className="text-muted-foreground">The banner you're looking for doesn't exist.</p>
@@ -64,19 +65,15 @@ export default function BannerDetailPage() {
   const redirectUrl = makeUrl(banner.type, { id: banner.targetId, url: banner.targetUrl });
 
   return (
-    <div className="p-4 max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={() => router.back()} >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <h1 className="text-xl font-bold">{banner.title || "Banner Details"}</h1>
-        </div>
-        <Badge variant={banner.isDeleted ? "destructive" : "secondary"}>
-          {banner.isDeleted ? "Deleted" : "Active"}
-        </Badge>
-      </div>
+    <div className="p-3 sm:p-4 lg:p-6 max-w-6xl mx-auto space-y-4 sm:space-y-6 min-w-0 overflow-x-hidden">
+      <DetailPageHeader
+        title={banner.title}
+        moduleName="Banner"
+        badge={{
+          label: banner.isDeleted ? "Deleted" : "Active",
+          variant: banner.isDeleted ? "destructive" : "secondary",
+        }}
+      />
 
       <Card>
         <CardHeader>

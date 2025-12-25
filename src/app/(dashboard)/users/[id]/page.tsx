@@ -16,12 +16,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PaginationControls } from "@/components/dashboard/common/pagination-controls";
-
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { userService } from "@/services/user.service";
 import { User as UserType } from "@/types/user";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import Loader from "@/components/ui/loader";
 import { StaffLogsPanel } from "@/components/dashboard/user/staff-logs-panel";
+import { DetailPageHeader } from "@/components/dashboard/common/detail-page-header";
 
 export default function UserDetailPage() {
   const params = useParams();
@@ -47,7 +48,7 @@ export default function UserDetailPage() {
 
   if (error || !user) {
     return (
-      <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
+      <div className="flex flex-1 flex-col gap-4 sm:gap-6 sm:max-w-6xl mx-auto w-full p-3 sm:p-4 lg:p-6 min-w-0 overflow-x-hidden min-w-0 overflow-x-hidden">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600">User not found</h1>
           <p className="text-muted-foreground">The user you're looking for doesn't exist.</p>
@@ -80,19 +81,14 @@ export default function UserDetailPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-6 sm:max-w-6xl mx-auto w-full p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-
-          <Button variant="outline" size="sm" onClick={() => router.back()} >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <h1 className="text-xl font-bold">{user.name || "User Details"}</h1>
-        </div>
-        <Badge variant={user.isDeleted ? "destructive" : "secondary"}>
-          {user.isDeleted ? "Deleted" : "Active"}
-        </Badge>
-      </div>
+      <DetailPageHeader
+        title={user.name}
+        moduleName="User"
+        badge={{
+          label: user.isDeleted ? "Deleted" : "Active",
+          variant: user.isDeleted ? "destructive" : "secondary",
+        }}
+      />
 
       {/* Basic Information */}
       <Card>
@@ -103,7 +99,7 @@ export default function UserDetailPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium">Full Name</label>
@@ -153,26 +149,6 @@ export default function UserDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Cart Information */}
-      {/* {user.cart && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ShoppingCart className="h-5 w-5" />
-              Cart Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label className="text-sm font-medium">Items Count</label>
-                <p className="text-2xl font-bold">{user.cart.items?.length || 0}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )} */}
-
       {/* Addresses Table */}
       {user.addresses && user.addresses.length > 0 && (
         <Card>
@@ -185,55 +161,55 @@ export default function UserDetailPage() {
           <CardContent>
             <div className="rounded border">
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Full Name</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Address</TableHead>
-                    <TableHead>City</TableHead>
-                    <TableHead>State</TableHead>
-                    <TableHead>Postal Code</TableHead>
-                    <TableHead>Country</TableHead>
-                    <TableHead className="w-16 text-center">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(user.addresses || [])
-                    .slice((addressesPage - 1) * itemsPerPage, addressesPage * itemsPerPage)
-                    .map((address, index) => (
-                      <TableRow key={address._id || index}>
-                        <TableCell className="font-medium">
-                          {address.fullname || "N/A"}
-                        </TableCell>
-                        <TableCell>{address.phone || "N/A"}</TableCell>
-                        <TableCell>
-                          <div className="max-w-xs">
-                            <p className="truncate">{address.line1 || "N/A"}</p>
-                            {address.line2 && (
-                              <p className="truncate text-sm text-muted-foreground">
-                                {address.line2}
-                              </p>
-                            )}
-                            {address.landmark && (
-                              <p className="truncate text-sm text-muted-foreground">
-                                Landmark: {address.landmark}
-                              </p>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>{address.city || "N/A"}</TableCell>
-                        <TableCell>{address.state || "N/A"}</TableCell>
-                        <TableCell>{address.postalCode || "N/A"}</TableCell>
-                        <TableCell>{address.country || "N/A"}</TableCell>
-                        <TableCell>
-                          <Link href={`/addresses/${address._id}`}>
-                            <Button variant="ghost">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                        </TableCell>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Full Name</TableHead>
+                        <TableHead>Phone</TableHead>
+                        <TableHead>Address</TableHead>
+                        <TableHead>City</TableHead>
+                        <TableHead>State</TableHead>
+                        <TableHead>Postal Code</TableHead>
+                        <TableHead>Country</TableHead>
+                        <TableHead className="w-16 text-center">Actions</TableHead>
                       </TableRow>
-                    ))}
+                    </TableHeader>
+                    <TableBody>
+                      {(user.addresses || [])
+                        .slice((addressesPage - 1) * itemsPerPage, addressesPage * itemsPerPage)
+                        .map((address, index) => (
+                          <TableRow key={address._id || index}>
+                            <TableCell className="font-medium">
+                              {address.fullname || "N/A"}
+                            </TableCell>
+                            <TableCell>{address.phone || "N/A"}</TableCell>
+                            <TableCell>
+                              <div className="max-w-xs">
+                                <p className="truncate">{address.line1 || "N/A"}</p>
+                                {address.line2 && (
+                                  <p className="truncate text-sm text-muted-foreground">
+                                    {address.line2}
+                                  </p>
+                                )}
+                                {address.landmark && (
+                                  <p className="truncate text-sm text-muted-foreground">
+                                    Landmark: {address.landmark}
+                                  </p>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>{address.city || "N/A"}</TableCell>
+                            <TableCell>{address.state || "N/A"}</TableCell>
+                            <TableCell>{address.postalCode || "N/A"}</TableCell>
+                            <TableCell>{address.country || "N/A"}</TableCell>
+                            <TableCell>
+                              <Link href={`/addresses/${address._id}`}>
+                                <Button variant="ghost">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </Link>
+                            </TableCell>
+                          </TableRow>
+                        ))}
                 </TableBody>
               </Table>
             </div>
@@ -255,26 +231,6 @@ export default function UserDetailPage() {
         </Card>
       )}
 
-      {/* Wishlist */}
-      {/* {user.wishlist && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Heart className="h-5 w-5" />
-              Wishlist
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label className="text-sm font-medium">Items Count</label>
-                <p className="text-2xl font-bold">{user.wishlist.items?.length || 0}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )} */}
-
       {/* Orders Table */}
       {user.orders && user.orders.length > 0 && (
         <Card>
@@ -286,7 +242,7 @@ export default function UserDetailPage() {
               </div>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             {/* Order Statistics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="text-center p-4 bg-green-50 rounded">
@@ -317,49 +273,49 @@ export default function UserDetailPage() {
 
             <div className="rounded border">
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created Date</TableHead>
-                    <TableHead>Updated Date</TableHead>
-                    <TableHead className="w-16 text-center">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(user.orders || [])
-                    .slice((ordersPage - 1) * itemsPerPage, ordersPage * itemsPerPage)
-                    .map((order, index) => (
-                      <TableRow key={order._id || index}>
-                        <TableCell>
-                          <Badge variant={
-                            order.status === "delivered" ? "default" :
-                              order.status === "cancelled" ? "destructive" :
-                                "secondary"
-                          }>
-                            {order.status || "pending"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {order.createdAt || "N/A"}
-                        </TableCell>
-                        <TableCell>
-                          {order.updatedAt || "N/A"}
-                        </TableCell>
-                        <TableCell>
-                          <Link href={`/orders/${order._id}`}>
-                            <Button variant="ghost">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </div>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Created Date</TableHead>
+                      <TableHead>Updated Date</TableHead>
+                      <TableHead className="w-16 text-center">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(user.orders || [])
+                      .slice((ordersPage - 1) * itemsPerPage, ordersPage * itemsPerPage)
+                      .map((order, index) => (
+                        <TableRow key={order._id || index}>
+                          <TableCell>
+                            <Badge variant={
+                              order.status === "delivered" ? "default" :
+                                order.status === "cancelled" ? "destructive" :
+                                  "secondary"
+                            }>
+                              {order.status || "pending"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {order.createdAt || "N/A"}
+                          </TableCell>
+                          <TableCell>
+                            {order.updatedAt || "N/A"}
+                          </TableCell>
+                          <TableCell>
+                            <Link href={`/orders/${order._id}`}>
+                              <Button variant="ghost">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </div>
           </CardContent>
           {(user.orders || []).length > itemsPerPage && (
-            <div className="px-6 pb-4">
+            <div className="px-6 pb-6">
               <PaginationControls
                 total={(user.orders || []).length}
                 limit={itemsPerPage}
@@ -409,68 +365,70 @@ export default function UserDetailPage() {
               </div>
             </div>
 
-            <div className="rounded border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Rating</TableHead>
-                    <TableHead>Comment</TableHead>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Created Date</TableHead>
-                    <TableHead className="w-16 text-center">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(user.reviews || [])
-                    .slice((reviewsPage - 1) * itemsPerPage, reviewsPage * itemsPerPage)
-                    .map((review, index) => (
-                      <TableRow key={review._id || index}>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <div className="flex">
-                              {Array.from({ length: 5 }, (_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-4 w-4 ${i < (review.rating || 0) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
-                                />
-                              ))}
+            <div className="mt-6 -mx-6 px-6">
+              <div className="rounded border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Rating</TableHead>
+                      <TableHead>Comment</TableHead>
+                      <TableHead>Product</TableHead>
+                      <TableHead>Created Date</TableHead>
+                      <TableHead className="w-16 text-center">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(user.reviews || [])
+                      .slice((reviewsPage - 1) * itemsPerPage, reviewsPage * itemsPerPage)
+                      .map((review, index) => (
+                        <TableRow key={review._id || index}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <div className="flex">
+                                {Array.from({ length: 5 }, (_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`h-4 w-4 ${i < (review.rating || 0) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="font-medium">{review.rating}/5</span>
                             </div>
-                            <span className="font-medium">{review.rating}/5</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="max-w-xs">
-                            <p className="truncate">
-                              {review.comment || "No comment"}
-                            </p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="max-w-xs">
-                            <p className="truncate font-medium">
-                              {typeof review.product === 'object' && review.product?.name
-                                ? review.product.name
-                                : "Product"}
-                            </p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {review.createdAt || "N/A"}
-                        </TableCell>
-                        <TableCell>
-                          <Link href={`/reviews/${review._id}`}>
-                            <Button variant="ghost">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
+                          </TableCell>
+                          <TableCell>
+                            <div className="max-w-xs">
+                              <p className="truncate">
+                                {review.comment || "No comment"}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="max-w-xs">
+                              <p className="truncate font-medium">
+                                {typeof review.product === 'object' && review.product?.name
+                                  ? review.product.name
+                                  : "Product"}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {review.createdAt || "N/A"}
+                          </TableCell>
+                          <TableCell>
+                            <Link href={`/reviews/${review._id}`}>
+                              <Button variant="ghost">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
             {(user.reviews || []).length > itemsPerPage && (
-              <div className="mt-4">
+              <div className="px-6 pb-6">
                 <PaginationControls
                   total={(user.reviews || []).length}
                   limit={itemsPerPage}
@@ -493,14 +451,14 @@ export default function UserDetailPage() {
       )}
 
       {/* No Relations Message */}
-      {!user.cart && (!user.addresses || user.addresses.length === 0) && !user.wishlist && (!user.orders || user.orders.length === 0) && (!user.reviews || user.reviews.length === 0) && user.role !== "staff" && (
+      {(!user.addresses || user.addresses.length === 0) && (!user.orders || user.orders.length === 0) && (!user.reviews || user.reviews.length === 0) && user.role !== "staff" && (
         <Card>
           <CardHeader>
             <CardTitle>Related Data</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground text-center py-8">
-              No related data (cart, addresses, wishlist, orders, reviews) found for this user.
+              No related data (addresses, orders, reviews) found for this user.
             </p>
           </CardContent>
         </Card>
