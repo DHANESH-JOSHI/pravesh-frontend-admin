@@ -346,6 +346,7 @@ export default function LoginPage() {
                             placeholder="Enter your email"
                             className="pl-10 bg-input border-border focus-visible:ring-primary"
                             {...field}
+                            autoComplete="username"
                           />
                         </div>
                       </FormControl>
@@ -367,6 +368,7 @@ export default function LoginPage() {
                             placeholder="Enter your password"
                             className="bg-input border-border focus-visible:ring-primary"
                             {...field}
+                            autoComplete="current-password"
                           />
                         </FormControl>
                         <FormMessage />

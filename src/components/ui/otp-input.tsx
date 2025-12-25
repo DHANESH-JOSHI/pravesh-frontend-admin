@@ -67,6 +67,7 @@ export function InputOTPForm({ phoneOrEmail }: { phoneOrEmail: string }) {
                   minLength={6}
                   value={field.value}
                   onChange={field.onChange}
+                  autoComplete="one-time-code"
                 >
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />

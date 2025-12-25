@@ -250,7 +250,7 @@ export function ProfileForm() {
                   <FormItem>
                     <FormLabel>Name *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your name..." {...field} />
+                      <Input placeholder="Enter your name..." {...field} autoComplete="name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -263,7 +263,7 @@ export function ProfileForm() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="Enter your email..." {...field} />
+                      <Input type="email" placeholder="Enter your email..." {...field} autoComplete="email" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -293,6 +293,7 @@ export function ProfileForm() {
                             type="password"
                             placeholder="Enter current password..."
                             {...field}
+                            autoComplete="current-password"
                           />
                         </FormControl>
                         <FormMessage />
@@ -310,6 +311,7 @@ export function ProfileForm() {
                             type="password"
                             placeholder="Enter new password..."
                             {...field}
+                            autoComplete="new-password"
                           />
                         </FormControl>
                         <FormMessage />
@@ -327,6 +329,7 @@ export function ProfileForm() {
                             type="password"
                             placeholder="Confirm new password..."
                             {...field}
+                            autoComplete="new-password"
                           />
                         </FormControl>
                         <FormMessage />

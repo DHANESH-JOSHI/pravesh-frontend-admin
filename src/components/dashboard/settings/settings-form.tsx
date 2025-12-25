@@ -156,7 +156,7 @@ export function SettingsForm() {
                   <FormItem>
                     <FormLabel>Business Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter business name..." {...field} />
+                      <Input placeholder="Enter business name..." {...field} autoComplete="organization" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -169,7 +169,7 @@ export function SettingsForm() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="Enter email..." {...field} />
+                      <Input type="email" placeholder="Enter email..." {...field} autoComplete="email" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -182,7 +182,7 @@ export function SettingsForm() {
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter phone number..." {...field} />
+                      <Input placeholder="Enter phone number..." {...field} type="tel" autoComplete="tel" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -195,7 +195,7 @@ export function SettingsForm() {
                   <FormItem>
                     <FormLabel>Address</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter address..." {...field} />
+                      <Input placeholder="Enter address..." {...field} autoComplete="street-address" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -277,7 +277,7 @@ export function SettingsForm() {
                   <FormItem>
                     <FormLabel>Facebook</FormLabel>
                     <FormControl>
-                      <Input type="url" placeholder="https://facebook.com/..." {...field} />
+                      <Input type="url" placeholder="https://facebook.com/..." {...field} autoComplete="off" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -352,7 +352,7 @@ export function SettingsForm() {
                 <FormItem>
                   <FormLabel>About Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter about title..." {...field} />
+                    <Input placeholder="Enter about title..." {...field} autoComplete="off" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -369,6 +369,7 @@ export function SettingsForm() {
                       placeholder="Enter about description..."
                       rows={4}
                       {...field}
+                      autoComplete="off"
                     />
                   </FormControl>
                   <FormMessage />
@@ -392,7 +393,7 @@ export function SettingsForm() {
                   <FormItem>
                     <FormLabel>Years of Experience</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., 10+" {...field} />
+                      <Input placeholder="e.g., 10+" {...field} autoComplete="off" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -454,7 +455,7 @@ export function SettingsForm() {
                 <FormItem>
                   <FormLabel>Working Hours</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Mon-Fri: 9AM-6PM" {...field} />
+                    <Input placeholder="e.g., Mon-Fri: 9AM-6PM" {...field} autoComplete="off" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
