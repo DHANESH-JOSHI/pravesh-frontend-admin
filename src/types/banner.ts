@@ -10,6 +10,7 @@ export const createBannerSchema = z.object({
   targetUrl: z.string().optional(),
   type: bannerTypeSchema.optional(),
   targetId: z.string().optional(),
+  targetSlug: z.string().optional(),
   order: z.number().optional(),
 });
 
@@ -22,6 +23,7 @@ export type Banner = {
   targetUrl?: string;
   type: BannerType;
   targetId?: string;
+  targetSlug?: string;
   isDeleted: boolean;
   order: number;
   createdAt: string;

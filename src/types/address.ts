@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { User } from "./user"; // assuming you have a Zod userSchema
+import { User } from "./user";
 import { Order, PaginatedData } from ".";
 
 export const createAddressSchema = z.object({

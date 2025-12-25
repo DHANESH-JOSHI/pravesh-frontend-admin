@@ -80,15 +80,6 @@ export function OrderLogsTable({ orderId, staffId, showFilters = true }: OrderLo
         return Eye;
       case "list":
         return List;
-      // Legacy support
-      case "status_update":
-        return CheckCircle;
-      case "items_updated":
-        return Package;
-      case "feedback_updated":
-        return Edit;
-      case "view_list":
-        return List;
       default:
         return FileText;
     }
@@ -109,15 +100,6 @@ export function OrderLogsTable({ orderId, staffId, showFilters = true }: OrderLo
       case "view":
         return "border-amber-500 text-amber-700 dark:border-amber-400 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30";
       case "list":
-        return "border-cyan-500 text-cyan-700 dark:border-cyan-400 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-950/30";
-      // Legacy support
-      case "status_update":
-        return "border-blue-500 text-blue-700 dark:border-blue-400 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/30";
-      case "items_updated":
-        return "border-purple-500 text-purple-700 dark:border-purple-400 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/30";
-      case "feedback_updated":
-        return "border-green-500 text-green-700 dark:border-green-400 dark:text-green-300 bg-green-50 dark:bg-green-950/30";
-      case "view_list":
         return "border-cyan-500 text-cyan-700 dark:border-cyan-400 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-950/30";
       default:
         return "border-gray-500 text-gray-700 dark:border-gray-400 dark:text-gray-300 bg-gray-50 dark:bg-gray-950/30";

@@ -609,7 +609,7 @@ export function ProductFormDialog({
 }
 
 
-export function BrandSearchableSelect({ value, action }: { value: string; action: (value: string) => void }) {
+export function BrandSearchableSelect({ value, action }: { value: string; action: (id: string, slug?: string) => void }) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
@@ -657,7 +657,14 @@ export function BrandSearchableSelect({ value, action }: { value: string; action
           <CommandEmpty className="py-4">{isLoadingBrands ? "Searching..." : "No brand found."}</CommandEmpty>
           <CommandGroup className="flex-1 overflow-y-auto min-h-0">
             {brands.map((brand) => (
-              <CommandItem key={brand._id} value={brand._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
+              <CommandItem key={brand._id} value={brand._id} onSelect={(currentValue) => { 
+                if (currentValue === value) {
+                  action("", "");
+                } else {
+                  action(currentValue, brand.slug);
+                }
+                setOpen(false); 
+              }}>
                 <Check className={cn("mr-2 h-4 w-4", value === brand._id ? "opacity-100" : "opacity-0")} />
                 {brand.name}
               </CommandItem>

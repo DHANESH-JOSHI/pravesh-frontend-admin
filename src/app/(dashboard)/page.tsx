@@ -150,7 +150,6 @@ export default function DashboardPage() {
 
   if (!stats) return null;
 
-  // ===== FALLBACK DATA FOR TESTING - REMOVE WHEN DONE TESTING =====
   const FALLBACK_TRENDING_PRODUCTS = [
     { _id: '1', name: 'Wireless Headphones', salesCount: 245, totalSold: 320, reviewCount: 45, rating: 4.5 },
     { _id: '2', name: 'Smart Watch Pro', salesCount: 189, totalSold: 250, reviewCount: 38, rating: 4.3 },

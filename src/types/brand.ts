@@ -12,6 +12,7 @@ export const updateBrandSchema = createBrandSchema.partial();
 export type Brand = {
   _id: string;
   name: string;
+  slug: string;
   image: string;
   categories: (string | Partial<Category>)[];
   isDeleted: boolean;

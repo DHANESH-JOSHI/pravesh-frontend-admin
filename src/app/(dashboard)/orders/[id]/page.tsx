@@ -1,11 +1,12 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Package, MapPin, Clock, UserIcon, Edit, IndianRupee, FileText } from "lucide-react";
+import { ArrowLeft, Package, MapPin, Clock, UserIcon, Edit, IndianRupee, FileText, Maximize2, X, Download } from "lucide-react";
 import { Link, useTransitionRouter } from "next-view-transitions"
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { orderService } from "@/services/order.service";
 import { Product, Address, User, Brand, Category, OrderStatus, AdminUpdateOrder, ApiResponse, Order } from "@/types";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
@@ -29,6 +30,28 @@ export default function OrderDetailPage() {
   const orderId = params.id as string;
   const queryClient = useQueryClient();
   const [open, setOpen] = useState<boolean>(false);
+  const [isImageFullscreen, setIsImageFullscreen] = useState(false);
+
+  const handleDownloadImage = async () => {
+    if (!order?.image) return;
+    
+    try {
+      const response = await fetch(order.image);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `order-${orderId}-image.${blob.type.split('/')[1] || 'jpg'}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success("Image downloaded successfully");
+    } catch (error) {
+      toast.error("Failed to download image");
+    }
+  };
+
   const { data, isLoading, error } = useQuery({
     queryKey: ["order", orderId],
     queryFn: async () => await orderService.getById(orderId),
@@ -365,8 +388,30 @@ export default function OrderDetailPage() {
             </CardHeader>
             <CardContent>
               {order.image && (
-                <div className="mb-4">
+                <div className="mb-4 relative group">
                   <img src={order.image} alt="Custom order image" className="max-w-full h-auto rounded" />
+                  <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="icon"
+                      className="h-7 w-7 sm:h-8 sm:w-8 bg-background/90 hover:bg-background"
+                      onClick={() => setIsImageFullscreen(true)}
+                      title="View fullscreen"
+                    >
+                      <Maximize2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="icon"
+                      className="h-7 w-7 sm:h-8 sm:w-8 bg-background/90 hover:bg-background"
+                      onClick={handleDownloadImage}
+                      title="Download image"
+                    >
+                      <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </Button>
+                  </div>
                 </div>
               )}
               {order.feedback && (
@@ -572,6 +617,34 @@ export default function OrderDetailPage() {
         onSubmit={(data) => updatemutation.mutate(data)}
         initialData={order}
       />
+
+      {/* Fullscreen Image Dialog */}
+      {order?.image && (
+        <Dialog open={isImageFullscreen} onOpenChange={setIsImageFullscreen}>
+          <DialogContent 
+            className="max-w-[95vw] max-h-[95vh] w-[95vw] h-[95vh] p-2 sm:p-4 z-[100] sm:max-w-[95vw]"
+            showCloseButton={false}
+          >
+            <DialogTitle className="sr-only">Fullscreen Order Image</DialogTitle>
+            <div className="relative w-full h-full flex items-center justify-center">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute top-2 right-2 z-10 h-8 w-8 sm:h-10 sm:w-10 bg-background/80 hover:bg-background"
+                onClick={() => setIsImageFullscreen(false)}
+              >
+                <X className="h-4 w-4 sm:h-5 sm:w-5" />
+              </Button>
+              <img
+                src={order.image}
+                alt="Fullscreen custom order image"
+                className="max-w-full max-h-full w-auto h-auto object-contain rounded"
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div >
   );
 }

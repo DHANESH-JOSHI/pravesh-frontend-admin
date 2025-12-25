@@ -51,15 +51,6 @@ export default function LogDetailPage() {
         return Eye;
       case "list":
         return List;
-      // Legacy support
-      case "status_update":
-        return CheckCircle;
-      case "items_updated":
-        return Package;
-      case "feedback_updated":
-        return Edit;
-      case "view_list":
-        return List;
       default:
         return FileText;
     }
@@ -75,15 +66,6 @@ export default function LogDetailPage() {
       case "view":
         return "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300";
       case "list":
-        return "bg-cyan-100 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-300";
-      // Legacy support
-      case "status_update":
-        return "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300";
-      case "items_updated":
-        return "bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300";
-      case "feedback_updated":
-        return "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300";
-      case "view_list":
         return "bg-cyan-100 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-300";
       default:
         return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronsUpDown, ImageIcon, Loader2, Trash } from "lucide-react";
+import { Check, ChevronsUpDown, ImageIcon, Loader2, Trash, Maximize2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -116,6 +116,7 @@ export function OrderFormDialog({
     name: "items",
   });
   const [imagePreview, setImagePreview] = useState<string | null>(initialData?.image || null);
+  const [isImageFullscreen, setIsImageFullscreen] = useState(false);
 
   useEffect(() => {
     setImagePreview(initialData?.image || null);
@@ -129,9 +130,10 @@ export function OrderFormDialog({
     };
   }, [imagePreview]);
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col w-[calc(100vw-2rem)] sm:w-full">
+        <DialogHeader className="shrink-0">
           <DialogTitle className="text-2xl font-bold">
             Edit Order
           </DialogTitle>
@@ -139,18 +141,29 @@ export function OrderFormDialog({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6 w-full"
+            className="space-y-6 w-full flex-1 overflow-y-auto overflow-x-hidden min-h-0 scrollbar-hide"
           >
             {initialData?.isCustomOrder && <FormItem className="space-y-2">
               <FormLabel>Image</FormLabel>
               <div className="flex items-center gap-4">
-                <div className="w-28 h-28 rounded border flex items-center justify-center overflow-hidden bg-muted">
+                <div className="relative w-28 h-28 rounded border flex items-center justify-center overflow-hidden bg-muted group">
                   {imagePreview ? (
-                    <img
-                      src={imagePreview}
-                      alt="preview"
-                      className="object-cover w-full h-full"
-                    />
+                    <>
+                      <img
+                        src={imagePreview}
+                        alt="preview"
+                        className="object-cover w-full h-full"
+                      />
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="icon"
+                        className="absolute top-1 right-1 h-7 w-7 sm:h-8 sm:w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/90 hover:bg-background"
+                        onClick={() => setIsImageFullscreen(true)}
+                      >
+                        <Maximize2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
+                    </>
                   ) : (
                     <div className="flex flex-col items-center text-sm text-muted-foreground">
                       <ImageIcon />
@@ -164,8 +177,8 @@ export function OrderFormDialog({
 
             <FormItem className="space-y-2">
               <FormLabel>Items</FormLabel>
-              <Card className="w-full shadow-sm">
-                <CardContent className="p-4">
+              <Card className="w-full shadow-sm overflow-hidden">
+                <CardContent className="p-4 overflow-x-hidden">
                   {fields.length === 0 ? (
                     <div className="text-sm text-muted-foreground">No items</div>
                   ) : (
@@ -176,13 +189,13 @@ export function OrderFormDialog({
                         const hasVariants = Object.keys(variants).length > 0;
                         
                         return (
-                          <div key={item.id} className="space-y-2 border rounded-lg p-3 overflow-hidden">
-                            <div className="flex items-center gap-2 min-w-0 w-full">
+                          <div key={item.id} className="space-y-2 border rounded-lg p-3 w-full overflow-hidden">
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full min-w-0 max-w-full">
                               <FormField
                                 control={form.control}
                                 name={`items.${index}.product`}
                                 render={() => (
-                                  <FormItem className="flex flex-col flex-1 min-w-0 max-w-full">
+                                  <FormItem className="flex flex-col flex-1 min-w-0 w-full sm:w-auto">
                                     <ProductSearchableSelect
                                       product={(tempItems && tempItems[index]?.product) as Product ?? null}
                                   onChange={(v, productData) => {
@@ -219,7 +232,7 @@ export function OrderFormDialog({
                                   const isValidUnit = currentUnitValue && unitNames.includes(currentUnitValue);
                                   
                                   return (
-                                    <FormItem className="w-24 shrink-0">
+                                    <FormItem className="w-full sm:w-24 shrink-0">
                                       <Select
                                         value={isValidUnit ? currentUnitValue : ''}
                                         onValueChange={field.onChange}
@@ -252,7 +265,7 @@ export function OrderFormDialog({
                                 control={form.control}
                                 name={`items.${index}.quantity`}
                                 render={({ field }) => (
-                                  <FormItem className="w-18 shrink-0">
+                                  <FormItem className="w-full sm:w-20 shrink-0">
                                     <FormControl>
                                       <Input
                                         type="number"
@@ -266,19 +279,6 @@ export function OrderFormDialog({
                                   </FormItem>
                                 )}
                               />
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="shrink-0 h-9 w-9"
-                                onClick={() => {
-                                  remove(index)
-                                  const currentItems = tempItems || [];
-                                  setTempItems(currentItems.filter((_, i) => i !== index));
-                                }}
-                              >
-                                <Trash className="h-4 w-4 text-destructive" />
-                              </Button>
                             </div>
                             {hasVariants && (
                               <FormField
@@ -321,6 +321,22 @@ export function OrderFormDialog({
                                 )}
                               />
                             )}
+                            <div className="flex justify-end pt-2 border-t">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                onClick={() => {
+                                  remove(index)
+                                  const currentItems = tempItems || [];
+                                  setTempItems(currentItems.filter((_, i) => i !== index));
+                                }}
+                              >
+                                <Trash className="h-4 w-4 mr-2" />
+                                Remove Item
+                              </Button>
+                            </div>
                           </div>
                         );
                       })}
@@ -358,7 +374,7 @@ export function OrderFormDialog({
               )}
             />
 
-            <div className="flex justify-end gap-3 pt-4 border-t">
+            <div className="flex justify-end gap-3 pt-4 border-t shrink-0">
               <Button
                 type="button"
                 variant="outline"
@@ -374,6 +390,34 @@ export function OrderFormDialog({
         </Form>
       </DialogContent>
     </Dialog>
+    {/* Fullscreen Image Dialog */}
+    {imagePreview && (
+      <Dialog open={isImageFullscreen} onOpenChange={setIsImageFullscreen}>
+        <DialogContent 
+          className="max-w-[95vw] max-h-[95vh] w-[95vw] h-[95vh] p-2 sm:p-4 z-[100] sm:max-w-[95vw]"
+          showCloseButton={false}
+        >
+          <DialogTitle className="sr-only">Fullscreen Order Image</DialogTitle>
+          <div className="relative w-full h-full flex items-center justify-center">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 z-10 h-8 w-8 sm:h-10 sm:w-10 bg-background/80 hover:bg-background"
+              onClick={() => setIsImageFullscreen(false)}
+            >
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
+            </Button>
+            <img
+              src={imagePreview || ''}
+              alt="Fullscreen preview"
+              className="max-w-full max-h-full w-auto h-auto object-contain rounded"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    )}
+  </>
   );
 }
 
@@ -407,9 +451,9 @@ function ProductSearchableSelect({ product, onChange }: { product: Partial<Produ
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between min-w-0"
+          className="w-full justify-between min-w-0 max-w-full"
         >
-          <span className="truncate flex-1 text-left">
+          <span className="truncate flex-1 text-left min-w-0">
             {selectedId ? selectedProduct?.name : "Select product..."}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

@@ -49,20 +49,20 @@ export default function BannerDetailPage() {
     );
   }
 
-  const makeUrl = (type: string, { id, url }: { id?: string, url?: string }) => {
+  const makeUrl = (type: string, { slug, url }: { slug?: string, url?: string }) => {
     switch (type) {
       case "product":
-        return `${baseUrl}/products${id ? `/${id}` : ""}`;
+        return `${baseUrl}/products${slug ? `/${slug}` : ""}`;
       case "category":
-        return `${baseUrl}/categories${id ? `/${id}` : ""}`;
+        return `${baseUrl}/categories${slug ? `/${slug}` : ""}`;
       case "brand":
-        return `${baseUrl}/brands${id ? `/${id}` : ""}`;
+        return `${baseUrl}/brands${slug ? `/${slug}` : ""}`;
       default:
         return url || "_";
     }
   }
 
-  const redirectUrl = makeUrl(banner.type, { id: banner.targetId, url: banner.targetUrl });
+  const redirectUrl = makeUrl(banner.type, { slug: banner.targetSlug, url: banner.targetUrl });
 
   return (
     <div className="p-3 sm:p-4 lg:p-6 max-w-6xl mx-auto space-y-4 sm:space-y-6 min-w-0 overflow-x-hidden">

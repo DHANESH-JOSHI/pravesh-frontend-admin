@@ -4,7 +4,6 @@ import { CreateBrand, UpdateBrand, Brand, BrandQueryOptions, PaginatedBrands } f
 
 class BrandService {
   async getAll(options: BrandQueryOptions) {
-    console.log(options);
     const response = await instance.get<ApiResponse<PaginatedBrands>>("/brands", {
       params: options
     });

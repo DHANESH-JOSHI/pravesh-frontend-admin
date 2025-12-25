@@ -24,6 +24,9 @@ class BannerService {
     if (data.targetId) {
       formData.append('targetId', data.targetId);
     }
+    if (data.targetSlug) {
+      formData.append('targetSlug', data.targetSlug);
+    }
     if (data.type) {
       formData.append('type', data.type);
     }
@@ -44,6 +47,9 @@ class BannerService {
     if (data.image) formData.append('image', data.image);
     if (data.targetUrl) {
       formData.append('targetUrl', data.targetUrl);
+    }
+    if (data.targetSlug) {
+      formData.append('targetSlug', data.targetSlug);
     }
     if (data.targetId) {
       formData.append('targetId', data.targetId);

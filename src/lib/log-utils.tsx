@@ -18,11 +18,6 @@ export const getActionConfig = (action: string, field?: string) => {
   const configs: Record<string, { color: string; icon: typeof Eye; label: string }> = {
     view: { color: "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300", icon: Eye, label: "View" },
     list: { color: "bg-cyan-100 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-300", icon: List, label: "List View" },
-    // Legacy support for old action values
-    status_update: { color: "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300", icon: CheckCircle, label: "Status Update" },
-    items_updated: { color: "bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300", icon: Package, label: "Items Update" },
-    feedback_updated: { color: "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300", icon: Edit, label: "Feedback Update" },
-    view_list: { color: "bg-cyan-100 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-300", icon: List, label: "List View" },
   };
   return configs[action] || { color: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300", icon: FileText, label: action.replace(/_/g, " ") };
 };
@@ -32,7 +27,7 @@ export const HighlightText = ({ text }: { text: string }) => {
     'received', 'approved', 'cancelled', 'confirmed', 'shipped',
     'out for delivery', 'out_for_delivery', 'delivered', 'refunded'
   ];
-  const parts: (string | React.ReactNode)[] = [];
+  const parts: (string | React.ReactNode)[] = []; 
   let lastIndex = 0;
   let keyCounter = 0;
 
@@ -245,31 +240,6 @@ export const formatLogMessage = (log: any, options?: { showAdminName?: boolean; 
         <>
           {adminPrefix && <>{adminPrefix} </>}
           <HighlightText text="updated feedback" />{orderRef && <> for <HighlightText text="order" /> <OrderLink id={String(displayOrderId)} /></>}
-        </>
-      );
-    
-    case "view_list":
-      const legacyQuery = log.metadata?.query;
-      if (legacyQuery?.status) {
-        return (
-          <>
-            {adminPrefix && <>{adminPrefix} </>}
-            <HighlightText text="viewed orders filtered by" /> {String(legacyQuery.status).replace(/_/g, " ")}
-          </>
-        );
-      }
-      if (legacyQuery?.user) {
-        return (
-          <>
-            {adminPrefix && <>{adminPrefix} </>}
-            <HighlightText text="searched orders" /> for "{legacyQuery.user}"
-          </>
-        );
-      }
-      return (
-        <>
-          {adminPrefix && <>{adminPrefix} </>}
-          <HighlightText text="viewed all orders" />
         </>
       );
     

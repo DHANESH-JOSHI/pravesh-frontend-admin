@@ -62,16 +62,25 @@ export function BannerFormDialog({
       targetUrl: initialData?.targetUrl || "",
       type: initialData?.type,
       targetId: initialData?.targetId || "",
+      targetSlug: initialData?.targetSlug || "",
       order: initialData?.order || 0,
     },
   });
   useEffect(() => {
     if (open) {
-      form.reset()
-      setImagePreview(null)
+      form.reset({
+        title: initialData?.title || "",
+        image: undefined,
+        targetUrl: initialData?.targetUrl || "",
+        type: initialData?.type,
+        targetId: initialData?.targetId || "",
+        targetSlug: initialData?.targetSlug || "",
+        order: initialData?.order || 0,
+      })
+      setImagePreview(initialData?.image || null)
     }
 
-  }, [open, form])
+  }, [open, form, initialData])
 
   useEffect(() => {
     return () => {
@@ -169,11 +178,29 @@ export function BannerFormDialog({
                   <FormItem className="space-y-2">
                     <FormLabel>Redirect To</FormLabel>
                     {form.watch("type") === "brand" ? (
-                      <BrandSearchableSelect value={field.value || ""} action={field.onChange} />
+                      <BrandSearchableSelect 
+                        value={field.value || ""} 
+                        action={(id, slug) => {
+                          field.onChange(id);
+                          form.setValue("targetSlug", slug || "");
+                        }} 
+                      />
                     ) : form.watch("type") === "category" ? (
-                      <CategoryTreeSingleSelect value={field.value || ""} action={field.onChange} />
+                      <CategoryTreeSingleSelect 
+                        value={field.value || ""} 
+                        action={(id, slug) => {
+                          field.onChange(id);
+                          form.setValue("targetSlug", slug || "");
+                        }} 
+                      />
                     ) : form.watch("type") === "product" ? (
-                      <ProductSearchableSelect value={field.value || ""} action={field.onChange} />
+                      <ProductSearchableSelect 
+                        value={field.value || ""} 
+                        action={(id, slug) => {
+                          field.onChange(id);
+                          form.setValue("targetSlug", slug || "");
+                        }} 
+                      />
                     ) : null}
                     <FormMessage />
                   </FormItem>
@@ -300,7 +327,7 @@ export function BannerFormDialog({
   );
 }
 
-export function ProductSearchableSelect({ value, action }: { value: string; action: (value: string) => void }) {
+export function ProductSearchableSelect({ value, action }: { value: string; action: (id: string, slug?: string) => void }) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
@@ -348,7 +375,14 @@ export function ProductSearchableSelect({ value, action }: { value: string; acti
           <CommandEmpty className="py-4">{isLoadingProducts ? "Searching..." : "No product found."}</CommandEmpty>
           <CommandGroup className="flex-1 overflow-y-auto min-h-0">
             {products.map((product) => (
-              <CommandItem key={product._id} value={product._id} onSelect={(currentValue) => { action(currentValue === value ? "" : currentValue); setOpen(false); }}>
+              <CommandItem key={product._id} value={product._id} onSelect={(currentValue) => { 
+                if (currentValue === value) {
+                  action("", "");
+                } else {
+                  action(currentValue, product.slug);
+                }
+                setOpen(false); 
+              }}>
                 <Check className={cn("mr-2 h-4 w-4", value === product._id ? "opacity-100" : "opacity-0")} />
                 {product.name}
               </CommandItem>

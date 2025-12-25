@@ -15,7 +15,7 @@ export function CategoryTreeSingleSelect({
   action,
 }: {
   value: string | null;
-  action: (value: string | null) => void;
+  action: (id: string | null, slug?: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<string[]>([]);
@@ -40,9 +40,9 @@ export function CategoryTreeSingleSelect({
       if (hasChildren) return;
 
       if (value === node._id) {
-        action(null);
+        action(null, undefined);
       } else {
-        action(node._id);
+        action(node._id, node.slug);
       }
       setOpen(false);
     },
