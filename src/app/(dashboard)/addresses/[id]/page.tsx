@@ -77,7 +77,7 @@ export default function AddressDetailPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-xl font-bold">{address._id}</h1>
+          <h1 className="text-xl font-bold">Address Details</h1>
         </div>
         <Badge variant={address.isDeleted ? "destructive" : "secondary"}>
           {address.isDeleted ? "Deleted" : "Active"}
@@ -187,10 +187,6 @@ export default function AddressDetailPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-12 md:gap-20">
                 <div>
-                  <label className="text-sm font-medium">ID</label>
-                  <p className="font-mono text-sm">{user._id || "N/A"}</p>
-                </div>
-                <div>
                   <label className="text-sm font-medium">Full Name</label>
                   <p className="text-lg font-semibold">{user.name || "Unknown User"}</p>
                 </div>
@@ -223,7 +219,6 @@ export default function AddressDetailPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Order ID</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Created Date</TableHead>
                   <TableHead>Updated Date</TableHead>
@@ -233,16 +228,13 @@ export default function AddressDetailPage() {
               <TableBody>
                 {orders.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="p-6 text-center text-muted-foreground">
+                    <TableCell colSpan={4} className="p-6 text-center text-muted-foreground">
                       No orders found for this address.
                     </TableCell>
                   </TableRow>
                 ) : (
                   paginatedOrders.map((order: Partial<Order>) => (
                     <TableRow key={order._id}>
-                      <TableCell className="font-medium font-mono">
-                        {order._id?.slice(-8) || `ORD-${order._id?.slice(-4)}`}
-                      </TableCell>
                       <TableCell>
                         <Badge variant={
                           order.status === "delivered" ? "default" :

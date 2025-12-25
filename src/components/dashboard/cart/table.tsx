@@ -106,12 +106,12 @@ export function CartsTable() {
                     const user = cart.user as User | null | undefined;
                     return (
                     <TableRow key={cart._id}>
-                      <TableCell className="font-medium font-mono text-sm">
+                      <TableCell className="font-medium text-sm">
                         <div className="truncate" title={user?.name || "Unknown User"}>
                           {user?.name || "Unknown User"}
                         </div>
                       </TableCell>
-                      <TableCell className="font-medium font-mono text-sm">
+                      <TableCell className="font-medium text-sm">
                         <div className="truncate" title={user?.email || "N/A"}>
                           {user?.email || "N/A"}
                         </div>

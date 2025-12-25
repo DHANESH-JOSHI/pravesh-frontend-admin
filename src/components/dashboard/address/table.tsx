@@ -75,7 +75,7 @@ export function AddressesTable() {
               <label className="text-xs font-medium text-muted-foreground">User</label>
               <input
                 type="text"
-                placeholder="User ID or name"
+                placeholder="User name or email"
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
                 className="w-full px-3 py-2 text-sm border rounded"

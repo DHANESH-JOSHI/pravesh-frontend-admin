@@ -78,16 +78,6 @@ export default function CartDetailPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Wallet</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₹{(user.wallet?.balance ?? 0).toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">balance</p>
-          </CardContent>
-        </Card>
       </div>
 
       <Card>
@@ -201,8 +191,6 @@ export default function CartDetailPage() {
         <CardContent>
           <div className="grid grid-cols-3 justify-between items-center">
             <div>
-              <label className="text-sm font-medium">Cart ID</label>
-              <p className="font-mono text-sm">{cart._id}</p>
             </div>
             <div>
               <label className="text-sm font-medium">Created At</label>

@@ -34,5 +34,4 @@ export * from './review';
 export * from './setting';
 export * from './user';
 export * from './unit';
-export * from './wallet';
 export * from './wishlist';

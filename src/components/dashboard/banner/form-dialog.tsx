@@ -167,7 +167,7 @@ export function BannerFormDialog({
                 name="targetId"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <FormLabel>Redirect ID</FormLabel>
+                    <FormLabel>Redirect To</FormLabel>
                     {form.watch("type") === "brand" ? (
                       <BrandSearchableSelect value={field.value || ""} action={field.onChange} />
                     ) : form.watch("type") === "category" ? (

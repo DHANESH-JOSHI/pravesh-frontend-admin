@@ -74,7 +74,7 @@ export function invalidateProductQueries(
 
 /**
  * Order-related invalidation
- * Matches backend: ORDER_ANY, ORDERS_BY_USER, ORDERS_ALL, USER_ANY, DASHBOARD_ALL, PRODUCTS_ALL, WALLET_BY_USER_ANY, PRODUCT_ANY/CATEGORY_ANY/BRAND_ANY (on delivered)
+ * Matches backend: ORDER_ANY, ORDERS_BY_USER, ORDERS_ALL, USER_ANY, DASHBOARD_ALL, PRODUCTS_ALL, PRODUCT_ANY/CATEGORY_ANY/BRAND_ANY (on delivered)
  */
 export function invalidateOrderQueries(
   queryClient: QueryClient,
@@ -82,13 +82,12 @@ export function invalidateOrderQueries(
     orderId?: MaybeString;
     userId?: MaybeString;
     touchesProducts?: boolean;
-    touchesWallet?: boolean;
     productIds?: MaybeString[];
     categoryIds?: MaybeString[];
     brandIds?: MaybeString[];
   } = {}
 ) {
-  const { orderId, userId, touchesProducts, touchesWallet, productIds, categoryIds, brandIds } = params;
+  const { orderId, userId, touchesProducts, productIds, categoryIds, brandIds } = params;
 
   // Invalidate specific order (matches: order:${orderId})
   if (orderId) {
@@ -117,14 +116,6 @@ export function invalidateOrderQueries(
     queryClient.invalidateQueries({ queryKey: ["products"], exact: false });
   }
   
-  // If order touches wallet (e.g., on confirm or status changes), invalidate wallet (matches: wallet:user:${userId}*)
-  if (touchesWallet && userId) {
-    queryClient.invalidateQueries({ queryKey: ["wallet", "user", userId], exact: false });
-    queryClient.invalidateQueries({ queryKey: ["wallet"], exact: false });
-    queryClient.invalidateQueries({ queryKey: ["wallet", "balance", userId] });
-    queryClient.invalidateQueries({ queryKey: ["wallet", "transactions", userId] });
-    queryClient.invalidateQueries({ queryKey: ["wallets"], exact: false });
-  }
   
   // When order is delivered, invalidate specific product/category/brand caches (affects salesCount, totalSold, counts)
   if (productIds && productIds.length > 0) {
@@ -454,33 +445,6 @@ export function invalidateCartQueries(
   }
 }
 
-/**
- * Wallet-related invalidation
- * Matches backend: WALLET_BY_USER_ANY, WALLET_BALANCE, WALLET_TRANSACTIONS, WALLETS_ALL
- */
-export function invalidateWalletQueries(
-  queryClient: QueryClient,
-  userId?: MaybeString
-) {
-  // Invalidate user-specific wallet (matches: wallet:user:${userId}*)
-  if (userId) {
-    queryClient.invalidateQueries({ queryKey: ["wallet", "user", userId], exact: false });
-    queryClient.invalidateQueries({ queryKey: ["wallet"], exact: false });
-  }
-  
-  // Invalidate wallet balance (matches: wallet:balance:${userId})
-  if (userId) {
-    queryClient.invalidateQueries({ queryKey: ["wallet", "balance", userId] });
-  }
-  
-  // Invalidate wallet transactions (matches: wallet:transactions:${userId})
-  if (userId) {
-    queryClient.invalidateQueries({ queryKey: ["wallet", "transactions", userId] });
-  }
-  
-  // Invalidate all wallet list variations (matches: wallets*)
-  queryClient.invalidateQueries({ queryKey: ["wallets"], exact: false });
-}
 
 /**
  * Setting-related invalidation

@@ -122,13 +122,6 @@ export function AddressViewDialog({
             </div>
           </div>
 
-          {/* Address ID */}
-          <div>
-            <span className="text-xs font-medium text-muted-foreground">
-              Address ID:
-            </span>
-            <p className="text-xs font-mono mt-1">{address._id}</p>
-          </div>
         </div>
       </DialogContent>
     </Dialog>

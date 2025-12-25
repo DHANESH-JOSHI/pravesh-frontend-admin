@@ -1,6 +1,7 @@
 import React from "react";
 import { Eye, List, Edit, CheckCircle, Package, FileText } from "lucide-react";
 import { Link } from "next-view-transitions";
+import { formatOrderId } from "./format-id";
 
 export const getActionConfig = (action: string) => {
   const configs: Record<string, { color: string; icon: typeof Eye; label: string }> = {
@@ -53,7 +54,7 @@ export const formatLogMessage = (log: any, options?: { showAdminName?: boolean; 
   const adminName = typeof log.admin === "object" ? log.admin?.name : "Unknown";
   const adminId = typeof log.admin === "object" ? log.admin?._id : log.admin;
   const orderId = typeof log.order === "object" ? log.order?._id : log.order;
-  const orderRef = orderId ? String(orderId).slice(-8) : null;
+  const orderRef = orderId ? formatOrderId(String(orderId), { showPrefix: false }) : null;
   const displayOrderId = currentOrderId || orderId;
 
   const UserLink = ({ id, name }: { id: string, name: string }) => (
@@ -69,10 +70,10 @@ export const formatLogMessage = (log: any, options?: { showAdminName?: boolean; 
   const OrderLink = ({ id }: { id: string }) => (
     <Link
       href={`/orders/${id}`}
-      className="underline text-primary hover:text-primary/80 font-medium font-mono"
+      className="underline text-primary hover:text-primary/80 font-medium"
       onClick={(e) => e.stopPropagation()}
     >
-      #{id.slice(-8)}
+      {formatOrderId(id)}
     </Link>
   );
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, User, Mail, Shield, Calendar, MapPin, Package, Star, Wallet, Eye } from "lucide-react";
+import { ArrowLeft, User, Mail, Shield, Calendar, MapPin, Package, Star, Eye } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -87,7 +87,7 @@ export default function UserDetailPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-xl font-bold">{user._id}</h1>
+          <h1 className="text-xl font-bold">{user.name || "User Details"}</h1>
         </div>
         <Badge variant={user.isDeleted ? "destructive" : "secondary"}>
           {user.isDeleted ? "Deleted" : "Active"}
@@ -153,36 +153,6 @@ export default function UserDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Wallet Information */}
-      {user.wallet && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Wallet className="h-5 w-5" />
-              Wallet Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label className="text-sm font-medium">Balance</label>
-                <p className="text-2xl font-bold text-green-600">
-                  ₹{user.wallet.balance?.toFixed(2) || "0.00"}
-                </p>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Transactions</label>
-                <p className="text-xl">{user.wallet.transactions?.length || 0}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Wallet ID</label>
-                <p className="font-mono text-xs">{user.wallet._id || "N/A"}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Cart Information */}
       {/* {user.cart && (
         <Card>
@@ -197,10 +167,6 @@ export default function UserDetailPage() {
               <div>
                 <label className="text-sm font-medium">Items Count</label>
                 <p className="text-2xl font-bold">{user.cart.items?.length || 0}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Cart ID</label>
-                <p className="font-mono text-xs">{user.cart._id || "N/A"}</p>
               </div>
             </div>
           </CardContent>
@@ -304,10 +270,6 @@ export default function UserDetailPage() {
                 <label className="text-sm font-medium">Items Count</label>
                 <p className="text-2xl font-bold">{user.wishlist.items?.length || 0}</p>
               </div>
-              <div>
-                <label className="text-sm font-medium">Wishlist ID</label>
-                <p className="font-mono text-xs">{user.wishlist._id || "N/A"}</p>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -357,7 +319,6 @@ export default function UserDetailPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Order ID</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Created Date</TableHead>
                     <TableHead>Updated Date</TableHead>
@@ -369,9 +330,6 @@ export default function UserDetailPage() {
                     .slice((ordersPage - 1) * itemsPerPage, ordersPage * itemsPerPage)
                     .map((order, index) => (
                       <TableRow key={order._id || index}>
-                        <TableCell className="font-medium font-mono">
-                          {order._id?.slice(-8) || `ORD-${index + 1}`}
-                        </TableCell>
                         <TableCell>
                           <Badge variant={
                             order.status === "delivered" ? "default" :
@@ -535,14 +493,14 @@ export default function UserDetailPage() {
       )}
 
       {/* No Relations Message */}
-      {!user.wallet && !user.cart && (!user.addresses || user.addresses.length === 0) && !user.wishlist && (!user.orders || user.orders.length === 0) && (!user.reviews || user.reviews.length === 0) && user.role !== "staff" && (
+      {!user.cart && (!user.addresses || user.addresses.length === 0) && !user.wishlist && (!user.orders || user.orders.length === 0) && (!user.reviews || user.reviews.length === 0) && user.role !== "staff" && (
         <Card>
           <CardHeader>
             <CardTitle>Related Data</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground text-center py-8">
-              No related data (wallet, cart, addresses, wishlist, orders, reviews) found for this user.
+              No related data (cart, addresses, wishlist, orders, reviews) found for this user.
             </p>
           </CardContent>
         </Card>

@@ -84,7 +84,7 @@ export default function ProductDetailPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-xl font-bold">{product._id}</h1>
+          <h1 className="text-xl font-bold">{product.name || "Product Details"}</h1>
         </div>
         <Badge variant={product.isDeleted ? "destructive" : "secondary"}>
           {product.isDeleted ? "Deleted" : "Active"}

@@ -87,18 +87,12 @@ export default function OrderDetailPage() {
         });
       }
       
-      const walletTouched = 
-        (oldStatus === 'received' && newStatus === 'confirmed') ||
-        (oldStatus === 'approved' && newStatus === 'confirmed') ||
-        (oldStatus === 'cancelled' && newStatus === 'refunded');
-      
       const productsTouched = newStatus === 'delivered';
       
       invalidateOrderQueries(queryClient, { 
         orderId, 
         userId,
         touchesProducts: productsTouched,
-        touchesWallet: walletTouched,
         productIds: productIds.length > 0 ? productIds : undefined,
         categoryIds: categoryIds.length > 0 ? categoryIds : undefined,
         brandIds: brandIds.length > 0 ? brandIds : undefined,
@@ -121,7 +115,6 @@ export default function OrderDetailPage() {
         orderId, 
         userId: typeof order?.user === 'string' ? order.user : order?.user?._id,
         touchesProducts: false,
-        touchesWallet: false,
       });
       setOpen(false);
     },
@@ -176,7 +169,7 @@ export default function OrderDetailPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-xl font-bold">{order._id}</h1>
+          <h1 className="text-xl font-bold">{order.orderNumber || "Order Details"}</h1>
         </div>
         <Button size="sm" onClick={() => setOpen(true)} disabled={order.status !== 'received'}>
           <Edit className="h-4 w-4 mr-2" />
@@ -204,17 +197,6 @@ export default function OrderDetailPage() {
           <CardContent>
             <div className="text-2xl font-bold">{totalItems}</div>
             <p className="text-xs text-muted-foreground">{order.items.length} unique products</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Wallet</CardTitle>
-            <IndianRupee className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₹{((order.user as User)?.wallet?.balance ?? 0).toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">balance</p>
           </CardContent>
         </Card>
 
@@ -406,10 +388,6 @@ export default function OrderDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Order ID</label>
-                <p className="font-mono text-sm">{order._id}</p>
-              </div>
               <div>
                 <label className="text-sm font-medium">Created At</label>
                 <p className="text-sm">{order.createdAt}</p>

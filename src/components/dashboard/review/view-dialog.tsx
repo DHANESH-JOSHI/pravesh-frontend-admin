@@ -127,13 +127,6 @@ export function ReviewViewDialog({
             </div>
           </div>
 
-          {/* Review ID */}
-          <div>
-            <span className="text-xs font-medium text-muted-foreground">
-              Review ID:
-            </span>
-            <p className="text-xs font-mono mt-1">{review._id}</p>
-          </div>
         </div>
       </DialogContent>
     </Dialog>

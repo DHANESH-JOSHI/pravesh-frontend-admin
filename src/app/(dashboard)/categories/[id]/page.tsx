@@ -159,7 +159,7 @@ export default function CategoryDetailPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-xl font-bold">{category._id}</h1>
+          <h1 className="text-xl font-bold">{category.title || "Category Details"}</h1>
         </div>
         <Badge variant={category.isDeleted ? "destructive" : "secondary"}>
           {category.isDeleted ? "Deleted" : "Active"}
@@ -195,9 +195,6 @@ export default function CategoryDetailPage() {
                       {typeof category.parentCategory === 'object'
                         ? category.parentCategory.title
                         : category.parentCategory}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {(category.parentCategory as Category)?._id}
                     </p>
                   </div>
                 </div>

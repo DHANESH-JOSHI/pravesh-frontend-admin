@@ -65,7 +65,7 @@ export default function ReviewDetailPage() {
         <Button variant="outline" size="sm" onClick={() => router.back()} >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
-        </Button><h1 className="text-xl font-bold">{review._id}</h1>
+        </Button><h1 className="text-xl font-bold">Review Details</h1>
       </div>
 
 
@@ -144,10 +144,6 @@ export default function ReviewDetailPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-12 md:gap-20">
                 <div>
-                  <label className="text-sm font-medium">ID</label>
-                  <p className="font-mono text-sm">{user._id || "N/A"}</p>
-                </div>
-                <div>
                   <label className="text-sm font-medium">Full Name</label>
                   <p className="text-lg font-semibold">{user.name || "Unknown User"}</p>
                 </div>
@@ -179,10 +175,6 @@ export default function ReviewDetailPage() {
           <CardContent>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-12 md:gap-20">
-                <div>
-                  <label className="text-sm font-medium">ID</label>
-                  <p className="font-mono text-sm">{product?._id || "N/A"}</p>
-                </div>
                 <div>
                   <label className="text-sm font-medium">Name</label>
                   <p className="text-lg font-semibold">{product?.name || "Unknown Product"}</p>

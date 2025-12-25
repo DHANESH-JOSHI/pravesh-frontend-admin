@@ -45,6 +45,7 @@ export type Order = {
   isCustomOrder: boolean;
   image?: string;
   feedback?: string;
+  orderNumber?: string; // Display number in format ORD-YYYY-MM-DD-NNNNNN
   createdAt: string;
   updatedAt: string;
 }

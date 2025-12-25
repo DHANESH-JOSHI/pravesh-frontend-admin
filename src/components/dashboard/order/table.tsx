@@ -123,6 +123,7 @@ export function OrdersTable() {
           <Table className="w-full table-auto">
             <TableHeader className="bg-primary/5">
               <TableRow className="[&>th]:py-3">
+                <TableHead className="min-w-[140px]">Order Number</TableHead>
                 <TableHead className="min-w-[120px]">Name</TableHead>
                 <TableHead className="min-w-[150px]">Email</TableHead>
                 <TableHead className="whitespace-nowrap">Status</TableHead>
@@ -146,7 +147,7 @@ export function OrdersTable() {
                 />
               ) : orders.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="p-6">
+                  <TableCell colSpan={7} className="p-6">
                     <EmptyState
                       title="No orders found"
                       description="Try a different search."
@@ -159,12 +160,15 @@ export function OrdersTable() {
                     const user = order.user as User | null | undefined;
                     return (
                     <TableRow key={order._id}>
+                      <TableCell className="min-w-0 font-medium font-mono text-sm">
+                        {order.orderNumber || "N/A"}
+                      </TableCell>
                       <TableCell className="min-w-0 font-medium">
                         <div className="truncate" title={user?.name || "Unknown User"}>
                           {user?.name || "Unknown User"}
                         </div>
                       </TableCell>
-                      <TableCell className="min-w-0 font-mono text-sm">
+                      <TableCell className="min-w-0 text-sm">
                         <div className="truncate" title={user?.email || "N/A"}>
                           {user?.email || "N/A"}
                         </div>

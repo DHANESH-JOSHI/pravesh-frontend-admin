@@ -86,7 +86,7 @@ export default function MessageDetailPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-xl font-bold">{message._id}</h1>
+          <h1 className="text-xl font-bold">{message.subject || "Message Details"}</h1>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant={message.status === "resolved" ? "default" : "secondary"}>

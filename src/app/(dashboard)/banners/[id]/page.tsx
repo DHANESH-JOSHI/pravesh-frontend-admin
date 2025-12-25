@@ -71,7 +71,7 @@ export default function BannerDetailPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-xl font-bold">{banner._id}</h1>
+          <h1 className="text-xl font-bold">{banner.title || "Banner Details"}</h1>
         </div>
         <Badge variant={banner.isDeleted ? "destructive" : "secondary"}>
           {banner.isDeleted ? "Deleted" : "Active"}

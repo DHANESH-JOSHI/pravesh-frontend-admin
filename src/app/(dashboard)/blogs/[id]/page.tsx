@@ -55,7 +55,7 @@ export default function BlogDetailPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-xl font-bold">{blog._id}</h1>
+          <h1 className="text-xl font-bold">{blog.title || "Blog Post"}</h1>
         </div>
         <Badge variant={!blog.isPublished ? "destructive" : "secondary"}>
           {!blog.isPublished ? "In Draft" : "Published"}

@@ -319,7 +319,7 @@ export default function OrderLogsPage() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="text-xs">Order ID</TableHead>
+                          <TableHead className="text-xs">Order</TableHead>
                           <TableHead className="text-xs text-center">Views</TableHead>
                           <TableHead className="text-xs">Action</TableHead>
                         </TableRow>
@@ -328,8 +328,8 @@ export default function OrderLogsPage() {
                         {mostViewed.length > 0 ? (
                           mostViewed.slice(0, 5).map((order) => (
                             <TableRow key={order.orderId}>
-                              <TableCell className="font-mono text-xs">
-                                {String(order.orderId).slice(-8)}
+                              <TableCell className="text-xs font-medium">
+                                View Details
                               </TableCell>
                               <TableCell className="text-center text-xs font-semibold">
                                 {order.viewCount}
