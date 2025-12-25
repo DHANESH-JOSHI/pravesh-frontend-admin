@@ -1,8 +1,8 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Package, MapPin, Clock, UserIcon, Edit, IndianRupee, FileText, Maximize2, X, Download } from "lucide-react";
-import { Link, useTransitionRouter } from "next-view-transitions"
+import { ArrowLeft, Package, MapPin, Clock, UserIcon, Edit, Maximize2, X, Download } from "lucide-react";
+import { Link } from "next-view-transitions"
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,13 +22,14 @@ import { orderLogService } from "@/services/order-log.service";
 import { OrderLogsTable } from "@/components/dashboard/logs/logs-table";
 import { formatDistanceToNow } from "date-fns";
 import { DetailPageHeader } from "@/components/dashboard/common/detail-page-header";
+import { useAuth } from "@/providers/auth";
 
 
 export default function OrderDetailPage() {
-  const router = useTransitionRouter()
   const params = useParams();
   const orderId = params.id as string;
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [open, setOpen] = useState<boolean>(false);
   const [isImageFullscreen, setIsImageFullscreen] = useState(false);
 
@@ -61,7 +62,7 @@ export default function OrderDetailPage() {
   const { data: logsData } = useQuery({
     queryKey: ["order-logs", orderId],
     queryFn: async () => await orderLogService.getOrderLogs(orderId),
-    enabled: !!orderId,
+    enabled: !!orderId && user?.role !== "staff",
     refetchInterval: () => {
       if (typeof window !== "undefined" && document.visibilityState === "visible") {
         return 5000;
@@ -191,7 +192,7 @@ export default function OrderDetailPage() {
         title={order.orderNumber}
         moduleName="Order"
         actions={
-          <Button size="sm" onClick={() => setOpen(true)} disabled={order.status !== 'received'}>
+          <Button size="sm" onClick={() => setOpen(true)} disabled={order.status !== 'accepted'}>
             <Edit className="h-4 w-4 mr-2" />
             Edit
           </Button>
@@ -246,229 +247,6 @@ export default function OrderDetailPage() {
                 <SelectItem value="refunded"><Badge className={getStatusColor("refunded")}>Refunded</Badge></SelectItem>
               </SelectContent>
             </Select>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Order Items</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-              <TableHeader>
-              <TableRow>
-                <TableHead>Thumbnail</TableHead>
-                <TableHead>Product</TableHead>
-                <TableHead>Brand</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Variant</TableHead>
-                {/*<TableHead className="text-right">Final</TableHead>*/}
-                <TableHead className="text-right">Unit</TableHead>
-                <TableHead className="text-right">Qty</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {order.items.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="p-6 text-center">
-                    No items in order
-                  </TableCell>
-                </TableRow>
-              ) : (
-                order.items.map((item, idx) => {
-                  const product = item.product as Partial<Product> | null | undefined;
-                  if (!product) {
-                    return (
-                      <TableRow key={idx}>
-                        <TableCell>
-                          <div className="w-14 h-14 rounded flex items-center justify-center">
-                            <Package className="h-6 w-6" />
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <span className="text-muted-foreground italic">Product deleted</span>
-                        </TableCell>
-                        <TableCell>N/A</TableCell>
-                        <TableCell>N/A</TableCell>
-                        <TableCell>N/A</TableCell>
-                        <TableCell className="text-right">
-                          {item.unit || 'N/A'}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {item.quantity}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  }
-                  const brand = product.brand as Partial<Brand> | undefined;
-                  const category = product.category as Partial<Category> | undefined;
-                  const variantSelections = item.variantSelections || {};
-                  const hasVariants = Object.keys(variantSelections).length > 0;
-                  
-                  return (
-                    <TableRow key={idx}>
-                      <TableCell>
-                        {product.thumbnail ? (
-                          <Image src={product.thumbnail} alt={product.name || "thumb"} width={40} height={40} className="rounded object-cover" />
-                        ) : (
-                          <div className="w-14 h-14 rounded flex items-center justify-center">
-                            <Package className="h-6 w-6" />
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {product._id ? (
-                        <Link className="hover:underline" href={`/products/${product._id}`}>{product.name || "N/A"}</Link>
-                        ) : (
-                          <span>{product.name || "N/A"}</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Link 
-                          className="hover:underline" 
-                          href={brand?._id ? `/brands/${brand._id}` : "#"}
-                          onClick={(e) => {
-                            if (!brand?._id) {
-                              e.preventDefault();
-                            }
-                          }}
-                        >
-                          {brand?.name || "N/A"}
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        <Link 
-                          className="hover:underline" 
-                          href={category?._id ? `/categories/${category._id}` : "#"}
-                          onClick={(e) => {
-                            if (!category?._id) {
-                              e.preventDefault();
-                            }
-                          }}
-                        >
-                          {category?.title || "N/A"}
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        {hasVariants ? (
-                          <div className="flex flex-wrap gap-1">
-                            {Object.entries(variantSelections).map(([key, value]) => (
-                              <Badge key={key} variant="secondary" className="text-xs">
-                                {key}: {value}
-                              </Badge>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">No variants</span>
-                        )}
-                      </TableCell>
-                      {/*<TableCell className="text-right font-semibold">₹{(product.finalPrice ?? 0).toFixed(2)}
-                      </TableCell>*/}
-                      <TableCell className="text-right">
-                        {item.unit || 'N/A'}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {item.quantity}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {
-        order.isCustomOrder && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Custom Order Details</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {order.image && (
-                <div className="mb-4 relative group">
-                  <img src={order.image} alt="Custom order image" className="max-w-full h-auto rounded" />
-                  <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="icon"
-                      className="h-7 w-7 sm:h-8 sm:w-8 bg-background/90 hover:bg-background"
-                      onClick={() => setIsImageFullscreen(true)}
-                      title="View fullscreen"
-                    >
-                      <Maximize2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="icon"
-                      className="h-7 w-7 sm:h-8 sm:w-8 bg-background/90 hover:bg-background"
-                      onClick={handleDownloadImage}
-                      title="Download image"
-                    >
-                      <Download className="h-3 w-3 sm:h-4 sm:w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-              {order.feedback && (
-                <div>
-                  <label className="text-sm font-medium">Feedback</label>
-                  <p className="text-sm text-muted-foreground">{order.feedback}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )
-      }
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Order Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Created At</label>
-                <p className="text-sm">{order.createdAt}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Updated At</label>
-                <p className="text-sm">{order.updatedAt}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Custom Order</label>
-                <p className="text-sm">{order.isCustomOrder ? "Yes" : "No"}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Shipping Address</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-start space-x-2">
-              <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div className="space-y-2">
-                {shippingAddress.line1 ? (
-                  <>
-                <p className="text-sm text-muted-foreground">
-                      {shippingAddress.line1}{shippingAddress.line2 ? `, ${shippingAddress.line2}` : ""}, {shippingAddress.city || ""}, {shippingAddress.state || ""} {shippingAddress.postalCode || ""}
-                </p>
-                    {shippingAddress.country && <p className="text-sm text-muted-foreground">{shippingAddress.country}</p>}
-                    {shippingAddress.phone && <p className="text-sm text-muted-foreground">{shippingAddress.phone}</p>}
-                    {shippingAddress.fullname && <p className="font-medium">{shippingAddress.fullname}</p>}
-                  </>
-                ) : (
-                  <p className="text-sm text-muted-foreground italic">Shipping address not available</p>
-                )}
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
@@ -605,8 +383,234 @@ export default function OrderDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Order Logs */}
-      {logsData?.data?.logs && logsData.data.logs.length > 0 && (
+      <Card>
+        <CardHeader>
+          <CardTitle>Order Items</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+              <TableHeader>
+              <TableRow>
+                <TableHead>Thumbnail</TableHead>
+                <TableHead>Product</TableHead>
+                <TableHead>Brand</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Variant</TableHead>
+                {/*<TableHead className="text-right">Final</TableHead>*/}
+                <TableHead className="text-right">Unit</TableHead>
+                <TableHead className="text-right">Qty</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {order.items.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="p-6 text-center">
+                    No items in order
+                  </TableCell>
+                </TableRow>
+              ) : (
+                order.items.map((item, idx) => {
+                  const product = item.product as Partial<Product> | null | undefined;
+                  if (!product) {
+                    return (
+                      <TableRow key={idx}>
+                        <TableCell>
+                          <div className="w-14 h-14 rounded flex items-center justify-center">
+                            <Package className="h-6 w-6" />
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-muted-foreground italic">Product deleted</span>
+                        </TableCell>
+                        <TableCell>N/A</TableCell>
+                        <TableCell>N/A</TableCell>
+                        <TableCell>N/A</TableCell>
+                        <TableCell className="text-right">
+                          {item.unit || 'N/A'}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {item.quantity}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
+                  const brand = product.brand as Partial<Brand> | undefined;
+                  const category = product.category as Partial<Category> | undefined;
+                  const variantSelections = item.variantSelections || {};
+                  const hasVariants = Object.keys(variantSelections).length > 0;
+                  
+                  return (
+                    <TableRow key={idx}>
+                      <TableCell>
+                        {product.thumbnail ? (
+                          <Image src={product.thumbnail} alt={product.name || "thumb"} width={40} height={40} className="rounded object-cover" />
+                        ) : (
+                          <div className="w-14 h-14 rounded flex items-center justify-center">
+                            <Package className="h-6 w-6" />
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {product._id ? (
+                        <Link className="hover:underline" href={`/products/${product._id}`}>{product.name || "N/A"}</Link>
+                        ) : (
+                          <span>{product.name || "N/A"}</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Link 
+                          className="hover:underline" 
+                          href={brand?._id ? `/brands/${brand._id}` : "#"}
+                          onClick={(e) => {
+                            if (!brand?._id) {
+                              e.preventDefault();
+                            }
+                          }}
+                        >
+                          {brand?.name || "N/A"}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link 
+                          className="hover:underline" 
+                          href={category?._id ? `/categories/${category._id}` : "#"}
+                          onClick={(e) => {
+                            if (!category?._id) {
+                              e.preventDefault();
+                            }
+                          }}
+                        >
+                          {category?.title || "N/A"}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        {hasVariants ? (
+                          <div className="flex flex-wrap gap-1">
+                            {Object.entries(variantSelections).map(([key, value]) => (
+                              <Badge key={key} variant="secondary" className="text-xs">
+                                {key}: {value}
+                              </Badge>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">No variants</span>
+                        )}
+                      </TableCell>
+                      {/*<TableCell className="text-right font-semibold">₹{(product.finalPrice ?? 0).toFixed(2)}
+                      </TableCell>*/}
+                      <TableCell className="text-right">
+                        {item.unit || 'N/A'}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {item.quantity}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Custom Order Image */}
+      {order.isCustomOrder && order.image && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Custom Order Image</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="relative group">
+              <img src={order.image} alt="Custom order image" className="max-w-full h-auto rounded-lg border" />
+              <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  className="h-7 w-7 sm:h-8 sm:w-8 bg-background/90 hover:bg-background"
+                  onClick={() => setIsImageFullscreen(true)}
+                  title="View fullscreen"
+                >
+                  <Maximize2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  className="h-7 w-7 sm:h-8 sm:w-8 bg-background/90 hover:bg-background"
+                  onClick={handleDownloadImage}
+                  title="Download image"
+                >
+                  <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Feedback */}
+      {order.feedback && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Feedback</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{order.feedback}</p>
+          </CardContent>
+        </Card>
+      )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Order Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Created At</label>
+                <p className="text-sm">{order.createdAt}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Updated At</label>
+                <p className="text-sm">{order.updatedAt}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Custom Order</label>
+                <p className="text-sm">{order.isCustomOrder ? "Yes" : "No"}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Shipping Address</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-start space-x-2">
+              <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+              <div className="space-y-2">
+                {shippingAddress.line1 ? (
+                  <>
+                <p className="text-sm text-muted-foreground">
+                      {shippingAddress.line1}{shippingAddress.line2 ? `, ${shippingAddress.line2}` : ""}, {shippingAddress.city || ""}, {shippingAddress.state || ""} {shippingAddress.postalCode || ""}
+                </p>
+                    {shippingAddress.country && <p className="text-sm text-muted-foreground">{shippingAddress.country}</p>}
+                    {shippingAddress.phone && <p className="text-sm text-muted-foreground">{shippingAddress.phone}</p>}
+                    {shippingAddress.fullname && <p className="font-medium">{shippingAddress.fullname}</p>}
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">Shipping address not available</p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Order Logs - Only show for admin users */}
+      {user?.role !== "staff" && logsData?.data?.logs && logsData.data.logs.length > 0 && (
         <OrderLogsTable orderId={orderId} showFilters={true} />
       )}
 

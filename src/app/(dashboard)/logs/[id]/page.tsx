@@ -6,12 +6,51 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { orderLogService } from "@/services/order-log.service";
+import { productService } from "@/services/product.service";
 import { DetailPageHeader } from "@/components/dashboard/common/detail-page-header";
 import { formatDistanceToNow } from "date-fns";
 import { Link } from "next-view-transitions";
-import { CheckCircle, Package, Edit, Eye, List, FileText, Clock, User, ArrowLeft } from "lucide-react";
+import { CheckCircle, Package, Edit, Eye, List, FileText, Clock, User, ArrowLeft, ExternalLink } from "lucide-react";
 import Loader from "@/components/ui/loader";
 import { Separator } from "@/components/ui/separator";
+import React from "react";
+
+// Component to display product with name and link
+function ProductDisplay({ productId }: { productId: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["product", productId],
+    queryFn: async () => await productService.getById(productId),
+    enabled: !!productId && productId !== "N/A",
+  });
+
+  const product = data?.data;
+
+  if (isLoading) {
+    return <span className="text-muted-foreground">Loading product...</span>;
+  }
+
+  if (!product) {
+    return (
+      <span className="text-muted-foreground">
+        Product ID: {productId.substring(0, 8)}...
+      </span>
+    );
+  }
+
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+      <span className="font-semibold text-base">{product.name || "Unknown Product"}</span>
+      <Link
+        href={`/products/${productId}`}
+        className="inline-flex items-center gap-1 text-primary hover:underline text-sm font-medium whitespace-nowrap"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <ExternalLink className="h-4 w-4" />
+        View Product
+      </Link>
+    </div>
+  );
+}
 
 export default function LogDetailPage() {
   const params = useParams();
@@ -72,13 +111,80 @@ export default function LogDetailPage() {
     }
   };
 
-  const formatValue = (value: any): string => {
-    if (value === null || value === undefined) return "—";
-    if (typeof value === "string") return value;
-    if (typeof value === "number") return String(value);
-    if (Array.isArray(value)) return JSON.stringify(value, null, 2);
-    if (typeof value === "object") return JSON.stringify(value, null, 2);
-    return String(value);
+  const renderFormattedValue = (value: any, field?: string): React.ReactNode => {
+    if (value === null || value === undefined) return <span className="text-muted-foreground">—</span>;
+    
+    // Format order items array in a user-friendly way
+    if (field === "items" && Array.isArray(value)) {
+      if (value.length === 0) return <span className="text-muted-foreground">No items</span>;
+      
+      return (
+        <div className="space-y-3">
+          {value.map((item: any, index: number) => (
+            <div key={index} className="p-3 bg-background/50 rounded-md border">
+              <div className="font-semibold text-base mb-2">Item {index + 1}</div>
+              <div className="space-y-2 text-sm">
+                <div>
+                  <span className="text-muted-foreground font-medium">Product: </span>
+                  {item.product ? (
+                    <ProductDisplay productId={String(item.product)} />
+                  ) : (
+                    <span className="text-muted-foreground">N/A</span>
+                  )}
+                </div>
+                <div className="text-muted-foreground">
+                  <span className="font-medium">Quantity: </span>
+                  <span className="font-semibold text-foreground text-base">{item.quantity || 0}</span> {item.unit || ""}
+                </div>
+                {item.variantSelections && Object.keys(item.variantSelections).length > 0 && (
+                  <div className="text-muted-foreground">
+                    <span className="font-medium">Variants: </span>
+                    {Object.entries(item.variantSelections).map(([key, val], idx) => (
+                      <span key={key} className="inline-block mr-2">
+                        <span className="font-semibold capitalize">{key}</span>: <span className="text-foreground font-medium">{String(val)}</span>
+                        {idx < Object.entries(item.variantSelections).length - 1 && ","}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    
+    // Format status values
+    if (field === "status") {
+      return <span className="font-semibold text-base">{String(value).replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</span>;
+    }
+    
+    // Format feedback
+    if (field === "feedback") {
+      return <span className="whitespace-pre-wrap text-sm">{value || "—"}</span>;
+    }
+    
+    // For arrays, format as list
+    if (Array.isArray(value)) {
+      if (value.length === 0) return <span className="text-muted-foreground">—</span>;
+      return (
+        <div className="space-y-1">
+          {value.map((item, idx) => (
+            <div key={idx} className="text-xs">• {JSON.stringify(item)}</div>
+          ))}
+        </div>
+      );
+    }
+    
+    // For objects, format nicely
+    if (typeof value === "object") {
+      return <pre className="text-xs whitespace-pre-wrap break-words">{JSON.stringify(value, null, 2)}</pre>;
+    }
+    
+    // For strings and numbers
+    if (typeof value === "string") return <span className="whitespace-pre-wrap">{value}</span>;
+    if (typeof value === "number") return <span>{String(value)}</span>;
+    return <span>{String(value)}</span>;
   };
 
   const ActionIcon = getActionIcon(log.action, log.field);
@@ -136,24 +242,24 @@ export default function LogDetailPage() {
           {(log.oldValue !== undefined || log.newValue !== undefined) && (
             <Card>
               <CardHeader>
-                <CardTitle>Value Changes</CardTitle>
+                <CardTitle>Changes Made</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground mb-2 block">Old Value</label>
-                    <div className="p-3 rounded-md bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900">
-                      <pre className="text-xs text-red-700 dark:text-red-300 whitespace-pre-wrap break-words">
-                        {formatValue(log.oldValue)}
-                      </pre>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex flex-col min-w-0">
+                    <label className="text-base font-semibold text-muted-foreground mb-3 block">Before</label>
+                    <div className="p-4 rounded-md bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 min-h-[80px] flex-1 overflow-x-auto">
+                      <div className="text-base text-red-700 dark:text-red-300">
+                        {renderFormattedValue(log.oldValue, log.field)}
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground mb-2 block">New Value</label>
-                    <div className="p-3 rounded-md bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900">
-                      <pre className="text-xs text-green-700 dark:text-green-300 whitespace-pre-wrap break-words">
-                        {formatValue(log.newValue)}
-                      </pre>
+                  <div className="flex flex-col min-w-0">
+                    <label className="text-base font-semibold text-muted-foreground mb-3 block">After</label>
+                    <div className="p-4 rounded-md bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 min-h-[80px] flex-1 overflow-x-auto">
+                      <div className="text-base text-green-700 dark:text-green-300">
+                        {renderFormattedValue(log.newValue, log.field)}
+                      </div>
                     </div>
                   </div>
                 </div>
