@@ -158,6 +158,22 @@ class ProductService {
     const response = await instance.delete<ApiResponse<void>>(`/products/${id}`);
     return response.data;
   }
+
+  async bulkImport(csvFile: File) {
+    const formData = new FormData();
+    formData.append('csv', csvFile);
+    const response = await instance.post<ApiResponse<{
+      total: number;
+      success: number;
+      failed: number;
+      errors: Array<{ row: number; errors: string[] }>;
+    }>>("/products/bulk-import", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  }
 }
 
 export const productService = new ProductService();

@@ -432,6 +432,7 @@ export function ProductsTable() {
             deleteMutation.mutate(pendingDeleteId);
         }}
       />
+
     </div >
   );
 }
