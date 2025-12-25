@@ -20,20 +20,29 @@ export function NavUser({
     avatar: string
   }
 }) {
+  const initials = user.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2)
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <SidebarMenuButton
           size="lg"
-          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground rounded-lg hover:bg-accent transition-colors"
         >
-          <Avatar className="h-8 w-8 rounded grayscale">
-            <AvatarImage src={user.avatar} alt={user.name} />
-            <AvatarFallback className="rounded">CN</AvatarFallback>
+          <Avatar className="h-10 w-10 rounded-lg ring-2 ring-primary/10">
+            <AvatarImage src={user.avatar} alt={user.name} className="object-cover" />
+            <AvatarFallback className="rounded-lg bg-gradient-to-br from-primary to-primary/80 text-primary-foreground font-semibold text-sm">
+              {initials}
+            </AvatarFallback>
           </Avatar>
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">{user.name}</span>
-            <span className="opacity-70 truncate text-xs">
+          <div className="grid flex-1 text-left text-sm leading-tight min-w-0">
+            <span className="truncate font-semibold text-base">{user.name}</span>
+            <span className="truncate text-xs text-muted-foreground font-medium">
               {user.email}
             </span>
           </div>
