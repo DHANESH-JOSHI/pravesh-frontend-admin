@@ -24,6 +24,17 @@ import { toast } from "sonner";
 import Loader from "@/components/ui/loader";
 import { invalidateSettingQueries } from "@/lib/invalidate-queries";
 
+// Helper function to safely convert string or array to array, filtering out empty values
+const normalizeArrayField = (value: string | string[] | undefined): string[] => {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0);
+  }
+  if (typeof value === 'string' && value.trim()) {
+    return [value];
+  }
+  return [];
+};
+
 export function SettingsForm() {
   const logoRef = useRef<HTMLInputElement>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -110,38 +121,22 @@ export function SettingsForm() {
         whyChooseUs: setting.whyChooseUs || "",
         privacyPolicy: {
           introduction: setting.privacyPolicy?.introduction || "",
-          informationWeCollect: Array.isArray(setting.privacyPolicy?.informationWeCollect) 
-            ? setting.privacyPolicy.informationWeCollect 
-            : (setting.privacyPolicy?.informationWeCollect ? [setting.privacyPolicy.informationWeCollect] : []),
-          howWeUseInformation: Array.isArray(setting.privacyPolicy?.howWeUseInformation) 
-            ? setting.privacyPolicy.howWeUseInformation 
-            : (setting.privacyPolicy?.howWeUseInformation ? [setting.privacyPolicy.howWeUseInformation] : []),
-          informationSharing: Array.isArray(setting.privacyPolicy?.informationSharing) 
-            ? setting.privacyPolicy.informationSharing 
-            : (setting.privacyPolicy?.informationSharing ? [setting.privacyPolicy.informationSharing] : []),
+          informationWeCollect: normalizeArrayField(setting.privacyPolicy?.informationWeCollect),
+          howWeUseInformation: normalizeArrayField(setting.privacyPolicy?.howWeUseInformation),
+          informationSharing: normalizeArrayField(setting.privacyPolicy?.informationSharing),
           dataSecurity: setting.privacyPolicy?.dataSecurity || "",
-          userRights: Array.isArray(setting.privacyPolicy?.userRights) 
-            ? setting.privacyPolicy.userRights 
-            : (setting.privacyPolicy?.userRights ? [setting.privacyPolicy.userRights] : []),
+          userRights: normalizeArrayField(setting.privacyPolicy?.userRights),
           cookies: setting.privacyPolicy?.cookies || "",
-          thirdPartyServices: Array.isArray(setting.privacyPolicy?.thirdPartyServices) 
-            ? setting.privacyPolicy.thirdPartyServices 
-            : (setting.privacyPolicy?.thirdPartyServices ? [setting.privacyPolicy.thirdPartyServices] : []),
+          thirdPartyServices: normalizeArrayField(setting.privacyPolicy?.thirdPartyServices),
           changesToPolicy: setting.privacyPolicy?.changesToPolicy || "",
         },
         returnsRefunds: {
           introduction: setting.returnsRefunds?.introduction || "",
-          returnEligibility: Array.isArray(setting.returnsRefunds?.returnEligibility) 
-            ? setting.returnsRefunds.returnEligibility 
-            : (setting.returnsRefunds?.returnEligibility ? [setting.returnsRefunds.returnEligibility] : []),
+          returnEligibility: normalizeArrayField(setting.returnsRefunds?.returnEligibility),
           returnTimeframe: setting.returnsRefunds?.returnTimeframe || "",
-          returnProcess: Array.isArray(setting.returnsRefunds?.returnProcess) 
-            ? setting.returnsRefunds.returnProcess 
-            : (setting.returnsRefunds?.returnProcess ? [setting.returnsRefunds.returnProcess] : []),
+          returnProcess: normalizeArrayField(setting.returnsRefunds?.returnProcess),
           refundPolicy: setting.returnsRefunds?.refundPolicy || "",
-          nonRefundableItems: Array.isArray(setting.returnsRefunds?.nonRefundableItems) 
-            ? setting.returnsRefunds.nonRefundableItems 
-            : (setting.returnsRefunds?.nonRefundableItems ? [setting.returnsRefunds.nonRefundableItems] : []),
+          nonRefundableItems: normalizeArrayField(setting.returnsRefunds?.nonRefundableItems),
           exchangePolicy: setting.returnsRefunds?.exchangePolicy || "",
           returnShipping: setting.returnsRefunds?.returnShipping || "",
           refundProcessingTime: setting.returnsRefunds?.refundProcessingTime || "",
