@@ -2,10 +2,10 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Plus, Trash, Upload } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -43,6 +43,7 @@ export function SettingsForm() {
       email: "",
       phone: "",
       address: "",
+      mapAddress: "",
       socialLinks: {
         facebook: "",
         instagram: "",
@@ -58,6 +59,28 @@ export function SettingsForm() {
       citiesServed: "",
       workingHours: "",
       whyChooseUs: "",
+        privacyPolicy: {
+          introduction: "",
+          informationWeCollect: [],
+          howWeUseInformation: [],
+          informationSharing: [],
+          dataSecurity: "",
+          userRights: [],
+          cookies: "",
+          thirdPartyServices: [],
+          changesToPolicy: "",
+        },
+        returnsRefunds: {
+          introduction: "",
+          returnEligibility: [],
+          returnTimeframe: "",
+          returnProcess: [],
+          refundPolicy: "",
+          nonRefundableItems: [],
+          exchangePolicy: "",
+          returnShipping: "",
+          refundProcessingTime: "",
+        },
     },
   });
 
@@ -68,6 +91,7 @@ export function SettingsForm() {
         email: setting.email || "",
         phone: setting.phone || "",
         address: setting.address || "",
+        mapAddress: setting.mapAddress || "",
         logo: setting.logo || undefined,
         socialLinks: {
           facebook: setting.socialLinks?.facebook || "",
@@ -84,6 +108,44 @@ export function SettingsForm() {
         citiesServed: setting.citiesServed || "",
         workingHours: setting.workingHours || "",
         whyChooseUs: setting.whyChooseUs || "",
+        privacyPolicy: {
+          introduction: setting.privacyPolicy?.introduction || "",
+          informationWeCollect: Array.isArray(setting.privacyPolicy?.informationWeCollect) 
+            ? setting.privacyPolicy.informationWeCollect 
+            : (setting.privacyPolicy?.informationWeCollect ? [setting.privacyPolicy.informationWeCollect] : []),
+          howWeUseInformation: Array.isArray(setting.privacyPolicy?.howWeUseInformation) 
+            ? setting.privacyPolicy.howWeUseInformation 
+            : (setting.privacyPolicy?.howWeUseInformation ? [setting.privacyPolicy.howWeUseInformation] : []),
+          informationSharing: Array.isArray(setting.privacyPolicy?.informationSharing) 
+            ? setting.privacyPolicy.informationSharing 
+            : (setting.privacyPolicy?.informationSharing ? [setting.privacyPolicy.informationSharing] : []),
+          dataSecurity: setting.privacyPolicy?.dataSecurity || "",
+          userRights: Array.isArray(setting.privacyPolicy?.userRights) 
+            ? setting.privacyPolicy.userRights 
+            : (setting.privacyPolicy?.userRights ? [setting.privacyPolicy.userRights] : []),
+          cookies: setting.privacyPolicy?.cookies || "",
+          thirdPartyServices: Array.isArray(setting.privacyPolicy?.thirdPartyServices) 
+            ? setting.privacyPolicy.thirdPartyServices 
+            : (setting.privacyPolicy?.thirdPartyServices ? [setting.privacyPolicy.thirdPartyServices] : []),
+          changesToPolicy: setting.privacyPolicy?.changesToPolicy || "",
+        },
+        returnsRefunds: {
+          introduction: setting.returnsRefunds?.introduction || "",
+          returnEligibility: Array.isArray(setting.returnsRefunds?.returnEligibility) 
+            ? setting.returnsRefunds.returnEligibility 
+            : (setting.returnsRefunds?.returnEligibility ? [setting.returnsRefunds.returnEligibility] : []),
+          returnTimeframe: setting.returnsRefunds?.returnTimeframe || "",
+          returnProcess: Array.isArray(setting.returnsRefunds?.returnProcess) 
+            ? setting.returnsRefunds.returnProcess 
+            : (setting.returnsRefunds?.returnProcess ? [setting.returnsRefunds.returnProcess] : []),
+          refundPolicy: setting.returnsRefunds?.refundPolicy || "",
+          nonRefundableItems: Array.isArray(setting.returnsRefunds?.nonRefundableItems) 
+            ? setting.returnsRefunds.nonRefundableItems 
+            : (setting.returnsRefunds?.nonRefundableItems ? [setting.returnsRefunds.nonRefundableItems] : []),
+          exchangePolicy: setting.returnsRefunds?.exchangePolicy || "",
+          returnShipping: setting.returnsRefunds?.returnShipping || "",
+          refundProcessingTime: setting.returnsRefunds?.refundProcessingTime || "",
+        },
       });
       setLogoPreview(setting.logo || null);
     }
@@ -202,6 +264,26 @@ export function SettingsForm() {
                 )}
               />
             </div>
+            <FormField
+              control={form.control}
+              name="mapAddress"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Map Address</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Enter address for map (e.g., Street, City, State, Country). This will be used to display the location on Google Maps." 
+                      rows={3}
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <p className="text-xs text-muted-foreground">
+                    This address will be used specifically for the map display on the Contact page. Leave empty to use the regular address.
+                  </p>
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="logo"
@@ -481,6 +563,254 @@ export function SettingsForm() {
           </CardContent>
         </Card>
 
+        {/* Privacy Policy */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Privacy Policy</CardTitle>
+            <p className="text-sm text-muted-foreground mt-2">
+              Fill in the sections below to create your privacy policy page. All fields are optional.
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              💡 Tip: Use the "Add Point" button to add bullet points for list fields.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <FormField
+              control={form.control}
+              name="privacyPolicy.introduction"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Introduction</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Enter introduction to your privacy policy..."
+                      rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <ArrayFieldInput
+              form={form}
+              name="privacyPolicy.informationWeCollect"
+              label="Information We Collect"
+              placeholder="e.g., Name and contact information"
+            />
+            <ArrayFieldInput
+              form={form}
+              name="privacyPolicy.howWeUseInformation"
+              label="How We Use Information"
+              placeholder="e.g., Process and fulfill your orders"
+            />
+            <ArrayFieldInput
+              form={form}
+              name="privacyPolicy.informationSharing"
+              label="Information Sharing"
+              placeholder="e.g., Shipping partners to fulfill your orders"
+            />
+            <FormField
+              control={form.control}
+              name="privacyPolicy.dataSecurity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Data Security</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Explain your data security measures..."
+                      rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <ArrayFieldInput
+              form={form}
+              name="privacyPolicy.userRights"
+              label="User Rights"
+              placeholder="e.g., Access your personal information"
+            />
+            <FormField
+              control={form.control}
+              name="privacyPolicy.cookies"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cookies</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Explain your cookie policy..."
+                      rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <ArrayFieldInput
+              form={form}
+              name="privacyPolicy.thirdPartyServices"
+              label="Third Party Services"
+              placeholder="e.g., Payment processors (Stripe, PayPal)"
+            />
+            <FormField
+              control={form.control}
+              name="privacyPolicy.changesToPolicy"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Changes to Policy</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Explain how you will notify users of policy changes..."
+                      rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Returns & Refunds */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Returns & Refunds</CardTitle>
+            <p className="text-sm text-muted-foreground mt-2">
+              Fill in the sections below to create your returns and refunds policy page. All fields are optional.
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              💡 Tip: Use the "Add Point" button to add bullet points for list fields.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <FormField
+              control={form.control}
+              name="returnsRefunds.introduction"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Introduction</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Enter introduction to your returns and refunds policy..."
+                      rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <ArrayFieldInput
+              form={form}
+              name="returnsRefunds.returnEligibility"
+              label="Return Eligibility"
+              placeholder="e.g., Items must be unused and in original packaging"
+            />
+            <FormField
+              control={form.control}
+              name="returnsRefunds.returnTimeframe"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Return Timeframe</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Specify the time period within which returns are accepted (e.g., 7 days, 30 days)..."
+                      rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <ArrayFieldInput
+              form={form}
+              name="returnsRefunds.returnProcess"
+              label="Return Process"
+              placeholder="e.g., Contact our customer service team to initiate a return"
+            />
+            <FormField
+              control={form.control}
+              name="returnsRefunds.refundPolicy"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Refund Policy</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Explain your refund policy, including refund methods and conditions..."
+                      rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <ArrayFieldInput
+              form={form}
+              name="returnsRefunds.nonRefundableItems"
+              label="Non-Refundable Items"
+              placeholder="e.g., Custom-made or personalized items"
+            />
+            <FormField
+              control={form.control}
+              name="returnsRefunds.exchangePolicy"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Exchange Policy</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Explain your exchange policy, if applicable..."
+                      rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="returnsRefunds.returnShipping"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Return Shipping</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Explain who pays for return shipping and how to ship items back..."
+                      rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="returnsRefunds.refundProcessingTime"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Refund Processing Time</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Specify how long it takes to process refunds (e.g., 5-7 business days)..."
+                      rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
+
         <div className="flex justify-end gap-4">
           <Button
             type="button"
@@ -502,3 +832,66 @@ export function SettingsForm() {
   );
 }
 
+// Helper component for array fields with add/remove functionality
+function ArrayFieldInput({
+  form,
+  name,
+  label,
+  placeholder,
+}: {
+  form: any;
+  name: string;
+  label: string;
+  placeholder?: string;
+}) {
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: name as any,
+  });
+
+  return (
+    <FormItem>
+      <FormLabel>{label}</FormLabel>
+      <div className="space-y-3">
+        {fields.map((field, index) => (
+          <div key={field.id} className="flex items-start gap-2">
+            <FormField
+              control={form.control}
+              name={`${name}.${index}`}
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormControl>
+                    <Input
+                      placeholder={placeholder || `Enter ${label.toLowerCase()}...`}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => remove(index)}
+              className="mt-0"
+            >
+              <Trash className="h-4 w-4 text-destructive" />
+            </Button>
+          </div>
+        ))}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={() => append("")}
+        >
+          <Plus className="h-4 w-4" />
+          Add Point
+        </Button>
+      </div>
+    </FormItem>
+  );
+}
