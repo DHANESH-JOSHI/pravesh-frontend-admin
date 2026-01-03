@@ -70,6 +70,14 @@ export function invalidateProductQueries(
   if (brandId || oldBrandId) {
     queryClient.invalidateQueries({ queryKey: ["brands"], exact: false });
   }
+  
+  // Invalidate order caches (orders display product info: name, thumbnail, slug in order items)
+  queryClient.invalidateQueries({ queryKey: ["orders"], exact: false });
+  queryClient.invalidateQueries({ queryKey: ["order"], exact: false });
+  
+  // Invalidate wishlist caches (wishlists display product info: name, thumbnail, slug)
+  // Note: Frontend uses Redux for wishlist, but dashboard might have wishlist queries
+  queryClient.invalidateQueries({ queryKey: ["wishlist"], exact: false });
 }
 
 /**
@@ -196,6 +204,7 @@ export function invalidateCategoryQueries(
   
   // Invalidate all category list variations (matches: categories*)
   queryClient.invalidateQueries({ queryKey: ["categories"], exact: false });
+  queryClient.invalidateQueries({ queryKey: ["categories-parent"], exact: false });
   queryClient.invalidateQueries({ queryKey: ["category"], exact: false });
   
   // Invalidate category tree (matches: categories:tree)
