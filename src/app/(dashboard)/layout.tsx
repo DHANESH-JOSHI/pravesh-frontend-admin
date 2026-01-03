@@ -23,6 +23,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/login");
+      return;
+    }
+    // Block regular users from accessing admin dashboard
+    if (!loading && user && user.role === "user") {
+      router.replace("/user-dashboard");
+      return;
     }
     if (!loading && user?.role === "staff") {
       const hasAccess = pathname === "/orders" || pathname.startsWith("/orders/") || pathname.startsWith("/profile");

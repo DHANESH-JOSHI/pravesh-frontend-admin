@@ -36,10 +36,22 @@ export default function LoginPage() {
   const [method, setMethod] = useState<"otp" | "password">("otp");
 
   useEffect(() => {
-    if (!loading && user) {
-      router.replace("/");
-    }
-  }, [user, loading, router]);
+    // Check if already logged in as admin/staff
+    (async () => {
+      try {
+        const res = await userService.getMe();
+        const userRole = res.data?.role;
+        if (userRole === "admin" || userRole === "staff") {
+          router.replace("/");
+        } else if (userRole === "user") {
+          // If regular user is logged in, redirect to user dashboard
+          router.replace("/user-dashboard");
+        }
+      } catch (e) {
+        // Not logged in, continue with login page
+      }
+    })();
+  }, [router]);
 
   const forgotPasswordForm = useForm<{ phoneOrEmail: string; otp?: string; newPassword?: string }>({
     defaultValues: {

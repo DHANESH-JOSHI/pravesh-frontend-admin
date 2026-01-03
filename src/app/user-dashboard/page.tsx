@@ -32,8 +32,12 @@ export default function UserDashboardPage() {
     (async () => {
       try {
         const res = await instance.get<ApiResponse<User>>("/users/me");
-        if (res.data?.data?.role === "user") {
+        const userRole = res.data?.data?.role;
+        if (userRole === "user" && res.data?.data) {
           setUser(res.data.data);
+        } else if (userRole === "admin" || userRole === "staff") {
+          // If admin/staff is logged in, redirect to admin dashboard
+          router.replace("/");
         } else {
           router.replace("/user-login");
         }
