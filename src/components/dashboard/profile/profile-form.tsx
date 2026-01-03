@@ -149,9 +149,11 @@ export function ProfileForm() {
 
   const deleteAccountMutation = useMutation({
     mutationFn: () => userService.deleteMe(),
-    onSuccess: ({ message }) => {
+    onSuccess: async ({ message }) => {
       toast.success(message ?? "Account deleted successfully");
-      logout();
+      // Logout to clear session and auth state
+      await logout();
+      // Redirect to login page
       router.push("/login");
     },
     onError: (error: any) => {

@@ -1,10 +1,9 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTransitionRouter } from "next-view-transitions";
 import instance from "@/lib/axios";
 import { ApiResponse, User } from "@/types";
 import Loader from "@/components/ui/loader";
-import { useState } from "react";
 
 export default function UserDashboardLayout({
   children,
@@ -13,10 +12,15 @@ export default function UserDashboardLayout({
 }) {
   const router = useTransitionRouter();
   const [loading, setLoading] = useState(true);
+  const hasCheckedRef = useRef(false);
 
   useEffect(() => {
     // Check authentication and role on every navigation
     (async () => {
+      // Prevent multiple redirects in the same render cycle
+      if (hasCheckedRef.current) return;
+      hasCheckedRef.current = true;
+      
       try {
         const res = await instance.get<ApiResponse<User>>("/users/me");
         const userRole = res.data?.data?.role;
@@ -37,6 +41,11 @@ export default function UserDashboardLayout({
         setLoading(false);
       }
     })();
+    
+    // Reset the ref when router changes (new navigation)
+    return () => {
+      hasCheckedRef.current = false;
+    };
   }, [router]);
 
   if (loading) {

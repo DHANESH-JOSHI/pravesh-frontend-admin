@@ -42,7 +42,7 @@ export default function LoginPage() {
         const res = await userService.getMe();
         const userRole = res.data?.role;
         if (userRole === "admin" || userRole === "staff") {
-      router.replace("/");
+          router.replace("/");
         } else if (userRole === "user") {
           // If regular user is logged in, redirect to user dashboard
           router.replace("/user-dashboard");
@@ -52,6 +52,18 @@ export default function LoginPage() {
       }
     })();
   }, [router]);
+
+  // Redirect when user state updates after login
+  useEffect(() => {
+    if (user) {
+      const userRole = user.role;
+      if (userRole === "admin" || userRole === "staff") {
+        router.replace("/");
+      } else if (userRole === "user") {
+        router.replace("/user-dashboard");
+      }
+    }
+  }, [user, router]);
 
   const forgotPasswordForm = useForm<{ phoneOrEmail: string; otp?: string; newPassword?: string }>({
     defaultValues: {
@@ -89,7 +101,7 @@ export default function LoginPage() {
       if (!data) return;
       login(data);
       toast.success(message ?? "Logged in");
-      // Navigation will be handled by useEffect when user state updates
+      // Redirect will be handled by useEffect when user state updates
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message ?? "Failed to login. Check credentials and try again.");
@@ -125,7 +137,8 @@ export default function LoginPage() {
     return <Loader text="Loading..." />
   }
   if (user) {
-    return null;
+    // User is logged in, redirecting...
+    return <Loader text="Redirecting..." />
   }
   return (
     <div className="flex min-h-screen items-center justify-center bg-linear-to-tr from-secondary/20 via-secondary/60 to-secondary">

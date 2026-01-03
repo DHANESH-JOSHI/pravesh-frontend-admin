@@ -33,15 +33,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       try {
         const res = await userService.getMe();
-        const userRole = res.data?.role;
-        // Only allow admin or staff roles in admin dashboard
-        // Regular users should use /user-dashboard
-        if (userRole !== "admin" && userRole !== "staff") {
-          // Clear admin session if user is a regular user
-          await logout();
-          setUser(null);
-          return;
-        }
+        // Keep the session - set user data regardless of role
+        // Layout will handle redirecting to appropriate dashboard based on role
         setUser(res?.data || null);
       } catch (e: any) {
         setUser(null);
@@ -49,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
       }
     })();
-  }, [logout]);
+  }, []);
 
   const value = useMemo(() => ({ user, loading, login, logout }), [user, loading, login, logout]);
 

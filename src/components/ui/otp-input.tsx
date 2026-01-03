@@ -45,7 +45,7 @@ export function InputOTPForm({ phoneOrEmail }: { phoneOrEmail: string }) {
       if (!data) return;
       login(data);
       toast.success("Login successful!");
-      // Navigation will be handled by useEffect in login page when user state updates
+      // Redirect will be handled by useEffect in login page when user state updates
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message ?? "Invalid OTP. Please try again.")

@@ -20,29 +20,31 @@ import { userService } from "@/services/user.service";
 import instance from "@/lib/axios";
 import { ApiResponse, User } from "@/types";
 import Loader from "@/components/ui/loader";
+import { useAuth } from "@/providers/auth";
 
 export default function UserDashboardPage() {
   const router = useTransitionRouter();
+  const { logout } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     // Check if user is logged in
+    // Note: Layout already handles redirects for admin/staff, so we only need to check for regular users
     (async () => {
       try {
         const res = await instance.get<ApiResponse<User>>("/users/me");
         const userRole = res.data?.data?.role;
         if (userRole === "user" && res.data?.data) {
           setUser(res.data.data);
-        } else if (userRole === "admin" || userRole === "staff") {
-          // If admin/staff is logged in, redirect to admin dashboard
-          router.replace("/");
         } else {
-          router.replace("/user-login");
+          // Layout will handle redirect for admin/staff or unauthenticated users
+          setUser(null);
         }
       } catch (e) {
-        router.replace("/user-login");
+        // Layout will handle redirect for unauthenticated users
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -51,14 +53,11 @@ export default function UserDashboardPage() {
 
   const deleteAccountMutation = useMutation({
     mutationFn: () => userService.deleteMe(),
-    onSuccess: ({ message }) => {
+    onSuccess: async ({ message }) => {
       toast.success(message ?? "Account deleted successfully");
-      // Clear cookies and redirect
-      document.cookie.split(";").forEach((c) => {
-        document.cookie = c
-          .replace(/^ +/, "")
-          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-      });
+      // Logout to clear session and auth state
+      await logout();
+      // Redirect to login page
       router.push("/user-login");
     },
     onError: (error: any) => {

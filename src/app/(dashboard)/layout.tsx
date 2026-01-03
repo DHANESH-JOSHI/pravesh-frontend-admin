@@ -3,7 +3,7 @@ import { AppSidebar } from "@/components/dashboard/sidebar";
 import Loader from "@/components/ui/loader";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useAuth } from "@/providers/auth";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { BreadcrumbHeader } from "@/components/dashboard/common/breadcrumb-header";
 import { useTransitionRouter } from "next-view-transitions";
 import { usePathname } from "next/navigation";
@@ -16,6 +16,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [checkingSession, setCheckingSession] = useState(true);
   const router = useTransitionRouter();
   const pathname = usePathname();
+  const hasRedirectedRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -26,11 +27,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // First check actual session to see if a regular user is logged in
     (async () => {
+      // Prevent multiple redirects
+      if (hasRedirectedRef.current) return;
+      
       try {
         const res = await instance.get<ApiResponse<User>>("/users/me");
         const userRole = res.data?.data?.role;
         if (userRole === "user") {
           // Regular user trying to access admin dashboard - redirect to user dashboard
+          hasRedirectedRef.current = true;
           router.replace("/user-dashboard");
           return;
         }
@@ -40,17 +45,26 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         setCheckingSession(false);
       }
     })();
+    
+    // Reset redirect flag when router changes
+    return () => {
+      hasRedirectedRef.current = false;
+    };
   }, [router]);
 
   useEffect(() => {
     if (checkingSession) return; // Wait for session check to complete
+    if (hasRedirectedRef.current) return; // Already redirected
     
+    // If no user is authenticated, redirect to login
     if (!loading && !user) {
+      hasRedirectedRef.current = true;
       router.replace("/login");
       return;
     }
-    // Block regular users from accessing admin dashboard (double check)
+    // Redirect regular users to their dashboard (they're logged in but shouldn't access admin dashboard)
     if (!loading && user && user.role === "user") {
+      hasRedirectedRef.current = true;
       router.replace("/user-dashboard");
       return;
     }
