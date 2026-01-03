@@ -85,11 +85,9 @@ class UserService {
     return response.data;
   }
 
-  async resetPassword(otp: string, newPassword: string): Promise<ApiResponse> {
-    if (!otp || !newPassword) {
-      throw new Error("OTP and new password are required");
-    }
+  async resetPassword(phoneOrEmail: string, otp: string, newPassword: string): Promise<ApiResponse> {
     const response = await instance.post<ApiResponse>(`/users/password/reset`, {
+      phoneOrEmail,
       otp,
       newPassword
     });

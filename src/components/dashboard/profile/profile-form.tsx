@@ -34,7 +34,6 @@ import { User } from "@/types/user";
 import { toast } from "sonner";
 import Loader from "@/components/ui/loader";
 import { useAuth } from "@/providers/auth";
-import { useTransitionRouter } from "next-view-transitions";
 
 const updateProfileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -56,7 +55,6 @@ type UpdatePassword = z.infer<typeof updatePasswordSchema>;
 
 export function ProfileForm() {
   const { user: currentUser, login, logout } = useAuth();
-  const router = useTransitionRouter();
   const imageRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [hasNewImage, setHasNewImage] = useState(false);
@@ -151,10 +149,7 @@ export function ProfileForm() {
     mutationFn: () => userService.deleteMe(),
     onSuccess: async ({ message }) => {
       toast.success(message ?? "Account deleted successfully");
-      // Logout to clear session and auth state
       await logout();
-      // Redirect to login page
-      router.push("/login");
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message ?? "Failed to delete account. Please try again.");

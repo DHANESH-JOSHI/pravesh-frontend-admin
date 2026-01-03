@@ -118,6 +118,7 @@ export function UserFormDialog({
                     <Input
                       placeholder="Enter user name..."
                       {...field}
+                      autoComplete="name"
                     />
                   </FormControl>
                   <FormMessage />
@@ -135,6 +136,7 @@ export function UserFormDialog({
                       type="tel"
                       placeholder="Enter phone number..."
                       {...field}
+                      autoComplete="tel"
                     />
                   </FormControl>
                   <FormMessage />
@@ -152,6 +154,7 @@ export function UserFormDialog({
                       type="email"
                       placeholder="Enter email..."
                       {...field}
+                      autoComplete="email"
                     />
                   </FormControl>
                   <FormMessage />
@@ -169,6 +172,7 @@ export function UserFormDialog({
                       type="password"
                       placeholder="Enter password..."
                       {...field}
+                      autoComplete="new-password"
                     />
                   </FormControl>
                   <FormMessage />

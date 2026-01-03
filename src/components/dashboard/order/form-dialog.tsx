@@ -271,6 +271,7 @@ export function OrderFormDialog({
                                         type="number"
                                         placeholder="Qty"
                                         {...field}
+                                        autoComplete="off"
                                         onChange={(e) => field.onChange(Number(e.target.value))}
                                         className="w-full"
                                       />

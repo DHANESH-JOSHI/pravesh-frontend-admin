@@ -118,6 +118,7 @@ export function BrandFormDialog({
                     <Input
                       placeholder="Enter brand name..."
                       {...field}
+                      autoComplete="off"
                     />
                   </FormControl>
                   <FormMessage />

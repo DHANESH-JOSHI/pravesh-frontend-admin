@@ -26,7 +26,6 @@ import { Link } from "next-view-transitions";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/providers/auth';
-import { useTransitionRouter } from 'next-view-transitions';
 
 interface IDashboardStats {
   totalUsers: number;
@@ -104,7 +103,6 @@ const PIE_COLORS = [
 export default function DashboardPage() {
   const isMobile = useIsMobile();
   const { user, loading: authLoading } = useAuth();
-  const router = useTransitionRouter();
   
   const {
     data: stats,
@@ -120,11 +118,8 @@ export default function DashboardPage() {
     },
   });
 
-  React.useEffect(() => {
-    if (!authLoading && user?.role === "staff") {
-      router.replace("/orders");
-    }
-  }, [user, authLoading, router]);
+  // Layout already handles all redirects including staff redirects
+  // No need for duplicate redirect logic here
 
   if (authLoading) {
     return <Loader text="Loading..." />;

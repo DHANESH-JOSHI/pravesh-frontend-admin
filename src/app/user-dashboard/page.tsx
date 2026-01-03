@@ -12,53 +12,21 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Trash2, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { useTransitionRouter } from "next-view-transitions";
 import { useMutation } from "@tanstack/react-query";
 import { userService } from "@/services/user.service";
-import instance from "@/lib/axios";
-import { ApiResponse, User } from "@/types";
-import Loader from "@/components/ui/loader";
 import { useAuth } from "@/providers/auth";
 
 export default function UserDashboardPage() {
-  const router = useTransitionRouter();
-  const { logout } = useAuth();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { logout, user } = useAuth();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
-  useEffect(() => {
-    // Check if user is logged in
-    // Note: Layout already handles redirects for admin/staff, so we only need to check for regular users
-    (async () => {
-      try {
-        const res = await instance.get<ApiResponse<User>>("/users/me");
-        const userRole = res.data?.data?.role;
-        if (userRole === "user" && res.data?.data) {
-          setUser(res.data.data);
-        } else {
-          // Layout will handle redirect for admin/staff or unauthenticated users
-          setUser(null);
-        }
-      } catch (e) {
-        // Layout will handle redirect for unauthenticated users
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [router]);
 
   const deleteAccountMutation = useMutation({
     mutationFn: () => userService.deleteMe(),
     onSuccess: async ({ message }) => {
       toast.success(message ?? "Account deleted successfully");
-      // Logout to clear session and auth state
       await logout();
-      // Redirect to login page
-      router.push("/user-login");
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message ?? "Failed to delete account. Please try again.");
@@ -66,12 +34,8 @@ export default function UserDashboardPage() {
     },
   });
 
-  if (loading) {
-    return <Loader text="Loading..." />;
-  }
-
   if (!user) {
-    return null; // Will redirect
+    return null;
   }
 
   return (

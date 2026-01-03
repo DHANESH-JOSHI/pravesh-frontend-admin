@@ -276,6 +276,7 @@ export function ProductFormDialog({
                           <Input
                             placeholder="Enter product name..."
                             {...field}
+                            autoComplete="off"
                           />
                         </FormControl>
                         <FormMessage />
@@ -365,7 +366,7 @@ export function ProductFormDialog({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Discount Value</FormLabel>
-                        <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+                        <Input type="number" {...field} onChange={e => field.onChange(Number(e.target.value))} autoComplete="off" />
                         <FormMessage />
                       </FormItem>
                     )}
@@ -717,7 +718,7 @@ function KeyValueFormArray({ name, title, form, fields, append, remove, isVarian
               render={({ field }) => (
                 <FormItem className="grow">
                   <FormControl>
-                    <Input placeholder={isVariant ? "Variant Name (e.g., Color, Size)" : "Key"} {...field} />
+                    <Input placeholder={isVariant ? "Variant Name (e.g., Color, Size)" : "Key"} {...field} autoComplete="off" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -737,6 +738,7 @@ function KeyValueFormArray({ name, title, form, fields, append, remove, isVarian
                         const val = e.target.value;
                         field.onChange(val);
                       }}
+                      autoComplete="off"
                     />
                   </FormControl>
                   <FormMessage />
@@ -913,6 +915,7 @@ function TagsInput({ value, onChange }: { value: string[]; onChange: (v: string[
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         onBlur={() => addTagFromInput()}
+        autoComplete="off"
       />
     </div>
   );

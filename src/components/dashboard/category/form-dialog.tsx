@@ -67,6 +67,7 @@ export function CategoryFormDialog({
                     <Input
                       placeholder="Enter category name..."
                       {...field}
+                      autoComplete="off"
                     />
                   </FormControl>
                   <FormMessage />

@@ -121,6 +121,7 @@ export function BlogFormDialog({
                         <Input
                           placeholder="Enter blog title..."
                           {...field}
+                          autoComplete="off"
                         />
                       </FormControl>
                       <FormMessage />
@@ -133,7 +134,7 @@ export function BlogFormDialog({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Tags</FormLabel>
-                      <Input placeholder="Enter tags, comma separated" defaultValue={Array.isArray(field.value) ? field.value.join(', ') : ''} onChange={e => field.onChange(e.target.value.split(',').map(s => s.trim()))} />
+                      <Input placeholder="Enter tags, comma separated" defaultValue={Array.isArray(field.value) ? field.value.join(', ') : ''} onChange={e => field.onChange(e.target.value.split(',').map(s => s.trim()))} autoComplete="off" />
                       <FormMessage />
                     </FormItem>
                   )}

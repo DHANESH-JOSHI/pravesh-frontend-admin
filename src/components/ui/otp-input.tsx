@@ -60,29 +60,31 @@ export function InputOTPForm({ phoneOrEmail }: { phoneOrEmail: string }) {
           name="otp"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>OTP : </FormLabel>
-              <FormControl className="flex flex-col items-center">
-                <InputOTP
-                  maxLength={6}
-                  minLength={6}
-                  value={field.value}
-                  onChange={field.onChange}
-                  autoComplete="one-time-code"
-                >
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
-                  </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup>
-                    <InputOTPSlot index={3} />
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
-                  </InputOTPGroup>
-                </InputOTP>
+              <FormLabel className="text-center block mb-4">OTP</FormLabel>
+              <FormControl>
+                <div className="flex justify-center">
+                  <InputOTP
+                    maxLength={6}
+                    minLength={6}
+                    value={field.value}
+                    onChange={field.onChange}
+                    autoComplete="one-time-code"
+                  >
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                    </InputOTPGroup>
+                    <InputOTPSeparator />
+                    <InputOTPGroup>
+                      <InputOTPSlot index={3} />
+                      <InputOTPSlot index={4} />
+                      <InputOTPSlot index={5} />
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-center" />
             </FormItem>
           )}
         />
@@ -90,7 +92,8 @@ export function InputOTPForm({ phoneOrEmail }: { phoneOrEmail: string }) {
         <Button
           type="submit"
           size="lg"
-          className="w-full bg-accent hover:bg-accent/80 text-primary"
+          className="w-full"
+          disabled={isPending}
         >
           {isPending ? <Loader2 className="animate-spin h-4 w-4" /> : "Verify OTP →"}
         </Button>

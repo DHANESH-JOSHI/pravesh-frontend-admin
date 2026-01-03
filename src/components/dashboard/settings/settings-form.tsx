@@ -383,7 +383,7 @@ export function SettingsForm() {
                   <FormItem>
                     <FormLabel>Instagram</FormLabel>
                     <FormControl>
-                      <Input type="url" placeholder="https://instagram.com/..." {...field} />
+                      <Input type="url" placeholder="https://instagram.com/..." {...field} autoComplete="off" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -396,7 +396,7 @@ export function SettingsForm() {
                   <FormItem>
                     <FormLabel>YouTube</FormLabel>
                     <FormControl>
-                      <Input type="url" placeholder="https://youtube.com/..." {...field} />
+                      <Input type="url" placeholder="https://youtube.com/..." {...field} autoComplete="off" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -409,7 +409,7 @@ export function SettingsForm() {
                   <FormItem>
                     <FormLabel>Twitter</FormLabel>
                     <FormControl>
-                      <Input type="url" placeholder="https://twitter.com/..." {...field} />
+                      <Input type="url" placeholder="https://twitter.com/..." {...field} autoComplete="off" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -422,7 +422,7 @@ export function SettingsForm() {
                   <FormItem>
                     <FormLabel>LinkedIn</FormLabel>
                     <FormControl>
-                      <Input type="url" placeholder="https://linkedin.com/..." {...field} />
+                      <Input type="url" placeholder="https://linkedin.com/..." {...field} autoComplete="off" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -499,7 +499,7 @@ export function SettingsForm() {
                   <FormItem>
                     <FormLabel>Happy Customers</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., 1000+" {...field} />
+                      <Input placeholder="e.g., 1000+" {...field} autoComplete="off" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -512,7 +512,7 @@ export function SettingsForm() {
                   <FormItem>
                     <FormLabel>Products Available</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., 500+" {...field} />
+                      <Input placeholder="e.g., 500+" {...field} autoComplete="off" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -525,7 +525,7 @@ export function SettingsForm() {
                   <FormItem>
                     <FormLabel>Cities Served</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., 50+" {...field} />
+                      <Input placeholder="e.g., 50+" {...field} autoComplete="off" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

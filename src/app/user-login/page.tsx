@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Loader2, Lock } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import Loader from "@/components/ui/loader";
 import { useMutation } from "@tanstack/react-query";
@@ -21,6 +21,7 @@ import { useTransitionRouter } from "next-view-transitions";
 import { z } from "zod";
 import instance from "@/lib/axios";
 import { ApiResponse, User } from "@/types";
+import { useAuth } from "@/providers/auth";
 
 const loginSchema = z.object({
   phoneOrEmail: z.string().min(1, "Phone or email is required"),
@@ -31,29 +32,25 @@ type Login = z.infer<typeof loginSchema>;
 
 export default function UserLoginPage() {
   const router = useTransitionRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading, login } = useAuth();
+  const hasRedirectedRef = useRef(false);
 
   useEffect(() => {
-    // Check if user is already logged in
-    (async () => {
-      try {
-        const res = await instance.get<ApiResponse<User>>("/users/me");
-        const userRole = res.data?.data?.role;
-        if (userRole === "user" && res.data?.data) {
-          setUser(res.data.data);
-          router.replace("/user-dashboard");
-        } else if (userRole === "admin" || userRole === "staff") {
-          // If admin/staff is logged in, redirect to admin dashboard
-          router.replace("/");
-        }
-      } catch (e) {
-        // Not logged in, continue with login page
-      } finally {
-        setLoading(false);
+    if (loading) return;
+    if (hasRedirectedRef.current) return;
+
+    if (user) {
+      const userRole = user.role;
+      hasRedirectedRef.current = true;
+      if (userRole === "user") {
+        router.replace("/user-dashboard");
+      } else if (userRole === "admin") {
+        router.replace("/");
+      } else if (userRole === "staff") {
+        router.replace("/orders");
       }
-    })();
-  }, [router]);
+    }
+  }, [user, loading, router]);
 
   const form = useForm<Login>({
     resolver: zodResolver(loginSchema),
@@ -70,9 +67,9 @@ export default function UserLoginPage() {
     },
     onSuccess: ({ data, message }) => {
       if (!data?.user) return;
-      setUser(data.user);
+      login(data.user); // Update AuthProvider
       toast.success(message ?? "Logged in");
-      router.push("/user-dashboard");
+      // Redirect will be handled by useEffect when user state updates from AuthProvider
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message ?? "Failed to login. Check credentials and try again.");

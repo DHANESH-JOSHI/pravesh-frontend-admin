@@ -72,6 +72,7 @@ export function TableHeaderControls({
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             className="pl-10"
+            autoComplete="off"
           />
         </div>
         <Badge variant="secondary" className="text-sm">

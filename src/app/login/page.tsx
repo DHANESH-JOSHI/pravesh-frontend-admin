@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Loader2, Mail, Shield, Lock, ArrowLeft } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { InputOTPForm } from "@/components/ui/otp-input";
 import { toast } from "sonner";
 import { useAuth } from "@/providers/auth";
@@ -32,38 +32,26 @@ export default function LoginPage() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const hasRedirectedRef = useRef(false);
 
   const [method, setMethod] = useState<"otp" | "password">("otp");
 
   useEffect(() => {
-    // Check if already logged in as admin/staff
-    (async () => {
-      try {
-        const res = await userService.getMe();
-        const userRole = res.data?.role;
-        if (userRole === "admin" || userRole === "staff") {
-          router.replace("/");
-        } else if (userRole === "user") {
-          // If regular user is logged in, redirect to user dashboard
-          router.replace("/user-dashboard");
-        }
-      } catch (e) {
-        // Not logged in, continue with login page
-      }
-    })();
-  }, [router]);
+    if (loading) return;
+    if (hasRedirectedRef.current) return;
 
-  // Redirect when user state updates after login
-  useEffect(() => {
     if (user) {
       const userRole = user.role;
-      if (userRole === "admin" || userRole === "staff") {
+      hasRedirectedRef.current = true;
+      if (userRole === "admin") {
         router.replace("/");
+      } else if (userRole === "staff") {
+        router.replace("/orders");
       } else if (userRole === "user") {
         router.replace("/user-dashboard");
       }
     }
-  }, [user, router]);
+  }, [user, loading, router]);
 
   const forgotPasswordForm = useForm<{ phoneOrEmail: string; otp?: string; newPassword?: string }>({
     defaultValues: {
@@ -121,7 +109,7 @@ export default function LoginPage() {
 
   const { mutate: resetPassword, isPending: isResettingPassword } = useMutation({
     mutationFn: ({ otp, newPassword }: { otp: string; newPassword: string }) =>
-      userService.resetPassword(otp, newPassword),
+      userService.resetPassword(resetEmail, otp, newPassword),
     onSuccess: ({ message }) => {
       toast.success(message ?? "Password reset successfully");
       setShowForgotPassword(false);
@@ -228,6 +216,7 @@ export default function LoginPage() {
                               placeholder="Enter 6-digit OTP"
                               maxLength={6}
                               {...field}
+                              autoComplete="one-time-code"
                             />
                           </FormControl>
                           <FormMessage />
@@ -245,6 +234,7 @@ export default function LoginPage() {
                               type="password"
                               placeholder="Enter new password"
                               {...field}
+                              autoComplete="new-password"
                             />
                           </FormControl>
                           <FormMessage />
@@ -305,6 +295,7 @@ export default function LoginPage() {
                                 placeholder="Enter your email or phone"
                                 className="pl-10 bg-input border-border focus-visible:ring-primary"
                                 {...field}
+                                autoComplete="username"
                               />
                             </div>
                           </FormControl>

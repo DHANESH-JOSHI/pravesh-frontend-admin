@@ -77,6 +77,7 @@ export function UnitFormDialog({
                     <Input
                       placeholder="Enter unit name (e.g., kg, piece, packet)..."
                       {...field}
+                      autoComplete="off"
                     />
                   </FormControl>
                   <FormMessage />
