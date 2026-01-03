@@ -243,7 +243,7 @@ export function CategoriesTable() {
                           year: "numeric",
                         })}
                       </TableCell>
-                      {!category.isDeleted && <TableCell className="w-20 px-2 text-center">
+                      <TableCell className="w-20 px-2 text-center">
                         <div className="flex items-center gap-2">
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -255,41 +255,45 @@ export function CategoriesTable() {
                               <p>View</p>
                             </TooltipContent>
                           </Tooltip>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 rounded-lg hover:bg-muted/60 transition-colors"
-                                onClick={() => setEditingCategory(category)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Edit</p>
-                            </TooltipContent>
-                          </Tooltip>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 text-destructive rounded-lg hover:bg-muted/60 transition-colors"
-                                onClick={() => {
-                                  setIsOpen(true);
-                                  pendingDeleteId = category._id;
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Delete</p>
-                            </TooltipContent>
-                          </Tooltip>
+                          {!category.isDeleted && appliedFilters.isDeleted !== "true" && (
+                            <>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 rounded-lg hover:bg-muted/60 transition-colors"
+                                    onClick={() => setEditingCategory(category)}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Edit</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-destructive rounded-lg hover:bg-muted/60 transition-colors"
+                                    onClick={() => {
+                                      setIsOpen(true);
+                                      pendingDeleteId = category._id;
+                                    }}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Delete</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </>
+                          )}
                         </div>
-                      </TableCell>}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </>

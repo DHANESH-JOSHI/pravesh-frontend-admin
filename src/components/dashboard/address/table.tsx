@@ -179,7 +179,7 @@ export function AddressesTable() {
                           year: "numeric",
                         })}
                       </TableCell>
-                      {!address.isDeleted && <TableCell>
+                      <TableCell>
                         <Tooltip>
                           <TooltipTrigger className="w-full flex justify-center">
                             <Link href={`/addresses/${address._id}`}>
@@ -190,7 +190,7 @@ export function AddressesTable() {
                             View
                           </TooltipContent>
                         </Tooltip>
-                      </TableCell>}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </>
