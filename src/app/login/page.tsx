@@ -42,7 +42,7 @@ export default function LoginPage() {
         const res = await userService.getMe();
         const userRole = res.data?.role;
         if (userRole === "admin" || userRole === "staff") {
-          router.replace("/");
+      router.replace("/");
         } else if (userRole === "user") {
           // If regular user is logged in, redirect to user dashboard
           router.replace("/user-dashboard");
@@ -428,6 +428,19 @@ export default function LoginPage() {
               Privacy Policy
             </a>
           </p>
+          <div className="mt-4 pt-4 border-t">
+            <p className="text-sm text-center text-muted-foreground mb-2">
+              Are you a regular user?
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={() => router.push("/user-login")}
+            >
+              Go to User Login
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

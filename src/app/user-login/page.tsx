@@ -145,6 +145,19 @@ export default function UserLoginPage() {
               </Button>
             </form>
           </Form>
+          <div className="mt-4 pt-4 border-t">
+            <p className="text-sm text-center text-muted-foreground mb-2">
+              Are you an admin or staff?
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={() => router.push("/login")}
+            >
+              Go to Admin Login
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

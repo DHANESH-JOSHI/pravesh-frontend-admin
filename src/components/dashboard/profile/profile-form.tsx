@@ -461,32 +461,32 @@ export function ProfileForm() {
                 </AlertDialogContent>
               </AlertDialog>
               <div className="flex gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={!form.formState.isDirty}
-                  onClick={() => {
-                    form.reset({
-                      name: user?.name || "",
-                      email: user?.email || "",
-                      image: undefined,
-                    });
-                setImagePreview(user?.img || null);
-                setHasNewImage(false);
-                if (imageRef.current) {
-                  imageRef.current.value = "";
-                }
-                  }}
-                >
-                  Reset
-                </Button>
-                <Button 
-                  type="submit" 
-                  disabled={updateMutation.isPending || !form.formState.isDirty}
-                >
-                  {updateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save Changes
-                </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!form.formState.isDirty}
+                onClick={() => {
+                  form.reset({
+                    name: user?.name || "",
+                    email: user?.email || "",
+                    image: undefined,
+                  });
+              setImagePreview(user?.img || null);
+              setHasNewImage(false);
+              if (imageRef.current) {
+                imageRef.current.value = "";
+              }
+                }}
+              >
+                Reset
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={updateMutation.isPending || !form.formState.isDirty}
+              >
+                {updateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Save Changes
+              </Button>
               </div>
             </>
           )}
