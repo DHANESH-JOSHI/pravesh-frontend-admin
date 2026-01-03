@@ -32,6 +32,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn, generateSlug } from "@/lib/utils";
+import { toast } from "sonner";
 import {
   type Product,
   type CreateProduct,
@@ -219,6 +220,22 @@ export function ProductFormDialog({
   }, [thumbnailPreview]);
 
   const handleFileChange = (file: File | undefined) => {
+    if (file) {
+      // Validate file size (10MB limit)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        toast.error("File size must be less than 10MB");
+        return;
+      }
+      
+      // Validate file type
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("Please select a valid image file (JPEG, PNG, or WebP)");
+        return;
+      }
+    }
+    
     form.setValue("thumbnail", file, { shouldDirty: true });
     if (thumbnailPreview?.startsWith("blob:"))
       URL.revokeObjectURL(thumbnailPreview);

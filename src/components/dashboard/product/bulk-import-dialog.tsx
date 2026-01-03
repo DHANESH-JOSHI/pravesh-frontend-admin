@@ -60,12 +60,23 @@ export function BulkImportDialog({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      if (selectedFile.type === "text/csv" || selectedFile.name.endsWith(".csv")) {
-        setFile(selectedFile);
-        setResult(null);
-      } else {
+      // Validate file type
+      if (selectedFile.type !== "text/csv" && !selectedFile.name.endsWith(".csv")) {
         toast.error("Please select a CSV file");
+        e.target.value = ""; // Clear the input
+        return;
       }
+      
+      // Validate file size (10MB limit)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (selectedFile.size > maxSize) {
+        toast.error("File size must be less than 10MB");
+        e.target.value = ""; // Clear the input
+        return;
+      }
+      
+      setFile(selectedFile);
+      setResult(null);
     }
   };
 

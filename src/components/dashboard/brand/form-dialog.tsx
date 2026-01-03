@@ -31,6 +31,7 @@ import {
 } from "@/types/brand";
 import { FormDialogProps } from "@/types";
 import { CategoryTreeSelect } from "@/components/category-tree-select";
+import { toast } from "sonner";
 
 export function BrandFormDialog({
   open,
@@ -69,6 +70,22 @@ export function BrandFormDialog({
   }, [imagePreview]);
 
   const handleFileChange = (file: File | undefined) => {
+    if (file) {
+      // Validate file size (10MB limit)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        toast.error("File size must be less than 10MB");
+        return;
+      }
+      
+      // Validate file type
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("Please select a valid image file (JPEG, PNG, or WebP)");
+        return;
+      }
+    }
+    
     form.setValue("image", file, { shouldDirty: true });
     if (imagePreview?.startsWith("blob:"))
       URL.revokeObjectURL(imagePreview);
