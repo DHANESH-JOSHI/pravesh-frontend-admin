@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Upload, X } from "lucide-react";
+import { Loader2, Upload, X, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -18,11 +18,23 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { userService } from "@/services/user.service";
 import { User } from "@/types/user";
 import { toast } from "sonner";
 import Loader from "@/components/ui/loader";
 import { useAuth } from "@/providers/auth";
+import { useTransitionRouter } from "next-view-transitions";
 
 const updateProfileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -43,11 +55,13 @@ type UpdateProfile = z.infer<typeof updateProfileSchema>;
 type UpdatePassword = z.infer<typeof updatePasswordSchema>;
 
 export function ProfileForm() {
-  const { user: currentUser, login } = useAuth();
+  const { user: currentUser, login, logout } = useAuth();
+  const router = useTransitionRouter();
   const imageRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [hasNewImage, setHasNewImage] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   const { data, isLoading, error } = useQuery({
     queryKey: ["user-profile"],
@@ -130,6 +144,19 @@ export function ProfileForm() {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message ?? "Failed to update password. Please try again.");
+    },
+  });
+
+  const deleteAccountMutation = useMutation({
+    mutationFn: () => userService.deleteMe(),
+    onSuccess: ({ message }) => {
+      toast.success(message ?? "Account deleted successfully");
+      logout();
+      router.push("/login");
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message ?? "Failed to delete account. Please try again.");
+      setShowDeleteDialog(false);
     },
   });
 
@@ -395,35 +422,72 @@ export function ProfileForm() {
           )}
         </Card>
 
-        <div className="flex justify-end gap-4">
+        <div className="flex justify-between items-center">
           {!showPasswordForm && (
             <>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!form.formState.isDirty}
-                onClick={() => {
-                  form.reset({
-                    name: user?.name || "",
-                    email: user?.email || "",
-                    image: undefined,
-                  });
-              setImagePreview(user?.img || null);
-              setHasNewImage(false);
-              if (imageRef.current) {
-                imageRef.current.value = "";
-              }
-                }}
-              >
-                Reset
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={updateMutation.isPending || !form.formState.isDirty}
-              >
-                {updateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save Changes
-              </Button>
+              <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    disabled={deleteAccountMutation.isPending}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Account
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your account
+                      and remove all associated data including orders, reviews, addresses, and cart items.
+                      You will be logged out and redirected to the login page.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => deleteAccountMutation.mutate()}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      disabled={deleteAccountMutation.isPending}
+                    >
+                      {deleteAccountMutation.isPending && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      Delete Account
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <div className="flex gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={!form.formState.isDirty}
+                  onClick={() => {
+                    form.reset({
+                      name: user?.name || "",
+                      email: user?.email || "",
+                      image: undefined,
+                    });
+                setImagePreview(user?.img || null);
+                setHasNewImage(false);
+                if (imageRef.current) {
+                  imageRef.current.value = "";
+                }
+                  }}
+                >
+                  Reset
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={updateMutation.isPending || !form.formState.isDirty}
+                >
+                  {updateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Save Changes
+                </Button>
+              </div>
             </>
           )}
         </div>

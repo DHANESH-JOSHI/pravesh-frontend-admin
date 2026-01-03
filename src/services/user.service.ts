@@ -95,6 +95,11 @@ class UserService {
     });
     return response.data;
   }
+
+  async deleteMe(): Promise<ApiResponse> {
+    const response = await instance.delete<ApiResponse>(`/users/me`);
+    return response.data;
+  }
 }
 
 export const userService = new UserService();
