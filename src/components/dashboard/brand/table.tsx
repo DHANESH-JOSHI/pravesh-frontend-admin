@@ -318,6 +318,7 @@ export function BrandsTable() {
           if (pendingDeleteId)
             deleteMutation.mutate(pendingDeleteId);
         }}
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

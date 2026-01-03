@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Upload, FileText, Download, X, CheckCircle2, XCircle } from "lucide-react";
+import { Upload, FileText, Download, X, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -198,14 +198,21 @@ Product Name 2,CategoryID2,UnitID1,,tag3,"{""color"":[""Red"",""Blue""]}","{""ma
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
+          <Button variant="outline" onClick={handleClose} disabled={mutation.isPending}>
             Close
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={!file || mutation.isPending}
           >
-            {mutation.isPending ? "Importing..." : "Import Products"}
+            {mutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Importing...
+              </>
+            ) : (
+              "Import Products"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

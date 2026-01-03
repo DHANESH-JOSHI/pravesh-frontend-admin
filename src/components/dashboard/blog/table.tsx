@@ -337,6 +337,7 @@ export function BlogsTable() {
           if (pendingDeleteId)
             deleteMutation.mutate(pendingDeleteId);
         }}
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

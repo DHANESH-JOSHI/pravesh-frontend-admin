@@ -282,6 +282,7 @@ export function UnitsTable() {
           if (pendingDeleteId)
             deleteMutation.mutate(pendingDeleteId);
         }}
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

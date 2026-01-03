@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Mail, User, Calendar, MessageSquare, CheckCircle2, Trash2 } from "lucide-react";
+import { ArrowLeft, Mail, User, Calendar, MessageSquare, CheckCircle2, Trash2, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -97,8 +97,17 @@ export default function MessageDetailPage() {
                 onClick={() => resolveMutation.mutate(message._id)}
                 disabled={resolveMutation.isPending}
               >
-                <CheckCircle2 className="h-4 w-4 mr-2" />
-                Mark as Resolved
+                {resolveMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Resolving...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                    Mark as Resolved
+                  </>
+                )}
               </Button>
             )}
             <Button

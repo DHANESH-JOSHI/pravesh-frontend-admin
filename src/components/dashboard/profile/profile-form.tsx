@@ -429,8 +429,17 @@ export function ProfileForm() {
                     variant="destructive"
                     disabled={deleteAccountMutation.isPending}
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete Account
+                    {deleteAccountMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Deleting...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Account
+                      </>
+                    )}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
@@ -443,16 +452,20 @@ export function ProfileForm() {
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel disabled={deleteAccountMutation.isPending}>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => deleteAccountMutation.mutate()}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       disabled={deleteAccountMutation.isPending}
                     >
-                      {deleteAccountMutation.isPending && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {deleteAccountMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Deleting...
+                        </>
+                      ) : (
+                        "Delete Account"
                       )}
-                      Delete Account
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

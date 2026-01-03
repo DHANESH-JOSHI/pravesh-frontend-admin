@@ -48,8 +48,17 @@ export default function UserDashboardPage() {
             disabled={deleteAccountMutation.isPending}
             className="h-12 px-8"
           >
-            <Trash2 className="h-5 w-5 mr-2" />
-            Delete Me
+            {deleteAccountMutation.isPending ? (
+              <>
+                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              <>
+                <Trash2 className="h-5 w-5 mr-2" />
+                Delete Me
+              </>
+            )}
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
@@ -62,16 +71,20 @@ export default function UserDashboardPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteAccountMutation.isPending}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteAccountMutation.mutate()}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={deleteAccountMutation.isPending}
             >
-              {deleteAccountMutation.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {deleteAccountMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Account"
               )}
-              Delete Account
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

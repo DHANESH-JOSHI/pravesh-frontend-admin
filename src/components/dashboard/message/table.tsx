@@ -277,6 +277,7 @@ export function MessagesTable() {
           }
         }}
         title="Delete Message"
+        isLoading={deleteMutation.isPending}
         description={`Are you sure you want to delete the message from ${selectedMessage?.name}? This action cannot be undone.`}
       />
     </div>

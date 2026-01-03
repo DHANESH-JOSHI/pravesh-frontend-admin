@@ -433,6 +433,7 @@ export function ProductsTable() {
           if (pendingDeleteId)
             deleteMutation.mutate(pendingDeleteId);
         }}
+        isLoading={deleteMutation.isPending}
       />
 
     </div >

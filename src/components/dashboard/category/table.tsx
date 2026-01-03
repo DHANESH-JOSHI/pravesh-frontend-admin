@@ -339,6 +339,7 @@ export function CategoriesTable() {
           if (pendingDeleteId)
             deleteMutation.mutate(pendingDeleteId);
         }}
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

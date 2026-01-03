@@ -304,6 +304,7 @@ export function UsersTable() {
           if (pendingDeleteId)
             deleteMutation.mutate(pendingDeleteId);
         }}
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

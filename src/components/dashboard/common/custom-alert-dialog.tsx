@@ -9,6 +9,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
 
 interface CustomAlertDialogProps {
     isOpen: boolean;
@@ -16,6 +17,7 @@ interface CustomAlertDialogProps {
     title?: string;
     onCancel?: () => void;
     onContinue?: () => void;
+    isLoading?: boolean;
 }
 export const CustomAlertDialog = ({
     isOpen,
@@ -23,6 +25,7 @@ export const CustomAlertDialog = ({
     title = "Are you sure?",
     onCancel = () => { },
     onContinue = () => { },
+    isLoading = false,
 }: CustomAlertDialogProps) => {
     return (
         <AlertDialog open={isOpen} onOpenChange={onCancel}>
@@ -34,11 +37,18 @@ export const CustomAlertDialog = ({
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={onCancel}>
+                    <AlertDialogCancel onClick={onCancel} disabled={isLoading}>
                         Cancel
                     </AlertDialogCancel>
-                    <AlertDialogAction onClick={onContinue}>
-                        Continue
+                    <AlertDialogAction onClick={onContinue} disabled={isLoading}>
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Processing...
+                            </>
+                        ) : (
+                            "Continue"
+                        )}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
