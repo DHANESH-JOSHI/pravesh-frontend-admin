@@ -9,6 +9,8 @@ export function MetaUpdater() {
     queryKey: ["settings"],
     queryFn: async () => await settingService.get(),
     retry: false,
+    refetchOnWindowFocus: true,
+    staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
   });
 
   const settings = data?.data;
